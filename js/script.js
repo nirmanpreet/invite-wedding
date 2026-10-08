@@ -122,11 +122,14 @@
       if (blessingText === '' || blessingText === undefined || blessingText === null) {
         blessingText = footerMsg;
       }
-      // Convert newlines to <br> for HTML rendering
-      blessingText = blessingText.replace(/\n/g, '<br>');
+      // Convert newlines to <br> for HTML rendering, then escape
+      // We replace \n with a placeholder, escape, then restore <br>
+      blessingText = blessingText.replace(/\n/g, '\u0001');
+      blessingText = esc(blessingText);
+      blessingText = blessingText.replace(/\u0001/g, '<br>');
       blessingEl.innerHTML =
         '<span class="ik" aria-hidden="true">ੴ</span>' +
-        '<div class="blessing-text">' + esc(blessingText) + '</div>';
+        '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
     var footerEl = document.getElementById('invite-footer');
