@@ -49,6 +49,10 @@
   --font-gurmukhi: 'Noto Sans Gurmukhi', 'Cormorant Garamond', serif;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 * {
   font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
@@ -57,6 +61,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -253,6 +258,7 @@ button, input {
 .sakura-falling {
   position: fixed;
   inset: 0;
+  width: 100%;
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
@@ -341,6 +347,7 @@ button, input {
   width: min(560px, 92%);
   margin: 26px auto 6px;
   padding: 20px 16px;
+  box-sizing: border-box;
   background: rgba(255, 253, 248, 0.72);
   border: 1px solid var(--gold-line);
   border-radius: 3px;
@@ -383,6 +390,8 @@ button, input {
   flex-wrap: wrap;
   margin: 22px auto 0;
   padding: 0 18px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .actions .venue {
   display: inline-block;
@@ -462,6 +471,7 @@ button, input {
   width: min(640px, 92%);
   margin: 22px auto;
   padding: 26px 22px;
+  box-sizing: border-box;
   background: rgba(255, 253, 248, 0.78);
   border: 1px solid var(--gold-line);
   border-radius: 3px;
@@ -907,11 +917,11 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "consoleShaadi": "ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਜ਼ਰੂਰ ਆਉਣਾ!",
         "rsvpTitle": "RSVP",
         "venueMapLabel": "ਨਕਸ਼ੇ 'ਤੇ ਸਥਾਨ ਵੇਖੋ",
-        "photoCaption": "ਨਿਰਮਾਨ ਅਤੇ ਸਿਮਰਨ",
+        "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
         "receptionHeading": "ਰਿਸੈਪਸ਼ਨ",
         "onWording": "ਨੂੰ",
         "atWording": "ਵੇਲੇ",
-        "inviteTitle": "ਦਾ ਵੈੱਡਿੰਗ ਰਿਸੈਪਸ਼ਨ",
+        "inviteTitle": "ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ",
         "qrTitle": "ਸਥਾਨ ਲਈ ਸਕੈਨ ਕਰੋ",
         "qrMap": "ਸਥਾਨ ਦਾ ਨਕਸ਼ਾ",
         "qrContact": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
