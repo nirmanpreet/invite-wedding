@@ -8,3 +8,5 @@ node_modules/
 
 # If you add your own private assets you don't want committed, uncomment:
 # assets/mp3/*.mp3
+nul
+serve.log

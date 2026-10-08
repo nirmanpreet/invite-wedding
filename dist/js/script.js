@@ -111,15 +111,25 @@
         '<h1>' + esc(p2) + '</h1>' +
         '<h3>' + esc(t('inviteTitle') || 'Are getting married') + '</h3>' +
         '<p>' + esc(tx('onWording', 'on')) + ' <span class="date">' + esc(date) + '</span>' +
-        (time ? ', ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
+        (time ? ' &middot; ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
         '</p>';
     }
-    // Blessing at the top of the page: ੴ + lakh khushiaan pathshahiaan + Waheguru blessing
+    // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
+      var blessingText = t('footerNote');
+      // Only fall back to English if translation is truly missing (not just empty string)
+      if (blessingText === '' || blessingText === undefined || blessingText === null) {
+        blessingText = footerMsg;
+      }
+      // Convert newlines to <br> for HTML rendering, then escape
+      // We replace \n with a placeholder, escape, then restore <br>
+      blessingText = blessingText.replace(/\n/g, '\u0001');
+      blessingText = esc(blessingText);
+      blessingText = blessingText.replace(/\u0001/g, '<br>');
       blessingEl.innerHTML =
         '<span class="ik" aria-hidden="true">ੴ</span>' +
-        '<div class="blessing-text">' + esc(t('footerNote') || footerMsg) + '</div>';
+        '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
     var footerEl = document.getElementById('invite-footer');
@@ -227,7 +237,7 @@
     el.innerHTML =
       '<h4>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h4>' + rsvpBy +
       (formEnabled
-        ? '<label for="rsvp-name">' + esc(namePh) + '</label>' +
+        ? '<label class="sr-only" for="rsvp-name">' + esc(namePh) + '</label>' +
           '<input id="rsvp-name" type="text" placeholder="' + esc(namePh) + '" autocomplete="name">' +
           '<div class="rsvp-attend-label">' + esc(attendLbl) + '</div>' +
           '<div class="rsvp-attending" role="group" aria-label="' + esc(attendLbl) + '">' +
@@ -277,7 +287,11 @@
     if (!el) return;
     if (features.venueMapEmbed === false) { el.innerHTML = ''; return; }
     var q = encodeURIComponent((venueName + ' ' + venueAddress).trim());
-    var embedUrl = 'https://www.google.com/maps?q=' + q + '&output=embed';
+    var placeId = (config.venue && config.venue.placeId) || '';
+    // place_id embed is the most reliable form; fall back to a text query.
+    var embedUrl = placeId
+      ? 'https://maps.google.com/maps?q=place_id:' + encodeURIComponent(placeId) + '&z=15&hl=en&output=embed'
+      : 'https://maps.google.com/maps?q=' + q + '&z=15&hl=en&output=embed';
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
@@ -356,7 +370,8 @@
 
   // Render a QR as a table, padded with white modules so both QRs share the
   // exact same grid size (and therefore the exact same physical size).
-  function qrTableHtml(qr, cellPx, targetN) {
+  // wrapInLink: 'map' | 'contact' | null - wraps the QR in <a> for click-to-open
+  function qrTableHtml(qr, cellPx, targetN, wrapInLink) {
     var n = qr.getModuleCount();
     var top = Math.floor((targetN - n) / 2);
     var left = Math.floor((targetN - n) / 2);
@@ -372,8 +387,18 @@
       }
       rows += '</tr>';
     }
-    return '<div class="qr-wrap" style="background:#fff;padding:' + (cellPx * 4) + 'px;display:inline-block;line-height:0;border-radius:10px;">' +
+    var tableHtml = '<div class="qr-wrap" style="background:#fff;padding:' + (cellPx * 4) + 'px;display:inline-block;line-height:0;border-radius:10px;">' +
       '<table class="qr-table" style="border-collapse:collapse;" cellpadding="0" cellspacing="0">' + rows + '</table></div>';
+    if (wrapInLink === 'map') {
+      var mapHref = (config.qr && config.qr.mapUrl) ||
+        ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venueName || '') + ' ' + (venueAddress || '')));
+      return '<a class="qr-link" href="' + esc(mapHref) + '" target="_blank" rel="noopener" aria-label="Open venue map">' + tableHtml + '</a>';
+    }
+    if (wrapInLink === 'contact') {
+      var phoneHref = (config.footer && config.footer.phoneHref) || '+61423594009';
+      return '<a class="qr-link" href="tel:' + esc(phoneHref) + '" aria-label="Call ' + esc(phoneHref) + '">' + tableHtml + '</a>';
+    }
+    return tableHtml;
   }
 
   function buildVCard() {
@@ -401,17 +426,20 @@
 
     // Both QRs share one grid size (the larger module count), so they render
     // at the exact same size — on the page and identically on the PDF card.
-    function buildPair(cellPx) {
+    function buildPair(cellPx, forPdf) {
       var q1 = makeQr(mapText);
       var q2 = makeQr(vcard);
       var targetN = Math.max(q1.getModuleCount(), q2.getModuleCount());
+      // On page (not PDF), wrap in clickable links
+      var wrapMap = forPdf ? null : 'map';
+      var wrapContact = forPdf ? null : 'contact';
       return {
-        map: qrTableHtml(q1, cellPx, targetN),
-        contact: qrTableHtml(q2, cellPx, targetN)
+        map: qrTableHtml(q1, cellPx, targetN, wrapMap),
+        contact: qrTableHtml(q2, cellPx, targetN, wrapContact)
       };
     }
 
-    var pagePair = buildPair(3);
+    var pagePair = buildPair(3, false);
     el.innerHTML =
       '<h4>' + title + '</h4>' +
       '<div class="qr-grid">' +
@@ -424,7 +452,7 @@
 
     var pdfQr = document.getElementById('pdf-qr');
     if (pdfQr) {
-      var pdfPair = buildPair(3);
+      var pdfPair = buildPair(3, true);
       pdfQr.innerHTML =
         '<div class="pdf-qr-title">' + title + '</div>' +
         '<div class="pdf-qr-grid">' +
@@ -662,6 +690,94 @@
     updatePdfLang();
     renderLangToggle();
     startPetal();
+    initAnimations();
+  }
+
+  // ---------- Royal animation layer (GSAP, graceful fallback) ----------
+  var royalAnimated = false;
+
+  function revealTargets() {
+    var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
+      'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
+      'rsvp-section', 'venue-map-embed', 'calendar-section', 'print-section'];
+    var out = [];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.offsetParent !== null) out.push(el);
+    });
+    var orn = document.querySelectorAll('.ornament');
+    var art = document.querySelector('.ceremony-image img');
+    if (art) out.push(art);
+    return out.concat(Array.prototype.slice.call(orn));
+  }
+
+  function playIntroCard() {
+    var card = document.querySelector('.intro-gate .card');
+    var gate = document.getElementById('intro-gate');
+    if (!card || !gate || gate.classList.contains('hide')) return;
+    var reduce = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!window.gsap || reduce) return;
+    gsap.from(card, {
+      opacity: 0, y: 26, duration: 1.1, ease: 'power2.out', delay: 0.15
+    });
+  }
+
+  function playRoyalReveal() {
+    if (royalAnimated) return;
+    royalAnimated = true;
+    var reduce = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var targets = revealTargets();
+    if (!targets.length) return;
+
+    // Always make content visible first so it can never be stuck hidden.
+    targets.forEach(function (el) {
+      el.style.opacity = '';
+      el.style.transform = '';
+    });
+    if (!window.gsap || reduce) return;
+
+    document.body.classList.add('royal-animating');
+
+    var tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    tl.from('#invite-blessing', { opacity: 0, y: 18, duration: 1.0 })
+      .from('.ornament', { opacity: 0, scaleX: 0.4, duration: 0.9 }, '-=0.6')
+      .from('.ceremony-image img', { opacity: 0, y: 24, duration: 1.1 }, '-=0.5')
+      .from('#invite-title', { opacity: 0, y: 20, duration: 0.9 }, '-=0.6')
+      .from('#time', { opacity: 0, y: 18, duration: 0.8 }, '-=0.55')
+      .from('#invite-actions', { opacity: 0, y: 14, duration: 0.7 }, '-=0.45')
+      .from(['#invite-footer', '#lang-toggle'], { opacity: 0, y: 12, duration: 0.6 }, '-=0.4')
+      .from(['#day-info', '#qr-section', '#rsvp-section', '#venue-map-embed',
+        '#calendar-section', '#print-section'], {
+        opacity: 0, y: 16, duration: 0.7, stagger: 0.12
+      }, '-=0.35');
+
+    if (window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.to('.ceremony-image img', {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: '.ceremony-image', start: 'top bottom', end: 'bottom top', scrub: 0.6 }
+      });
+    }
+  }
+
+  function initAnimations() {
+    playIntroCard();
+    var gate = document.getElementById('intro-gate');
+    var already = document.body.classList.contains('intro-done');
+    if (already || !gate || gate.classList.contains('hide')) {
+      setTimeout(playRoyalReveal, 120);
+    } else {
+      // Reveal once the intro gate is dismissed by any path.
+      var iv = setInterval(function () {
+        if (document.body.classList.contains('intro-done')) {
+          clearInterval(iv);
+          setTimeout(playRoyalReveal, 260);
+        }
+      }, 120);
+      setTimeout(function () { clearInterval(iv); }, 20000);
+    }
   }
 
   if (document.readyState === 'loading') {

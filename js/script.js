@@ -111,7 +111,7 @@
         '<h1>' + esc(p2) + '</h1>' +
         '<h3>' + esc(t('inviteTitle') || 'Are getting married') + '</h3>' +
         '<p>' + esc(tx('onWording', 'on')) + ' <span class="date">' + esc(date) + '</span>' +
-        (time ? ', ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
+        (time ? ' &middot; ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
         '</p>';
     }
     // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
@@ -237,7 +237,7 @@
     el.innerHTML =
       '<h4>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h4>' + rsvpBy +
       (formEnabled
-        ? '<label for="rsvp-name">' + esc(namePh) + '</label>' +
+        ? '<label class="sr-only" for="rsvp-name">' + esc(namePh) + '</label>' +
           '<input id="rsvp-name" type="text" placeholder="' + esc(namePh) + '" autocomplete="name">' +
           '<div class="rsvp-attend-label">' + esc(attendLbl) + '</div>' +
           '<div class="rsvp-attending" role="group" aria-label="' + esc(attendLbl) + '">' +
@@ -287,7 +287,11 @@
     if (!el) return;
     if (features.venueMapEmbed === false) { el.innerHTML = ''; return; }
     var q = encodeURIComponent((venueName + ' ' + venueAddress).trim());
-    var embedUrl = 'https://www.google.com/maps?q=' + q + '&output=embed';
+    var placeId = (config.venue && config.venue.placeId) || '';
+    // place_id embed is the most reliable form; fall back to a text query.
+    var embedUrl = placeId
+      ? 'https://maps.google.com/maps?q=place_id:' + encodeURIComponent(placeId) + '&z=15&hl=en&output=embed'
+      : 'https://maps.google.com/maps?q=' + q + '&z=15&hl=en&output=embed';
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
@@ -686,6 +690,94 @@
     updatePdfLang();
     renderLangToggle();
     startPetal();
+    initAnimations();
+  }
+
+  // ---------- Royal animation layer (GSAP, graceful fallback) ----------
+  var royalAnimated = false;
+
+  function revealTargets() {
+    var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
+      'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
+      'rsvp-section', 'venue-map-embed', 'calendar-section', 'print-section'];
+    var out = [];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.offsetParent !== null) out.push(el);
+    });
+    var orn = document.querySelectorAll('.ornament');
+    var art = document.querySelector('.ceremony-image img');
+    if (art) out.push(art);
+    return out.concat(Array.prototype.slice.call(orn));
+  }
+
+  function playIntroCard() {
+    var card = document.querySelector('.intro-gate .card');
+    var gate = document.getElementById('intro-gate');
+    if (!card || !gate || gate.classList.contains('hide')) return;
+    var reduce = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!window.gsap || reduce) return;
+    gsap.from(card, {
+      opacity: 0, y: 26, duration: 1.1, ease: 'power2.out', delay: 0.15
+    });
+  }
+
+  function playRoyalReveal() {
+    if (royalAnimated) return;
+    royalAnimated = true;
+    var reduce = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var targets = revealTargets();
+    if (!targets.length) return;
+
+    // Always make content visible first so it can never be stuck hidden.
+    targets.forEach(function (el) {
+      el.style.opacity = '';
+      el.style.transform = '';
+    });
+    if (!window.gsap || reduce) return;
+
+    document.body.classList.add('royal-animating');
+
+    var tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    tl.from('#invite-blessing', { opacity: 0, y: 18, duration: 1.0 })
+      .from('.ornament', { opacity: 0, scaleX: 0.4, duration: 0.9 }, '-=0.6')
+      .from('.ceremony-image img', { opacity: 0, y: 24, duration: 1.1 }, '-=0.5')
+      .from('#invite-title', { opacity: 0, y: 20, duration: 0.9 }, '-=0.6')
+      .from('#time', { opacity: 0, y: 18, duration: 0.8 }, '-=0.55')
+      .from('#invite-actions', { opacity: 0, y: 14, duration: 0.7 }, '-=0.45')
+      .from(['#invite-footer', '#lang-toggle'], { opacity: 0, y: 12, duration: 0.6 }, '-=0.4')
+      .from(['#day-info', '#qr-section', '#rsvp-section', '#venue-map-embed',
+        '#calendar-section', '#print-section'], {
+        opacity: 0, y: 16, duration: 0.7, stagger: 0.12
+      }, '-=0.35');
+
+    if (window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.to('.ceremony-image img', {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: '.ceremony-image', start: 'top bottom', end: 'bottom top', scrub: 0.6 }
+      });
+    }
+  }
+
+  function initAnimations() {
+    playIntroCard();
+    var gate = document.getElementById('intro-gate');
+    var already = document.body.classList.contains('intro-done');
+    if (already || !gate || gate.classList.contains('hide')) {
+      setTimeout(playRoyalReveal, 120);
+    } else {
+      // Reveal once the intro gate is dismissed by any path.
+      var iv = setInterval(function () {
+        if (document.body.classList.contains('intro-done')) {
+          clearInterval(iv);
+          setTimeout(playRoyalReveal, 260);
+        }
+      }, 120);
+      setTimeout(function () { clearInterval(iv); }, 20000);
+    }
   }
 
   if (document.readyState === 'loading') {

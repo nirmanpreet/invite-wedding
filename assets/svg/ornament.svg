@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 70" width="400" height="70">
+  <defs>
+    <linearGradient id="ornGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c8a24b" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#c8a24b" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#e5c46d" stop-opacity="1"/>
+      <stop offset="82%" stop-color="#c8a24b" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#c8a24b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- main hairline -->
+  <path d="M10 35 H170 M230 35 H390" stroke="url(#ornGold)" stroke-width="1.4" fill="none"/>
+  <!-- center lotus / rosette -->
+  <g transform="translate(200 35)">
+    <ellipse rx="9" ry="13" fill="none" stroke="url(#ornGold)" stroke-width="1.4"/>
+    <ellipse rx="3.5" ry="6" fill="#e5c46d"/>
+    <path d="M-22 0 Q-14 -9 -8 0" fill="none" stroke="url(#ornGold)" stroke-width="1.2"/>
+    <path d="M22 0 Q14 -9 8 0" fill="none" stroke="url(#ornGold)" stroke-width="1.2"/>
+    <path d="M-22 0 Q-14 9 -8 0" fill="none" stroke="url(#ornGold)" stroke-width="1.2"/>
+    <path d="M22 0 Q14 9 8 0" fill="none" stroke="url(#ornGold)" stroke-width="1.2"/>
+    <circle cx="-27" cy="0" r="2.2" fill="#c8a24b"/>
+    <circle cx="27" cy="0" r="2.2" fill="#c8a24b"/>
+  </g>
+  <!-- small leaf ticks -->
+  <g fill="url(#ornGold)">
+    <path d="M52 35 q6 -6 12 0 q-6 6 -12 0Z"/>
+    <path d="M336 35 q6 -6 12 0 q-6 6 -12 0Z"/>
+    <path d="M108 35 q4 -4 8 0 q-4 4 -8 0Z"/>
+    <path d="M284 35 q4 -4 8 0 q-4 4 -8 0Z"/>
+  </g>
+</svg>

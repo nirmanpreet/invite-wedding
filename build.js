@@ -90,12 +90,16 @@ const html = `<!DOCTYPE html>
 
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700&family=Dancing+Script:wght@600;700&family=Noto+Sans+Gurmukhi:wght@500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
       <style>
 ${css}
       </style>
+
+      <!-- GSAP + ScrollTrigger (royal animation layer) -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
       <script>
 ${qrLib}
@@ -141,24 +145,16 @@ ${qrLib}
       <!-- Petals -->
       <div class="sakura-falling" id="sakura-falling"></div>
 
-      <!-- Sikh decorative top -->
-      <div class="sikh-decor top" aria-hidden="true">
-        <img src="assets/svg/khanda.svg" alt="" width="80" height="80">
-        <img src="assets/svg/floral-corner.svg" alt="" width="80" height="80">
-      </div>
-
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
       <div class="blessing" id="invite-blessing"></div>
 
-      <!-- Anand Karaj ceremonial image -->
-      <div class="ceremony-image" aria-hidden="true">
-        <img src="assets/img/anand-karaj.jpg" alt="Anand Karaj ceremony" loading="lazy">
+      <div class="ornament" aria-hidden="true">
+        <img src="assets/svg/ornament.svg" alt="">
       </div>
 
-      <!-- Sikh decorative bottom -->
-      <div class="sikh-decor bottom" aria-hidden="true">
-        <img src="assets/svg/floral-corner.svg" alt="" width="80" height="80">
-        <img src="assets/svg/khanda.svg" alt="" width="80" height="80">
+      <!-- Anand Karaj ceremonial art (background blended away) -->
+      <div class="ceremony-image" aria-hidden="true">
+        <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
       </div>
 
       <!-- Print-only header -->
@@ -189,14 +185,14 @@ ${qrLib}
 
       <!-- Hidden PDF card -->
 
-      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Arvo', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
+      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
         <div style="text-align:center;">
           <div style="font-size:34px; color:#a4243b; margin-bottom:12px;">ੴ</div>
           <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;">ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ</div>
           <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Dancing Script', cursive; font-weight:bold; margin:4px 0;">${esc(p1)}</div>
-          <div style="font-size:22px; color:#b8862e; font-family:'Dancing Script', cursive;">${esc(connector)}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Dancing Script', cursive; font-weight:bold; margin:4px 0 14px;">${esc(p2)}</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;">${esc(p1)}</div>
+          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;">${esc(connector)}</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;">${esc(p2)}</div>
           <div style="font-size:15px; letter-spacing:2px; text-transform:uppercase; color:#a4813a; margin-bottom:12px;">Wedding Reception &bull; ${esc(att(config, 'date', ''))}</div>
           <div style="font-size:16px; color:#4a1220; margin:4px 0;">${esc(att(config, 'time', ''))}</div>
           <div style="font-size:16px; color:#4a1220; margin:4px 0;">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
@@ -232,6 +228,20 @@ fs.mkdirSync(iconDist, { recursive: true });
 const iconSrc = path.join(ROOT, 'assets/icon.svg');
 if (fs.existsSync(iconSrc)) {
   fs.copyFileSync(iconSrc, path.join(iconDist, 'icon.svg'));
+}
+
+// Royal ornament + Anand Karaj art
+const svgDist = path.join(iconDist, 'svg');
+fs.mkdirSync(svgDist, { recursive: true });
+const ornamentSrc = path.join(ROOT, 'assets/svg/ornament.svg');
+if (fs.existsSync(ornamentSrc)) {
+  fs.copyFileSync(ornamentSrc, path.join(svgDist, 'ornament.svg'));
+}
+const imgDist = path.join(iconDist, 'img');
+fs.mkdirSync(imgDist, { recursive: true });
+const artSrc = path.join(ROOT, 'assets/img/anand-karaj.jpg');
+if (fs.existsSync(artSrc)) {
+  fs.copyFileSync(artSrc, path.join(imgDist, 'anand-karaj.jpg'));
 }
 
 console.log('Built dist/index.html (Sikh theme, reception invite).');
