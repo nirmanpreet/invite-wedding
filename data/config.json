@@ -37,7 +37,7 @@
     "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!"
   },
   "links": {
-    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
+    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
     "downloadCard": "#",
     "downloadLabel": "DOWNLOAD INVITATION CARD",
     "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1",
@@ -87,8 +87,8 @@
     "saveTheDate": true
   },
   "qr": {
-    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl uses real coordinates (GPS needs Latin/ASCII - never the Punjabi address). The contact QR is a vCard for Nirman (his phone) with the venue address.",
-    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
+    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl points at the Park City Resort pin in Malout using coordinates only - the place_id previously carried here was dead (no title/description/coords returned) and could resolve anywhere. GPS needs Latin/ASCII, so never the Punjabi address. The contact QR is a vCard for Nirman (his phone) with the venue address.",
+    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
     "vcardName": "Nirman"
   },
   "rsvpWhatsApp": {
@@ -209,7 +209,7 @@
         "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ",
         "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
         "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
-        "saveTheDateNote": "ਰਿਸੈਪਸ਼ਨ ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰ ਲਓ ਤਾਂ ਕਿਸੇ ਵੀ ਦਿਨ ਨਾ ਛੁੱਟੇ।",
+        "saveTheDateNote": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਤਾਰੀਖ਼ ਨੂੰ ਸੇਵ ਕਰੋ ਤਾਂ ਜੋ ਤੁਸੀਂ ਇਸ ਤਾਰੀਖ਼ ਨੂੰ ਨਾ ਭੁੱਲੋ।",
         "weekdays": [
           "ਐਤਵਾਰ",
           "ਸੋਮਵਾਰ",

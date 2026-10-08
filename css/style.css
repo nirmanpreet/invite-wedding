@@ -152,6 +152,25 @@ html[lang="pa"] .intro-gate h2 {
   letter-spacing: normal;
   text-shadow: none;
 }
+/* Gurbani blessing on the intro gate. Never letter-spaced: Gurmukhi glyphs
+   join at the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6). */
+.intro-gate .gate-blessing {
+  font-family: var(--font-gurmukhi);
+  font-size: clamp(13px, 3.6vw, 15px);
+  line-height: 1.95;
+  color: var(--maroon);
+  letter-spacing: normal;
+  text-transform: none;
+  margin: 0 auto 20px;
+  /* Each Gurbani line must stay on its own line - the <br> is the break. */
+  max-width: 100%;
+}
+html[lang="en"] .intro-gate .gate-blessing,
+html[lang="pa"] .intro-gate .gate-blessing {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* Great Vibes' ampersand swash reaches into the letters either side of it.
    Breathing room keeps "Nirman & Simran" from reading as one word. */
 .intro-gate h2 .amp {
@@ -778,6 +797,16 @@ html[lang="pa"] .title h1 {
 .ornament img { display: block; width: 100%; height: auto; }
 
 /* Never let the ornament dominate on small screens */
+@media (max-width: 380px) {
+  /* Reclaim width so the longer Gurbani line still fits on one line. */
+  .intro-gate .card { padding: 34px 18px 30px; }
+  .intro-gate .gate-blessing { font-size: 11.5px; line-height: 2; }
+}
+@media (max-width: 340px) {
+  .intro-gate .card { padding: 28px 12px 26px; }
+  .intro-gate .gate-blessing { font-size: 10.5px; }
+}
+
 @media (max-width: 380px) {
   .ornament { width: 66%; margin: 20px auto; }
 }

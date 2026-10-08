@@ -132,6 +132,10 @@ ${qrLib}
       <div class="intro-gate" id="intro-gate">
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
+          <div class="gate-blessing">
+            ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
+            ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥
+          </div>
           <h2>${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</h2>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
           <div class="lang-pick" id="intro-lang-pick">

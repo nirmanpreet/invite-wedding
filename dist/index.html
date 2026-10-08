@@ -174,6 +174,25 @@ html[lang="pa"] .intro-gate h2 {
   letter-spacing: normal;
   text-shadow: none;
 }
+/* Gurbani blessing on the intro gate. Never letter-spaced: Gurmukhi glyphs
+   join at the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6). */
+.intro-gate .gate-blessing {
+  font-family: var(--font-gurmukhi);
+  font-size: clamp(13px, 3.6vw, 15px);
+  line-height: 1.95;
+  color: var(--maroon);
+  letter-spacing: normal;
+  text-transform: none;
+  margin: 0 auto 20px;
+  /* Each Gurbani line must stay on its own line - the <br> is the break. */
+  max-width: 100%;
+}
+html[lang="en"] .intro-gate .gate-blessing,
+html[lang="pa"] .intro-gate .gate-blessing {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* Great Vibes' ampersand swash reaches into the letters either side of it.
    Breathing room keeps "Nirman & Simran" from reading as one word. */
 .intro-gate h2 .amp {
@@ -801,6 +820,16 @@ html[lang="pa"] .title h1 {
 
 /* Never let the ornament dominate on small screens */
 @media (max-width: 380px) {
+  /* Reclaim width so the longer Gurbani line still fits on one line. */
+  .intro-gate .card { padding: 34px 18px 30px; }
+  .intro-gate .gate-blessing { font-size: 11.5px; line-height: 2; }
+}
+@media (max-width: 340px) {
+  .intro-gate .card { padding: 28px 12px 26px; }
+  .intro-gate .gate-blessing { font-size: 10.5px; }
+}
+
+@media (max-width: 380px) {
   .ornament { width: 66%; margin: 20px auto; }
 }
 /* ============================================================
@@ -1035,7 +1064,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!"
   },
   "links": {
-    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
+    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
     "downloadCard": "#",
     "downloadLabel": "DOWNLOAD INVITATION CARD",
     "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1",
@@ -1085,8 +1114,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "saveTheDate": true
   },
   "qr": {
-    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl uses real coordinates (GPS needs Latin/ASCII - never the Punjabi address). The contact QR is a vCard for Nirman (his phone) with the venue address.",
-    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
+    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl points at the Park City Resort pin in Malout using coordinates only - the place_id previously carried here was dead (no title/description/coords returned) and could resolve anywhere. GPS needs Latin/ASCII, so never the Punjabi address. The contact QR is a vCard for Nirman (his phone) with the venue address.",
+    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
     "vcardName": "Nirman"
   },
   "rsvpWhatsApp": {
@@ -1207,7 +1236,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ",
         "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
         "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
-        "saveTheDateNote": "ਰਿਸੈਪਸ਼ਨ ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰ ਲਓ ਤਾਂ ਕਿਸੇ ਵੀ ਦਿਨ ਨਾ ਛੁੱਟੇ।",
+        "saveTheDateNote": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਤਾਰੀਖ਼ ਨੂੰ ਸੇਵ ਕਰੋ ਤਾਂ ਜੋ ਤੁਸੀਂ ਇਸ ਤਾਰੀਖ਼ ਨੂੰ ਨਾ ਭੁੱਲੋ।",
         "weekdays": [
           "ਐਤਵਾਰ",
           "ਸੋਮਵਾਰ",
@@ -1288,6 +1317,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       <div class="intro-gate" id="intro-gate">
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
+          <div class="gate-blessing">
+            ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
+            ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥
+          </div>
           <h2>Nirman <span class="amp">&amp;</span> Simran</h2>
           <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
           <div class="lang-pick" id="intro-lang-pick">
