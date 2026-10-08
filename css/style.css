@@ -228,6 +228,32 @@ img { max-width: 100%; height: auto; }
 /* ============================================================
    Page Reveal — Gentle Fade In
    ============================================================ */
+/* ============================================================
+   Content Hidden Until Intro Gate Dismissed
+   ============================================================ */
+body:not(.intro-done) .blessing,
+body:not(.intro-done) #invite-blessing,
+body:not(.intro-done) .qr-section,
+body:not(.intro-done) #qr-section,
+body:not(.intro-done) .day-info,
+body:not(.intro-done) #day-info,
+body:not(.intro-done) .rsvp-section,
+body:not(.intro-done) #rsvp-section,
+body:not(.intro-done) .photos,
+body:not(.intro-done) #photos,
+body:not(.intro-done) .venue-map,
+body:not(.intro-done) #venue-map-embed,
+body:not(.intro-done) .calendar-section,
+body:not(.intro-done) #calendar-section,
+body:not(.intro-done) .print-section,
+body:not(.intro-done) #print-section,
+body:not(.intro-done) .footer,
+body:not(.intro-done) .ceremony-image,
+body:not(.intro-done) .sikh-decor {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .wrap {
   opacity: 0;
   transform: translateY(16px);
