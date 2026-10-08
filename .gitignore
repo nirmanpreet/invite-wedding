@@ -10,3 +10,8 @@ node_modules/
 # assets/mp3/*.mp3
 nul
 serve.log
+
+# Scratch copy of the source artwork. The tracked original lives at
+# assets/img/anand-karaj.jpg; this root-level duplicate is byte-identical
+# (md5 2d0b3f26df5a09aaf365f1842303d4d2) and is not worth 264 KB in history.
+new.jpg

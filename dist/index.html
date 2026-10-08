@@ -16,7 +16,7 @@
 
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
       <style>
@@ -45,7 +45,7 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Cormorant Garamond', 'Arvo', Georgia, serif;
-  --font-script: 'Great Vibes', 'Dancing Script', cursive;
+  --font-script: 'Dancing Script', 'Great Vibes', cursive;
   --font-gurmukhi: 'Noto Sans Gurmukhi', 'Cormorant Garamond', serif;
 }
 
@@ -270,20 +270,8 @@ html[lang="pa"] .intro-gate .gate-blessing {
    ORNAMENT DIVIDER
    ============================================================ */
 
-/* ============================================================
-   ANAND KARAJ ART — white bg removed via multiply blend
-   ============================================================ */
-.ceremony-image {
-  margin: 6px auto 34px;
-  width: min(560px, 92%);
-  text-align: center;
-}
-.ceremony-image img {
-  width: 100%;
-  mix-blend-mode: multiply;
-  filter: contrast(1.04) saturate(1.06);
-  opacity: 0.94;
-}
+
+
 
 /* ============================================================
    PETALS
@@ -781,55 +769,52 @@ html[lang="pa"] .title h1 {
   .ornament { width: 66%; margin: 20px auto; }
 }
 /* ============================================================
-   ROYAL NAMES
-   Set in Great Vibes - a flowing script, which suits the invitation.
-   The reason it read as "lowercase" before was scale, not case: the
-   strokes are hairlines, so at small sizes "Nirman" looked like
-   lowercase and was hard to read. At this size the capitals and the
-   lowercase alike are clear.
+   NAMES - Dancing Script 700
+   Great Vibes was replaced because its capital N is a low-set swash
+   that read as smaller than the letters after it. Dancing Script has
+   full-height, even capitals and keeps the calligraphic feel. It is
+   loaded explicitly at weights 400/700 from Google Fonts; being in a
+   CSS fallback stack is NOT the same as being downloaded.
 
-   Rules that must not regress:
-   - never upper-case a name: Great Vibes' swash capitals turned
-     "Nirman" into an unreadable "NJRMaN"
-   - never letter-space a connected script face (same principle as
-     Gurmukhi in W3C Gurmukhi Layout Requirements 5.1 / 6): the glyphs
-     are drawn as one shape and tracking pulls them apart
+   Invariants that must not regress:
+   - never upper-case a name (a script face's capitals are swashes:
+     upper-casing Great Vibes rendered "Nirman" as "NJRMaN")
+   - never letter-space a connected script face (pulls the joined
+     glyphs apart - same principle as Gurmukhi, W3C 5.1 / 6)
    ============================================================ */
 .title h1 {
   font-family: var(--font-script);
-  font-weight: 400;
-  font-size: clamp(74px, 21vw, 132px);
-  line-height: 1.02;
+  font-weight: 700;
+  font-size: clamp(56px, 15vw, 96px);
+  line-height: 1.14;
   letter-spacing: 0;
   margin: 10px 0 0;
   color: var(--royal);
   text-transform: none;
   text-shadow:
     0 1px 0 rgba(255, 253, 247, 0.8),
-    0 2px 18px rgba(140, 35, 64, 0.16);
+    0 2px 14px rgba(140, 35, 64, 0.14);
 }
 
 .intro-gate h2 {
   font-family: var(--font-script);
-  font-weight: 400;
-  font-size: clamp(62px, 17vw, 96px);
-  line-height: 1.12;
+  font-weight: 700;
+  font-size: clamp(44px, 11.5vw, 70px);
+  line-height: 1.22;
   letter-spacing: 0;
   color: var(--royal);
-  margin: 2px 0 4px;
+  margin: 2px 0 6px;
   text-transform: none;
   text-shadow:
     0 1px 0 rgba(255, 253, 247, 0.75),
-    0 2px 14px rgba(140, 35, 64, 0.14);
+    0 2px 12px rgba(140, 35, 64, 0.12);
 }
 
-/* The ampersand: gold, a touch larger, untracked so the swash keeps
-   its own shape, with breathing room so it does not fuse the names. */
 .title h2 {
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: clamp(40px, 11vw, 62px);
-  line-height: 1;
+  font-size: clamp(30px, 8vw, 44px);
+  line-height: 1.1;
   letter-spacing: 0;
   margin: 0;
   color: var(--gold);
@@ -838,9 +823,21 @@ html[lang="pa"] .title h1 {
 
 .intro-gate h2 .amp {
   display: inline-block;
-  margin: 0 0.12em;
+  margin: 0 0.08em;
   color: var(--gold);
   letter-spacing: 0;
+}
+
+/* The Latin name under the Gurmukhi name, in the same family so the
+   two lines feel like one lockup. */
+.name-latin {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(26px, 7.5vw, 40px);
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.3;
+  margin-top: 0;
 }
 /* ============================================================
    GURMUKHI TYPOGRAPHY CORRECTIONS
@@ -1048,6 +1045,172 @@ html[lang="pa"] #print-invite {
   .rose-petal { display: none; }
 }
 /* ============================================================
+   CEREMONY ARTWORK
+   The new artwork is a 1216x1216 JPEG, so its white background is
+   baked in (JPEG has no alpha). multiply blends white away against the
+   cream page, then the filter warms and softens it so it sits with the
+   rest of the invitation instead of looking pasted on.
+
+   multiply + a light wash is used rather than mix-blend-mode alone:
+   the art's own whites survive as page cream, and the golds/pinks are
+   pulled slightly toward the theme's antique gold.
+   ============================================================ */
+
+
+
+@media (max-width: 420px) {
+  
+  
+}
+/* ============================================================
+   CEREMONY ARTWORK
+   The artwork is a 1216x1216 JPEG, so its white background is baked in
+   (JPEG has no alpha). mix-blend-mode: multiply blends that white away
+   against the cream page, then a light filter warms it so it sits with
+   the rest of the invitation.
+
+   Do NOT add `isolation: isolate` to .ceremony-image. It creates a
+   stacking context, which stops multiply blending against the page and
+   made the white background multiply against transparent - rendering a
+   black box behind the picture.
+   ============================================================ */
+
+
+
+@media (max-width: 420px) {
+  
+  
+}
+/* ============================================================
+   CEREMONY ARTWORK
+   anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
+   (no alpha possible) with a near-black background baked in - 62.5% of
+   its pixels were near-black and the corners were rgb(0,0,0) - so
+   mix-blend-mode: multiply correctly rendered a black box, and
+   screen/lighten would have washed the artwork out to near-cream.
+
+   The black was converted to a real alpha channel instead, with a soft
+   ramp (LO 26 / HI 58) so JPEG anti-aliasing along the gold outlines
+   became partial alpha rather than a dark fringe.
+
+   Because the PNG now has genuine transparency there is no blend mode:
+   the illustration sits directly on the cream page. The filter only
+   warms the colours toward the antique gold.
+   ============================================================ */
+
+
+
+@media (max-width: 420px) {
+  
+  
+}
+/* ============================================================
+   CEREMONY ARTWORK
+   anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
+   (no alpha possible) with a near-black background baked in - 62.5% of
+   its pixels were near-black and the corners were rgb(0,0,0) - so
+   mix-blend-mode: multiply correctly rendered a black box, and
+   screen/lighten would have washed the artwork out to near-cream.
+
+   The black was converted to a real alpha channel instead, with a soft
+   ramp (LO 26 / HI 58) so JPEG anti-aliasing along the gold outlines
+   became partial alpha rather than a dark fringe.
+
+   Because the PNG now has genuine transparency there is no blend mode:
+   the illustration sits directly on the cream page. The filter only
+   warms the colours toward the antique gold.
+   ============================================================ */
+
+
+
+@media (max-width: 420px) {
+  
+  
+}
+/* ============================================================
+   CEREMONY ARTWORK
+   anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
+   (no alpha possible) with a near-black background baked in - 62.5% of
+   its pixels were near-black and the corners were rgb(0,0,0) - so
+   mix-blend-mode: multiply correctly rendered a black box, and
+   screen/lighten would have washed the artwork out to near-cream.
+
+   The black was converted to a real alpha channel instead, with a soft
+   ramp (LO 26 / HI 58) so JPEG anti-aliasing along the gold outlines
+   became partial alpha rather than a dark fringe.
+
+   Integration, in three parts:
+   - a soft antique-gold aura on ::before, so the art sits in a pool of
+     light rather than on top of a flat panel
+   - a wide, very low-opacity drop-shadow so it has no hard cut-out edge
+   - a warm filter that pulls the golds toward the theme's antique gold
+
+   Deliberately NO mask-image here. With a genuinely transparent PNG a
+   mask buys nothing (the corners are already clear), and a large enough
+   mask to matter would erode the artwork's outer flourishes. It was also
+   unreliable on Android WebKit earlier in this build.
+   ============================================================ */
+.ceremony-image {
+  position: relative;
+  margin: 16px auto 26px;
+  width: min(400px, 88%);
+  text-align: center;
+}
+
+/* Soft gold aura behind the illustration */
+.ceremony-image::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 124%;
+  height: 130%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(closest-side,
+      rgba(198, 160, 90, 0.20) 0%,
+      rgba(198, 160, 90, 0.10) 48%,
+      rgba(198, 160, 90, 0.03) 70%,
+      rgba(198, 160, 90, 0) 84%);
+  pointer-events: none;
+}
+
+.ceremony-image img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+  object-fit: contain;
+  margin: 0 auto;
+
+  /* Warm the golds toward the theme's antique gold, calm the saturation a
+     touch, and drop a wide low-opacity shadow so there is no cut-out edge.
+     No blend mode - the PNG is already transparent and multiply would
+     darken it. */
+  filter:
+    sepia(0.12)
+    saturate(1.04)
+    brightness(1.02)
+    contrast(0.97)
+    drop-shadow(0 6px 20px rgba(140, 35, 64, 0.09));
+
+  /* Sits behind the names in the visual hierarchy, not in front of them. */
+  opacity: 0.92;
+}
+
+/* Short phones: the blessing + names must still share the first screen. */
+@media (max-width: 420px) {
+  .ceremony-image { width: min(270px, 76%); margin: 10px auto 20px; }
+  .ceremony-image img { max-height: 175px; }
+  .ceremony-image::before { width: 135%; height: 140%; }
+}
+
+@media (max-height: 700px) and (max-width: 480px) {
+  .ceremony-image img { max-height: 140px; }
+  .ceremony-image { margin: 8px auto 16px; }
+}
+/* ============================================================
    VISUAL REFINEMENTS
    1. Ceremony art - capped so it cannot dominate a phone screen
    2. Section rhythm - one consistent gap between blocks
@@ -1058,19 +1221,8 @@ html[lang="pa"] #print-invite {
 /* --- 1. Ceremony art ------------------------------------------------
    The illustration is 336px tall on a 360px phone, which was most of
    the first screen. Cap the height and centre it in a soft frame. */
-.ceremony-image {
-  margin: 26px auto 30px;
-  width: min(420px, 90%);
-  text-align: center;
-}
-.ceremony-image img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 260px;
-  object-fit: contain;
-  margin: 0 auto;
-}
+
+
 
 /* --- 2. Section rhythm ----------------------------------------------
    Sections used to each pick their own margins, so the page had
@@ -1147,8 +1299,8 @@ html[lang="pa"] #print-invite {
 
 /* --- Small screens -------------------------------------------------- */
 @media (max-width: 420px) {
-  .ceremony-image { width: min(320px, 88%); margin: 22px auto 26px; }
-  .ceremony-image img { max-height: 210px; }
+  
+  
   #day-info, #qr-section, #rsvp-section,
   #calendar-section, #print-section, #venue-map-embed { margin-top: 22px; }
 }
@@ -1181,7 +1333,7 @@ html[lang="pa"] #print-invite {
   .print-header { display: block; margin-bottom: 16px; }
   .wrap, .title h1, .title p { color: #000; }
   .blessing .blessing-text { color: #000; }
-  .ceremony-image { display: none !important; }
+  
   .footer .phone { color: #000; }
 }
       </style>
@@ -1519,18 +1671,16 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
+      <!-- Anand Karaj ceremonial art, straight after the blessing -->
+      <div class="ceremony-image" aria-hidden="true">
+        <img src="assets/img/anand-karaj.png" alt="" loading="lazy">
+      </div>
+
       <!-- Print-only header -->
       <div id="print-header" class="print-header"></div>
 
       <div class="wrap">
         <div class="title" id="invite-title"></div>
-
-        <!-- Anand Karaj ceremonial art. After the names on purpose: it is
-             decorative and tall, and leading with it pushed the couple's
-             names below the fold on short phones. -->
-        <div class="ceremony-image" aria-hidden="true">
-          <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
-        </div>
       </div>
 
       <div id="time"></div>

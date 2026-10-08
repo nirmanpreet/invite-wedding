@@ -90,7 +90,7 @@ const html = `<!DOCTYPE html>
 
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
       <style>
@@ -164,18 +164,16 @@ ${qrLib}
         <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
+      <!-- Anand Karaj ceremonial art, straight after the blessing -->
+      <div class="ceremony-image" aria-hidden="true">
+        <img src="assets/img/anand-karaj.png" alt="" loading="lazy">
+      </div>
+
       <!-- Print-only header -->
       <div id="print-header" class="print-header"></div>
 
       <div class="wrap">
         <div class="title" id="invite-title"></div>
-
-        <!-- Anand Karaj ceremonial art. After the names on purpose: it is
-             decorative and tall, and leading with it pushed the couple's
-             names below the fold on short phones. -->
-        <div class="ceremony-image" aria-hidden="true">
-          <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
-        </div>
       </div>
 
       <div id="time"></div>
@@ -258,10 +256,12 @@ if (fs.existsSync(ornamentSrc)) {
 });
 const imgDist = path.join(iconDist, 'img');
 fs.mkdirSync(imgDist, { recursive: true });
-const artSrc = path.join(ROOT, 'assets/img/anand-karaj.jpg');
-if (fs.existsSync(artSrc)) {
-  fs.copyFileSync(artSrc, path.join(imgDist, 'anand-karaj.jpg'));
-}
+// The transparent PNG is what the page uses. The source JPG is kept as the
+// editable original and copied too, so the asset folder stays self-contained.
+['anand-karaj.png', 'anand-karaj.jpg'].forEach(function (f) {
+  const src = path.join(ROOT, 'assets/img', f);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(imgDist, f));
+});
 
 console.log('Built dist/index.html (Sikh theme, reception invite).');
 console.log('  Couple   : ' + p1 + ' & ' + p2);
