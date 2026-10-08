@@ -735,22 +735,78 @@
 // ---------- Rose petals ----------
   // A gentle shower over the hero: one rose every 1.5s in the royal palette,
   // stopping once the hero scrolls away so the rest of the page stays calm and
-  // readable. Respects prefers-reduced-motion.
+  /* ==============================================================
+     FALLING ROSES - canvas
+     --------------------------------------------------------------
+     Replaces the old DOM petals, which were invisible on Android.
+
+     The old chain had four separate things Android could break, any
+     one of which was enough to make nothing appear:
+       1. an SVG data URI in background-image, which the browser had to
+          rasterise - and the petal carried `will-change: transform,
+          opacity`, so it was composited into its own layer first
+       2. a nested custom-property chain: script.js set
+          `--rose: var(--rose-burg)`, then CSS read
+          `background-image: var(--rose, var(--rose-pink))`. Custom
+          properties whose value is itself a var() are substituted
+          lazily, and setProperty() for custom properties was missing
+          or partial in a lot of Android WebView builds
+       3. `will-change` on every petal promoted each one to its own GPU
+          layer - on a mid-range phone that is a memory and CPU problem
+          and layers can render blank
+       4. unprefixed @keyframes/animation/transform, which pre-Chromium
+          Android WebView needs -webkit- forms of
+
+     A canvas removes all four. There is no image to decode (the rose
+     is drawn procedurally, so it is also crisp at any pixel density),
+     no custom properties, no per-element layers, and one draw loop
+     instead of 15+ DOM nodes with animations attached. It behaves
+     identically on every Android version still in circulation.
+     ============================================================== */
   function startPetal() {
     if (features.sakura === false) return;
     var container = document.getElementById('sakura-falling');
     if (!container) return;
-    var reducedMotion = false;
-    try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-    if (reducedMotion) return;
 
-    // Royal palette: theme burgundy + antique gold, with a blush for softness.
-    // Pre-tinted variants declared in CSS. background-image rather than a CSS
-    // mask: older Android Chrome drops masks on SVG data URIs, so the roses
-    // were invisible on mobile.
-    var VARIANTS = ['--rose-burg', '--rose-royal', '--rose-gold', '--rose-goldLt', '--rose-pink', '--rose-blush'];
-    var INTERVAL = 1500;
-    var MAX_AGE = 15000;
+    // Respect prefers-reduced-motion by not building the canvas at all.
+    var reduced = false;
+    try {
+      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+                window.matchMedia('(prefers-reduced-motion)').matches;
+    } catch (e) {}
+    if (reduced) return;
+
+    var supportsCanvas = !!document.createElement('canvas').getContext;
+    if (!supportsCanvas) return;
+
+    var canvas = document.createElement('canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:block';
+    container.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+
+    // Royal palette, carried over from the old pre-tinted SVG variants.
+    var PALETTE = [
+      { o: '#a4243b', m: '#c4516a', c: '#dc8296' }, // 0 burgundy
+      { o: '#8c2340', m: '#ad4a66', c: '#c87e93' }, // 1 royal
+      { o: '#d9b865', m: '#e5c46d', c: '#f3e3b6' }, // 2 antique gold
+      { o: '#e5c46d', m: '#f0dda6', c: '#f8eecd' }, // 3 light gold
+      { o: '#e9aec0', m: '#f6d3de', c: '#fbeff3' }, // 4 pink
+      { o: '#f2cdd9', m: '#fbe9ee', c: '#fef6f8' }  // 5 blush
+    ];
+
+    /* Weighted draw order. Indexes into PALETTE above, repeated to bias the
+       mix toward the soft end so the shower stays light over cream. */
+    var PICK = [4, 4, 4, 4, 5, 5, 5, 3, 3, 2, 2, 0, 1];
+
+    var MAX_ALIVE = 14;      // bound the cost on low-end phones
+    var SPAWN_MS = 1200;
+    var GRAVITY = 26;        // px per second
+    var petals = [];
+    var last = 0;
+    var spawnAt = 0;
+    var running = true;
+    var rafId = null;
 
     var hero = document.querySelector('.wrap') || document.body;
 
@@ -762,36 +818,140 @@
       return r.bottom > 0 && r.top < window.innerHeight;
     }
 
-    function spawn() {
-      if (hidden || !inHero()) return;
-      var petal = document.createElement('div');
-      petal.className = 'rose-petal';
-      var size = 22 + Math.random() * 14;
-      petal.style.width = size + 'px';
-      petal.style.height = size + 'px';
-      petal.style.setProperty('--rose', 'var(' + VARIANTS[Math.floor(Math.random() * VARIANTS.length)] + ')');
-      petal.style.left = (6 + Math.random() * 88) + '%';
-      petal.style.animationDuration = (10 + Math.random() * 6) + 's';
-      petal.style.animationDelay = (Math.random() * 3) + 's';
-      container.appendChild(petal);
-      setTimeout(function () {
-        if (petal.parentNode) petal.parentNode.removeChild(petal);
-      }, MAX_AGE);
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      var w = container.clientWidth || window.innerWidth;
+      var h = container.clientHeight || window.innerHeight;
+      canvas.width = Math.max(1, Math.round(w * dpr));
+      canvas.height = Math.max(1, Math.round(h * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { w: w, h: h };
+    }
+    var dims = size();
+
+    function spawn(w, h) {
+      // Weighted, not uniform. A flat pick gave every petal an equal chance of
+      // the deep burgundy, and at 22-38px that reads as a dark blob rather
+      // than a soft shower. Blush and pink now dominate, gold is a warm
+      // accent, and burgundy/royal are rare so they land as punctuation.
+      var pal = PALETTE[PICK[Math.floor(Math.random() * PICK.length)]];
+      var size2 = 26 + Math.random() * 18;
+      petals.push({
+        x: 8 + Math.random() * (w - 16),
+        y: -30,
+        r: size2 / 2,
+        vy: GRAVITY * (0.75 + Math.random() * 0.7),
+        spin: (Math.random() - 0.5) * 1.5,
+        rot: Math.random() * Math.PI * 2,
+        swayAmp: 12 + Math.random() * 22,
+        swayFreq: 0.5 + Math.random() * 0.8,
+        swayPhase: Math.random() * Math.PI * 2,
+        t: 0,
+        pal: pal
+      });
     }
 
-    // Stop while the tab is hidden so a backgrounded tab is not busy.
-    var hidden = false;
+    // One petal drawn as three concentric rings of five petals, each ring
+    // offset half a step so they nest. Drawn with arc + scale rather than
+    // ctx.ellipse, which older Android WebView lacks.
+    function drawRose(p, alpha) {
+      var r = p.r;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = alpha;
+
+      var rings = [
+        { n: 5, dist: 0.42, rw: 0.36, rh: 0.58, off: 0, col: p.pal.o },
+        { n: 5, dist: 0.25, rw: 0.28, rh: 0.44, off: Math.PI / 5, col: p.pal.m }
+      ];
+
+      for (var k = 0; k < rings.length; k++) {
+        var ring = rings[k];
+        for (var i = 0; i < ring.n; i++) {
+          var a = (i / ring.n) * Math.PI * 2 + ring.off;
+          ctx.save();
+          ctx.rotate(a);
+          ctx.translate(0, -r * ring.dist);
+          ctx.scale(ring.rw / ring.rh, 1);
+          ctx.beginPath();
+          ctx.arc(0, 0, r * ring.rh, 0, Math.PI * 2);
+          ctx.fillStyle = ring.col;
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.30, 0, Math.PI * 2);
+      ctx.fillStyle = p.pal.c;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function frame(now) {
+      if (!last) last = now;
+      var dt = Math.min((now - last) / 1000, 0.05); // clamp after a tab switch
+      last = now;
+
+      ctx.clearRect(0, 0, dims.w, dims.h);
+
+      if (running && inHero() && petals.length < MAX_ALIVE && now >= spawnAt) {
+        spawn(dims.w, dims.h);
+        spawnAt = now + SPAWN_MS + Math.random() * 900;
+      }
+
+      for (var i = petals.length - 1; i >= 0; i--) {
+        var p = petals[i];
+        p.t += dt;
+        p.y += p.vy * dt;
+        p.rot += p.spin * dt;
+        p.x += Math.sin(p.t * p.swayFreq + p.swayPhase) * p.swayAmp * dt;
+
+        // Fade in over the first 12% of the fall, out over the last 15%.
+        var life = p.y / dims.h;
+        var alpha = life < 0.12 ? life / 0.12 : life > 0.85 ? Math.max(0, (1 - life) / 0.15) : 1;
+        alpha *= 0.78;
+
+        if (p.y > dims.h + 40 || alpha <= 0.01) {
+          petals.splice(i, 1);
+          continue;
+        }
+        drawRose(p, alpha);
+      }
+
+      rafId = window.requestAnimationFrame(frame);
+    }
+
+    // Stop while the tab is hidden: no work, no battery drain.
     document.addEventListener('visibilitychange', function () {
-      hidden = document.hidden;
-      if (hidden) {
-        Array.prototype.forEach.call(container.querySelectorAll('.rose-petal'), function (p) {
-          if (p.parentNode) p.parentNode.removeChild(p);
-        });
+      running = !document.hidden;
+      if (running) {
+        last = 0; // avoid a huge dt jump on the first frame back
+      }
+      if (!running && rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+        ctx.clearRect(0, 0, dims.w, dims.h);
+        petals.length = 0;
+      } else if (running && !rafId) {
+        rafId = window.requestAnimationFrame(frame);
       }
     });
 
-    spawn();
-    setInterval(spawn, INTERVAL);
+    window.addEventListener('resize', function () {
+      dims = size();
+    });
+    window.addEventListener('orientationchange', function () {
+      setTimeout(function () { dims = size(); }, 250);
+    });
+
+    // Seed a few so the hero is never empty on arrival.
+    for (var k = 0; k < 4; k++) spawn(dims.w, dims.h);
+    petals.forEach(function (p) { p.y = Math.random() * dims.h * 0.5; });
+
+    rafId = window.requestAnimationFrame(frame);
   }
 
   // ---------- Language toggle ----------

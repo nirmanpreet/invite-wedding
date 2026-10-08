@@ -83,9 +83,16 @@
     <img src="assets/svg/divider-ornament.svg" alt="">
   </div>
 
-  <!-- Anand Karaj ceremonial art, straight after the blessing -->
+  <!-- Anand Karaj ceremonial art, straight after the blessing.
+       <picture> because this is the page's likely LCP element: at 1216px the
+       PNG is 1.36 MB, while the same resolution as WebP is 268 KB. The 900px
+       PNG is only ever fetched by a browser with no WebP support, since a
+       browser picks one source and ignores the other. -->
   <div class="ceremony-image" aria-hidden="true">
-    <img src="assets/img/anand-karaj.png" alt="" loading="lazy">
+    <picture>
+      <source type="image/webp" srcset="assets/img/anand-karaj.webp">
+      <img src="assets/img/anand-karaj-fallback.png" alt="" loading="eager" fetchpriority="high" decoding="async">
+    </picture>
   </div>
 
   <!-- Print-only header -->

@@ -248,19 +248,25 @@ html[lang="pa"] .intro-gate .gate-blessing {
    ORNAMENT DIVIDER
    ============================================================ */
 
-
-
-
 /* ============================================================
-   PETALS
+   PETALS - canvas
+   ============================================================
+   The falling roses are drawn on a <canvas> by startPetal() in
+   js/script.js, not by CSS. The previous DOM version was invisible
+   on Android for four independent reasons (an SVG data URI needing
+   rasterise on a will-change-composited layer, a nested var(--rose)
+   custom property set from JS, per-petal GPU layer promotion, and
+   unprefixed keyframes). The canvas removes all four: no image to
+   decode, no custom properties, one layer, one draw loop.
+
+   z-index 0 keeps the roses under the content layer (.wrap is 2).
+   At 1 they painted over the heading and hid letters.
    ============================================================ */
 .sakura-falling {
   position: fixed;
   inset: 0;
   width: 100%;
   pointer-events: none;
-  /* Below the content layer (.wrap is z-index 2). At z-index 1 the petals
-     painted over the heading text and hid letters, so drop them under it. */
   z-index: 0;
   overflow: hidden;
 }
@@ -977,88 +983,10 @@ html[lang="pa"] #print-invite {
    petals themselves. The shape is a CSS mask - one data URI cached
    with the stylesheet - and each petal's colour comes from --petal.
    ============================================================ */
-:root {
-  /* Pre-tinted rose variants. Each petal picks one via --rose, set per
-     spawn in script.js. background-image is used instead of a CSS mask
-     because older Android Chrome drops masks on SVG data URIs, which
-     made the roses invisible on mobile. */
-  --rose-pink: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23e9aec0%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23f6d3de%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23fbeff3%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fdf7f9%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-  --rose-blush: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23f2cdd9%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23fbe9ee%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23fef6f8%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fffbfc%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-  --rose-gold: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23d9b865%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23e5c46d%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23f3e3b6%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fbf3d9%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-  --rose-goldLt: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23e5c46d%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23f0dda6%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23f8eecd%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fdf8e4%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-  --rose-burg: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23a4243b%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23c4516a%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23dc8296%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23eaa9b6%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23f2d2d9%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-  --rose-royal: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%238c2340%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23ad4a66%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23c87e93%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23dda9b8%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23efd3da%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-}
-
-
-.rose-petal {
-  position: absolute;
-  top: -6%;
-  width: 28px;
-  height: 28px;
-  background-image: var(--rose, var(--rose-pink));
-  -webkit-background-image: var(--rose, var(--rose-pink));
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-  -webkit-background-size: contain;
-  /* fallback tint, so a petal is never invisible if the SVG fails to decode */
-  background-color: rgba(233, 174, 192, 0.5);
-  opacity: 0;
-  will-change: transform, opacity;
-  animation: roseFall linear infinite;
-}
 
 /* A gentle diagonal drift with a slow tumble. translateX is kept small
    so petals stay over the names instead of sweeping off to one side. */
-@keyframes roseFall {
-  0%   { transform: translate3d(0, 0, 0) rotate(0deg);      opacity: 0; }
-  12%  { opacity: 0.85; }
-  50%  { transform: translate3d(22px, 52vh, 0) rotate(190deg); }
-  88%  { opacity: 0.8; }
-  100% { transform: translate3d(-14px, 108vh, 0) rotate(400deg); opacity: 0; }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .rose-petal { display: none; }
-}
-/* ============================================================
-   CEREMONY ARTWORK
-   The new artwork is a 1216x1216 JPEG, so its white background is
-   baked in (JPEG has no alpha). multiply blends white away against the
-   cream page, then the filter warms and softens it so it sits with the
-   rest of the invitation instead of looking pasted on.
-
-   multiply + a light wash is used rather than mix-blend-mode alone:
-   the art's own whites survive as page cream, and the golds/pinks are
-   pulled slightly toward the theme's antique gold.
-   ============================================================ */
-
-
-
-@media (max-width: 420px) {
-  
-  
-}
-/* ============================================================
-   CEREMONY ARTWORK
-   The artwork is a 1216x1216 JPEG, so its white background is baked in
-   (JPEG has no alpha). mix-blend-mode: multiply blends that white away
-   against the cream page, then a light filter warms it so it sits with
-   the rest of the invitation.
-
-   Do NOT add `isolation: isolate` to .ceremony-image. It creates a
-   stacking context, which stops multiply blending against the page and
-   made the white background multiply against transparent - rendering a
-   black box behind the picture.
-   ============================================================ */
-
-
-
-@media (max-width: 420px) {
-  
-  
-}
 /* ============================================================
    CEREMONY ARTWORK
    anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
@@ -1071,40 +999,25 @@ html[lang="pa"] #print-invite {
    ramp (LO 26 / HI 58) so JPEG anti-aliasing along the gold outlines
    became partial alpha rather than a dark fringe.
 
-   Because the PNG now has genuine transparency there is no blend mode:
-   the illustration sits directly on the cream page. The filter only
-   warms the colours toward the antique gold.
+   Integration, in three parts:
+   - a soft antique-gold aura on ::before, so the art sits in a pool of
+     light rather than on top of a flat panel
+   - a wide, very low-opacity drop-shadow so it has no hard cut-out edge
+   - a warm filter that pulls the golds toward the theme's antique gold
+
+   Deliberately NO mask-image here. With a genuinely transparent PNG a
+   mask buys nothing (the corners are already clear), and a large enough
+   mask to matter would erode the artwork's outer flourishes. It was also
+   unreliable on Android WebKit earlier in this build.
    ============================================================ */
 
+/* Soft gold aura behind the illustration */
 
+/* Small phones: the blessing and the couple's names must still share the
+   first screen, so the art takes whatever vertical room is left over. */
 
-@media (max-width: 420px) {
-  
-  
-}
-/* ============================================================
-   CEREMONY ARTWORK
-   anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
-   (no alpha possible) with a near-black background baked in - 62.5% of
-   its pixels were near-black and the corners were rgb(0,0,0) - so
-   mix-blend-mode: multiply correctly rendered a black box, and
-   screen/lighten would have washed the artwork out to near-cream.
+/* Short screens (landscape phones, very small handsets). The names win. */
 
-   The black was converted to a real alpha channel instead, with a soft
-   ramp (LO 26 / HI 58) so JPEG anti-aliasing along the gold outlines
-   became partial alpha rather than a dark fringe.
-
-   Because the PNG now has genuine transparency there is no blend mode:
-   the illustration sits directly on the cream page. The filter only
-   warms the colours toward the antique gold.
-   ============================================================ */
-
-
-
-@media (max-width: 420px) {
-  
-  
-}
 /* ============================================================
    CEREMONY ARTWORK
    anand-karaj.png is a transparent PNG. The source new.jpg was a JPEG
@@ -1130,8 +1043,8 @@ html[lang="pa"] #print-invite {
    ============================================================ */
 .ceremony-image {
   position: relative;
-  margin: 16px auto 26px;
-  width: min(400px, 88%);
+  margin: 16px auto 28px;
+  width: min(460px, 90%);
   text-align: center;
 }
 
@@ -1153,12 +1066,19 @@ html[lang="pa"] #print-invite {
   pointer-events: none;
 }
 
+/* <picture> is inline by default, which would leave the img's box inline and
+   break the centring and the aura alignment. */
+.ceremony-image picture {
+  display: block;
+  margin: 0 auto;
+}
+
 .ceremony-image img {
   position: relative;
   display: block;
   width: 100%;
   height: auto;
-  max-height: 230px;
+  max-height: 300px;
   object-fit: contain;
   margin: 0 auto;
 
@@ -1177,17 +1097,20 @@ html[lang="pa"] #print-invite {
   opacity: 0.92;
 }
 
-/* Short phones: the blessing + names must still share the first screen. */
+/* Small phones: the blessing and the couple's names must still share the
+   first screen, so the art takes whatever vertical room is left over. */
 @media (max-width: 420px) {
-  .ceremony-image { width: min(270px, 76%); margin: 10px auto 20px; }
-  .ceremony-image img { max-height: 175px; }
-  .ceremony-image::before { width: 135%; height: 140%; }
+  .ceremony-image { width: min(320px, 86%); margin: 12px auto 22px; }
+  .ceremony-image img { max-height: 215px; }
+  .ceremony-image::before { width: 130%; height: 135%; }
 }
 
+/* Short screens (landscape phones, very small handsets). The names win. */
 @media (max-height: 700px) and (max-width: 480px) {
-  .ceremony-image img { max-height: 140px; }
   .ceremony-image { margin: 8px auto 16px; }
+  .ceremony-image img { max-height: 150px; }
 }
+
 /* ============================================================
    VISUAL REFINEMENTS
    1. Ceremony art - capped so it cannot dominate a phone screen
@@ -1199,8 +1122,6 @@ html[lang="pa"] #print-invite {
 /* --- 1. Ceremony art ------------------------------------------------
    The illustration is 336px tall on a 360px phone, which was most of
    the first screen. Cap the height and centre it in a soft frame. */
-
-
 
 /* --- 2. Section rhythm ----------------------------------------------
    Sections used to each pick their own margins, so the page had

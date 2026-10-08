@@ -164,9 +164,16 @@ ${qrLib}
         <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
-      <!-- Anand Karaj ceremonial art, straight after the blessing -->
+      <!-- Anand Karaj ceremonial art, straight after the blessing.
+           <picture> because this is the page's likely LCP element: at 1216px
+           the PNG is 1.36 MB, while the same resolution as WebP is 268 KB.
+           The 900px PNG is only ever fetched by a browser with no WebP
+           support, since a browser picks one source and ignores the other. -->
       <div class="ceremony-image" aria-hidden="true">
-        <img src="assets/img/anand-karaj.png" alt="" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/img/anand-karaj.webp">
+          <img src="assets/img/anand-karaj-fallback.png" alt="" loading="eager" fetchpriority="high" decoding="async">
+        </picture>
       </div>
 
       <!-- Print-only header -->
@@ -256,9 +263,12 @@ if (fs.existsSync(ornamentSrc)) {
 });
 const imgDist = path.join(iconDist, 'img');
 fs.mkdirSync(imgDist, { recursive: true });
-// The transparent PNG is what the page uses. The source JPG is kept as the
-// editable original and copied too, so the asset folder stays self-contained.
-['anand-karaj.png', 'anand-karaj.jpg'].forEach(function (f) {
+/* The page loads anand-karaj.webp (268 KB) via <picture>, with
+   anand-karaj-fallback.png (900px, 818 KB) only for browsers without WebP.
+   The 1216px transparent PNG and the original JPG are the editable masters:
+   anand-karaj.png is what the WebP was encoded from, so it must stay in the
+   build for the encoder to be reproducible. */
+['anand-karaj.webp', 'anand-karaj-fallback.png', 'anand-karaj.png', 'anand-karaj.jpg'].forEach(function (f) {
   const src = path.join(ROOT, 'assets/img', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(imgDist, f));
 });
