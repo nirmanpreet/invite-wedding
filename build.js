@@ -150,6 +150,11 @@ ${qrLib}
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
       <div class="blessing" id="invite-blessing"></div>
 
+      <!-- Anand Karaj ceremonial image -->
+      <div class="ceremony-image" aria-hidden="true">
+        <img src="assets/img/anand-karaj.jpg" alt="Anand Karaj ceremony" loading="lazy">
+      </div>
+
       <!-- Sikh decorative bottom -->
       <div class="sikh-decor bottom" aria-hidden="true">
         <img src="assets/svg/floral-corner.svg" alt="" width="80" height="80">

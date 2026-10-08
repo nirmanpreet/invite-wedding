@@ -195,6 +195,37 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
+   Ceremony Image — Classical Framed Anand Karaj
+   ============================================================ */
+.ceremony-image {
+  margin: 28px auto 32px;
+  max-width: 480px;
+  text-align: center;
+}
+.ceremony-image img {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border-radius: 12px;
+  border: 3px solid var(--gold-line);
+  box-shadow:
+    0 8px 24px rgba(109, 26, 45, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.ceremony-image img:hover {
+  transform: scale(1.01);
+  box-shadow:
+    0 12px 32px rgba(109, 26, 45, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ceremony-image img { transition: none; }
+}
+
+
+
+/* ============================================================
    Page Reveal â€” Gentle Fade In
    ============================================================ */
 .wrap {
