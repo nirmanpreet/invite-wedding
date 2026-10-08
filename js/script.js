@@ -114,12 +114,17 @@
         (time ? ', ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
         '</p>';
     }
-    // Blessing at the top of the page: ੴ + lakh khushiaan pathshahiaan + Waheguru blessing
+    // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
+      var blessingText = t('footerNote');
+      // Only fall back to English if translation is truly missing (not just empty string)
+      if (blessingText === '' || blessingText === undefined || blessingText === null) {
+        blessingText = footerMsg;
+      }
       blessingEl.innerHTML =
         '<span class="ik" aria-hidden="true">ੴ</span>' +
-        '<div class="blessing-text">' + esc(t('footerNote') || footerMsg) + '</div>';
+        '<div class="blessing-text">' + esc(blessingText) + '</div>';
     }
     // Footer at the bottom: contact only
     var footerEl = document.getElementById('invite-footer');
