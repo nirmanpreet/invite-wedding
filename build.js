@@ -164,16 +164,18 @@ ${qrLib}
         <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
-      <!-- Anand Karaj ceremonial art (background blended away) -->
-      <div class="ceremony-image" aria-hidden="true">
-        <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
-      </div>
-
       <!-- Print-only header -->
       <div id="print-header" class="print-header"></div>
 
       <div class="wrap">
         <div class="title" id="invite-title"></div>
+
+        <!-- Anand Karaj ceremonial art. After the names on purpose: it is
+             decorative and tall, and leading with it pushed the couple's
+             names below the fold on short phones. -->
+        <div class="ceremony-image" aria-hidden="true">
+          <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
+        </div>
       </div>
 
       <div id="time"></div>

@@ -782,64 +782,63 @@ html[lang="pa"] .title h1 {
 }
 /* ============================================================
    ROYAL NAMES
-   The names used to be set in Great Vibes, a hairline script. Legible
-   only at a glance, and it read as lowercase rather than as a name -
-   so it is now set in Playfair Display, the didone serif used on
-   formal royal wedding stationery: strong verticals, real capitals,
-   and generous tracking.
+   Set in Great Vibes - a flowing script, which suits the invitation.
+   The reason it read as "lowercase" before was scale, not case: the
+   strokes are hairlines, so at small sizes "Nirman" looked like
+   lowercase and was hard to read. At this size the capitals and the
+   lowercase alike are clear.
 
-   Rules that matter here:
-   - text-transform is NEVER upper/none-swaying on a name: "Nirman" and
-     "Simran" must appear exactly as written.
-   - letter-spacing is safe on an unconnected serif (unlike a script
-     face or Gurmukhi, whose glyphs join at the top bar).
+   Rules that must not regress:
+   - never upper-case a name: Great Vibes' swash capitals turned
+     "Nirman" into an unreadable "NJRMaN"
+   - never letter-space a connected script face (same principle as
+     Gurmukhi in W3C Gurmukhi Layout Requirements 5.1 / 6): the glyphs
+     are drawn as one shape and tracking pulls them apart
    ============================================================ */
-:root {
-  --font-royal-name: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-}
-
 .title h1 {
-  font-family: var(--font-royal-name);
-  font-weight: 700;
-  font-size: clamp(46px, 12vw, 78px);
-  line-height: 1.08;
-  letter-spacing: 3px;
-  margin: 14px 0 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(74px, 21vw, 132px);
+  line-height: 1.02;
+  letter-spacing: 0;
+  margin: 10px 0 0;
   color: var(--royal);
   text-transform: none;
   text-shadow:
     0 1px 0 rgba(255, 253, 247, 0.8),
-    0 2px 14px rgba(140, 35, 64, 0.14);
+    0 2px 18px rgba(140, 35, 64, 0.16);
 }
 
 .intro-gate h2 {
-  font-family: var(--font-royal-name);
-  font-weight: 700;
-  font-size: clamp(34px, 8.6vw, 50px);
-  line-height: 1.16;
-  letter-spacing: 3px;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(62px, 17vw, 96px);
+  line-height: 1.12;
+  letter-spacing: 0;
   color: var(--royal);
-  margin: 4px 0 4px;
+  margin: 2px 0 4px;
   text-transform: none;
   text-shadow:
     0 1px 0 rgba(255, 253, 247, 0.75),
-    0 2px 12px rgba(140, 35, 64, 0.12);
+    0 2px 14px rgba(140, 35, 64, 0.14);
 }
 
-/* The connector ampersand: gold, slightly larger, no tracking so the
-   swash keeps its own shape. */
+/* The ampersand: gold, a touch larger, untracked so the swash keeps
+   its own shape, with breathing room so it does not fuse the names. */
 .title h2 {
-  font-family: var(--font-royal-name);
-  font-weight: 500;
-  font-size: clamp(26px, 6vw, 38px);
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(40px, 11vw, 62px);
+  line-height: 1;
   letter-spacing: 0;
+  margin: 0;
   color: var(--gold);
   text-transform: none;
 }
 
 .intro-gate h2 .amp {
   display: inline-block;
-  margin: 0 0.1em;
+  margin: 0 0.12em;
   color: var(--gold);
   letter-spacing: 0;
 }
@@ -995,10 +994,6 @@ html[lang="pa"] #print-invite {
   text-transform: none;
 }
 
-:root {
-  --rose-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23000%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23000%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23000%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23000%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23000%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
-}
-
 /* ============================================================
    ROSE PETALS
    A gentle shower over the hero only, in the royal palette: theme
@@ -1007,18 +1002,33 @@ html[lang="pa"] #print-invite {
    petals themselves. The shape is a CSS mask - one data URI cached
    with the stylesheet - and each petal's colour comes from --petal.
    ============================================================ */
+:root {
+  /* Pre-tinted rose variants. Each petal picks one via --rose, set per
+     spawn in script.js. background-image is used instead of a CSS mask
+     because older Android Chrome drops masks on SVG data URIs, which
+     made the roses invisible on mobile. */
+  --rose-pink: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23e9aec0%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23f6d3de%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23fbeff3%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fdf7f9%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+  --rose-blush: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23f2cdd9%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23fbe9ee%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23fef6f8%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fffbfc%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+  --rose-gold: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23d9b865%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23e5c46d%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23f3e3b6%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fbf3d9%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+  --rose-goldLt: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23e5c46d%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23f0dda6%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23f8eecd%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23fdf8e4%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+  --rose-burg: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%23a4243b%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23c4516a%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23dc8296%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23eaa9b6%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23f2d2d9%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+  --rose-royal: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20role%3D%22img%22%20aria-label%3D%22Rose%22%3E%0A%20%20%3C!--%20Outer%20petal%20ring%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%201.6c1.5%200%202.7.9%203.3%202.1%201.3-.5%202.8%200%203.6%201.2.7%201.1.6%202.5-.1%203.5%201.4.6%202.2%202%201.9%203.4-.3%201.4-1.5%202.4-2.9%202.6.5%201.4.1%203-1.2%203.9-1.2.9-2.8.8-4-.2-1%20.9-2.4%201.1-3.6.6-1.3-.6-2-2-1.7-3.3-1.5-.1-2.8-1.1-3.2-2.6-.4-1.4.3-2.9%201.7-3.6-.7-1-.8-2.4-.1-3.5.8-1.2%202.3-1.7%203.6-1.2.6-1.2%201.8-2.1%203.3-2.1z%22%20fill%3D%22%238c2340%22%2F%3E%0A%20%20%3C!--%20Mid%20petals%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%204.4c1.2%200%202.2.7%202.6%201.7%201.4.2%202.5%201.3%202.5%202.7%200%20.4-.1.8-.2%201.1.9.6%201.5%201.6%201.5%202.7%200%201.8-1.4%203.2-3.2%203.2-.3%200-.6%200-.9-.1-.6%201.2-1.8%202-3.2%202-1.4%200-2.6-.9-3.1-2.2-.3.1-.6.1-.9.1-1.8%200-3.2-1.4-3.2-3.2%200-1.1.6-2.1%201.5-2.7-.1-.3-.2-.7-.2-1.1%200-1.4%201.1-2.5%202.5-2.7.4-1%201.4-1.7%202.6-1.7z%22%20fill%3D%22%23ad4a66%22%2F%3E%0A%20%20%3C!--%20Centre%20spiral%20--%3E%0A%20%20%3Cpath%20d%3D%22M12%207.4c1.7%200%203.1%201.4%203.1%203.1%200%20.5-.1%201-.4%201.5.7.5%201.2%201.3%201.2%202.2%200%201.6-1.3%202.9-2.9%202.9-.7%200-1.3-.2-1.8-.6-.5.4-1.1.6-1.8.6-1.6%200-2.9-1.3-2.9-2.9%200-.9.5-1.7%201.2-2.2-.3-.5-.4-1-.4-1.5%200-1.7%201.4-3.1%203.1-3.1z%22%20fill%3D%22%23c87e93%22%2F%3E%0A%20%20%3C!--%20Tight%20curl%20--%3E%0A%20%20%3Cpath%20d%3D%22M12.4%209.6c1.3%200%202.4%201%202.4%202.3s-1.1%202.3-2.4%202.3c-.7%200-1.4-.3-1.8-.8.3.1.6.1.9.1%201%200%201.8-.8%201.8-1.8%200-.6-.3-1.2-.7-1.5.1%200%20.1-.1.1-.2%200-.2-.1-.3-.3-.3z%22%20fill%3D%22%23dda9b8%22%2F%3E%0A%20%20%3C!--%20Highlight%20--%3E%0A%20%20%3Cellipse%20cx%3D%228.6%22%20cy%3D%227.4%22%20rx%3D%221.5%22%20ry%3D%221.1%22%20fill%3D%22%23efd3da%22%20opacity%3D%220.45%22%20transform%3D%22rotate(-28%208.6%207.4)%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+
 .rose-petal {
   position: absolute;
   top: -6%;
-  width: 20px;
-  height: 20px;
-  background-color: var(--petal, #e9aec0);
-  -webkit-mask-image: var(--rose-mask);
-  mask-image: var(--rose-mask);
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  width: 28px;
+  height: 28px;
+  background-image: var(--rose, var(--rose-pink));
+  -webkit-background-image: var(--rose, var(--rose-pink));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  -webkit-background-size: contain;
+  /* fallback tint, so a petal is never invisible if the SVG fails to decode */
+  background-color: rgba(233, 174, 192, 0.5);
   opacity: 0;
   will-change: transform, opacity;
   animation: roseFall linear infinite;
@@ -1036,6 +1046,111 @@ html[lang="pa"] #print-invite {
 
 @media (prefers-reduced-motion: reduce) {
   .rose-petal { display: none; }
+}
+/* ============================================================
+   VISUAL REFINEMENTS
+   1. Ceremony art - capped so it cannot dominate a phone screen
+   2. Section rhythm - one consistent gap between blocks
+   3. Buttons - softer corners and a subtle gold lift
+   4. Map - framed so Google's plain embed matches the invitation
+   ============================================================ */
+
+/* --- 1. Ceremony art ------------------------------------------------
+   The illustration is 336px tall on a 360px phone, which was most of
+   the first screen. Cap the height and centre it in a soft frame. */
+.ceremony-image {
+  margin: 26px auto 30px;
+  width: min(420px, 90%);
+  text-align: center;
+}
+.ceremony-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 260px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* --- 2. Section rhythm ----------------------------------------------
+   Sections used to each pick their own margins, so the page had
+   uneven gaps. One consistent top gap, plus breathing room after the
+   hero block. */
+#time { margin-top: 30px; }
+.dance-med { margin: 18px 0 26px; }
+#day-info,
+#qr-section,
+#rsvp-section,
+#calendar-section,
+#print-section,
+#venue-map-embed {
+  margin-top: 26px;
+}
+#invite-footer,
+#lang-toggle { margin-top: 22px; }
+
+/* --- 3. Buttons -----------------------------------------------------
+   Softer corners and a very light gold wash on hover/focus so they
+   feel like part of the invitation rather than web UI. */
+.actions .venue,
+#rsvp-send,
+.attend-btn,
+#print-invite,
+.intro-gate .lang-pick button {
+  border-radius: 6px;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease),
+              border-color 0.3s var(--ease), box-shadow 0.3s var(--ease),
+              transform 0.15s var(--ease);
+}
+.actions .venue:hover,
+#print-invite:hover,
+.attend-btn:hover {
+  background: linear-gradient(180deg, rgba(229, 196, 109, 0.22), rgba(200, 162, 75, 0.10));
+  box-shadow: 0 6px 18px rgba(109, 26, 45, 0.10);
+}
+.actions .venue:active,
+#print-invite:active,
+.attend-btn:active { transform: translateY(1px); }
+.attend-btn.selected {
+  background: linear-gradient(180deg, rgba(140, 35, 64, 0.14), rgba(109, 26, 45, 0.08));
+}
+
+/* Card edges: a hairline inner highlight so the panels read as
+   embossed card stock rather than flat rectangles. */
+.day-info,
+.qr-section,
+.rsvp-section,
+.calendar-section,
+.print-section,
+#time,
+#venue-map-embed {
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* --- 4. Map frame ---------------------------------------------------
+   Google will not style its embed without an API key, so instead of
+   fighting it we frame it: rounded, gold hairline, soft shadow, so it
+   sits inside the invitation rather than looking pasted on. */
+#venue-map-embed {
+  border-radius: 4px;
+  overflow: hidden;
+}
+#venue-map-embed iframe {
+  border-radius: 3px 3px 0 0;
+  filter: saturate(0.88) contrast(1.02);
+}
+#venue-map-embed .map-label {
+  background: linear-gradient(180deg, #fffdf8, #fdf6e9);
+  border-top: 1px solid var(--gold-line);
+  padding: 9px 12px;
+}
+
+/* --- Small screens -------------------------------------------------- */
+@media (max-width: 420px) {
+  .ceremony-image { width: min(320px, 88%); margin: 22px auto 26px; }
+  .ceremony-image img { max-height: 210px; }
+  #day-info, #qr-section, #rsvp-section,
+  #calendar-section, #print-section, #venue-map-embed { margin-top: 22px; }
 }
 /* ============================================================
    REDUCED MOTION
@@ -1404,16 +1519,18 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
-      <!-- Anand Karaj ceremonial art (background blended away) -->
-      <div class="ceremony-image" aria-hidden="true">
-        <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
-      </div>
-
       <!-- Print-only header -->
       <div id="print-header" class="print-header"></div>
 
       <div class="wrap">
         <div class="title" id="invite-title"></div>
+
+        <!-- Anand Karaj ceremonial art. After the names on purpose: it is
+             decorative and tall, and leading with it pushed the couple's
+             names below the fold on short phones. -->
+        <div class="ceremony-image" aria-hidden="true">
+          <img src="assets/img/anand-karaj.jpg" alt="" loading="lazy">
+        </div>
       </div>
 
       <div id="time"></div>

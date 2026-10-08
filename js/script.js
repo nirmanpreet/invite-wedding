@@ -733,7 +733,7 @@
   }
 
 // ---------- Rose petals ----------
-  // A sparse shower over the hero only: one rose every 3s in soft pink/cream,
+  // A gentle shower over the hero: one rose every 1.5s in the royal palette,
   // stopping once the hero scrolls away so the rest of the page stays calm and
   // readable. Respects prefers-reduced-motion.
   function startPetal() {
@@ -745,21 +745,31 @@
     if (reducedMotion) return;
 
     // Royal palette: theme burgundy + antique gold, with a blush for softness.
-    var COLORS = ['#c76a86', '#a4243b', '#8c2340', '#d9b865', '#e5c46d', '#e9aec0'];
+    // Pre-tinted variants declared in CSS. background-image rather than a CSS
+    // mask: older Android Chrome drops masks on SVG data URIs, so the roses
+    // were invisible on mobile.
+    var VARIANTS = ['--rose-burg', '--rose-royal', '--rose-gold', '--rose-goldLt', '--rose-pink', '--rose-blush'];
     var INTERVAL = 1500;
     var MAX_AGE = 15000;
 
     var hero = document.querySelector('.wrap') || document.body;
-    var inView = true;
+
+    // Gate on scroll position, not an IntersectionObserver on .wrap: on a
+    // 360x640 phone .wrap sat entirely below the fold, so a visibility
+    // observer reported "not intersecting" and NO petals ever spawned.
+    function inHero() {
+      var r = hero.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    }
 
     function spawn() {
-      if (!inView) return;
+      if (hidden || !inHero()) return;
       var petal = document.createElement('div');
       petal.className = 'rose-petal';
-      var size = 17 + Math.random() * 11;
+      var size = 22 + Math.random() * 14;
       petal.style.width = size + 'px';
       petal.style.height = size + 'px';
-      petal.style.setProperty('--petal', COLORS[Math.floor(Math.random() * COLORS.length)]);
+      petal.style.setProperty('--rose', 'var(' + VARIANTS[Math.floor(Math.random() * VARIANTS.length)] + ')');
       petal.style.left = (6 + Math.random() * 88) + '%';
       petal.style.animationDuration = (10 + Math.random() * 6) + 's';
       petal.style.animationDelay = (Math.random() * 3) + 's';
@@ -769,15 +779,15 @@
       }, MAX_AGE);
     }
 
-    // Stop once the hero scrolls away; resume if the guest scrolls back up.
-    if (typeof IntersectionObserver === 'function') {
-      var io = new IntersectionObserver(function (entries) {
-        inView = entries[0].isIntersecting;
-      }, { threshold: 0.1 });
-      io.observe(hero);
-    }
+    // Stop while the tab is hidden so a backgrounded tab is not busy.
+    var hidden = false;
     document.addEventListener('visibilitychange', function () {
-      inView = !document.hidden;
+      hidden = document.hidden;
+      if (hidden) {
+        Array.prototype.forEach.call(container.querySelectorAll('.rose-petal'), function (p) {
+          if (p.parentNode) p.parentNode.removeChild(p);
+        });
+      }
     });
 
     spawn();
