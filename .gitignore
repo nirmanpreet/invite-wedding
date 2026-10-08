@@ -1,0 +1,10 @@
+# Local dev / editor artifacts
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+node_modules/
+
+# If you add your own private assets you don't want committed, uncomment:
+# assets/mp3/*.mp3

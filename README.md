@@ -1,161 +1,58 @@
 
-<p align="center"><a href="https://sonali.netlify.app/"><img src="./assets/wedding.gif" width="150px" height="150px"/></a></p>
-<h1 align="center"><a href="https://sonali.netlify.app/">Wedding Invitation</a> :ring: <br> <br> SAVE THE DATE: NOV 29, 2020 <br> <a href="https://sonali.netlify.app/">sonali.netlify.app</a></h1>
+<p align="center"><img src="./assets/wedding.gif" width="150px" height="150px"/></p>
+<h1 align="center">Nirman &amp; Simran :ring: <br> <br> Wedding Reception <br> 6 December 2026</h1>
 
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/vinitshahdeo/Wedding-Invitation?logo=github)](https://sonali.netlify.app/) [![Netlify Status](https://api.netlify.com/api/v1/badges/e945f101-f434-45e6-8c33-df855c6b2082/deploy-status)](https://app.netlify.com/sites/sonali/deploys) [![GitHub license](https://img.shields.io/github/license/vinitshahdeo/Wedding-Invitation?logo=github)](https://github.com/vinitshahdeo/Wedding-Invitation) [![GitHub Star - Vinit Shahdeo](https://img.shields.io/badge/GitHub_Star-%E2%AD%90_vinitshahdeo-E89B25?colorA=302237&logo=github)](https://stars.github.com/profiles/vinitshahdeo/) [![Peerlist](https://github-readme-badge.peerlist.io/api/vinitshahdeo)](https://peerlist.io/vinitshahdeo)
+<p align="center">
+  ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ — With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception of Nirman &amp; Simran!
+</p>
 
-## Wedding Invitation :ring:
+<p align="center">
+  <strong>6 December 2026 • 10:00 AM onwards • Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</strong>
+</p>
 
-<details>
-  <summary><strong>View Invitation</strong></summary>
-  <a href="https://sonali.netlify.app/"><img src="./assets/img/sonali.jpeg" /></a>
-</details>
+## Features
 
-With the divine grace of the almighty,
-inviting you and your family to elder sister's wedding to be held on **29th November at [Ashirwad Garden](https://goo.gl/maps/5z5xX2hTYzU8VGEJ9), Ratu, Ranchi from 7:00 PM** onwards.
+- Bilingual — English / ਪੰਜਾਬੀ language toggle (remembers your choice)
+- Live countdown to the big day
+- RSVP via WhatsApp with **Yes / No** attending buttons
+- **QR codes** — "Scan me for venue": one QR opens the venue map, one stores the contact vCard (phone + venue address); shown on the page, the PDF card, and print
+- Venue map embed + Google Maps directions
+- Add to calendar (.ics) download
+- Downloadable PDF invitation card (generated in the browser)
+- Print-friendly view
+- Tap-to-call contact link
+- SEO (JSON-LD Event schema) + PWA manifest (add to home screen)
+- Mobile-first, fast — no jQuery, petals respect reduced-motion
 
-- [Download](https://github.com/vinitshahdeo/vinitshahdeo/raw/master/docs/Sonali%20%26%20Gagan.pdf) the Invitation card
+## Run locally
 
-- Find [venue](https://goo.gl/maps/5z5xX2hTYzU8VGEJ9) on Google map
-
-- Visit the [website](https://sonali.netlify.app/) for more details
-
-- See the Facebook [post](https://www.facebook.com/vinit.shahdeo/posts/3521599654622390)
-
-- See the [Tweet](https://twitter.com/Vinit_Shahdeo/status/1328570280705482752)
-
-```js
-
-const newCouple = 'Sonali & Gagan';
-
-// Nov 29, 2020
-const weddingDate = new Date(2020, 11, 29);
-
-// Wedding venue: https://goo.gl/maps/5z5xX2hTYzU8VGEJ9
-const weddingVenue = new Location('Ashirwad Garden, Ranchi');
-
-(function() {
-    newCouple.willTieKnot(weddingDate);
-
-    // your presence is requested
-    (new Wedding()).acceptInvitation(
-        window.open('https://sonali.netlify.app/')
-    );
-})();
-
-
+```bash
+node serve.js
+# Open http://localhost:3000
 ```
 
-## Are you or your loved ones a *bride-to-be* or *groom-to-be*? 
-> Feel free to use this template to build your wedding website!
+## Build for hosting (GitHub Pages / Vercel / Netlify)
 
-To reuse this, follow the steps:
-
-- *Replace the date in [script.js](https://github.com/vinitshahdeo/Wedding-Invitation/blob/master/js/script.js#L29) to have a timer running for your big day!*
-
-```js
-// Set the date we're counting down to
-var countDownDate = new Date("Nov 29, 2020 00:00:00").getTime();
+```bash
+node build.js
+# Deploy the self-contained dist/ folder
 ```
 
-- *If you wish to change the track which plays on click, edit the `src` in [index.html](https://github.com/vinitshahdeo/Wedding-Invitation/blob/760c4aa437115fc365f5cb86a4b428b0e292b5ba/index.html#L69)*
+## Customize
 
-```html
-<div class="music">
-   <audio src="./assets/mp3/song.mp3" id="my_audio" loop="loop"></audio> 
-</div>
+Edit [data/config.json](data/config.json) — names, date, time, venue, RSVP deadline, WhatsApp number, colors, feature toggles, and all English/ਪੰਜਾਬੀ strings — then refresh the page.
+
+## Structure
+
+```
+index.html            # main page (dev, served by serve.js)
+data/config.json      # all invitation content & settings
+js/script.js          # app logic (no dependencies)
+js/qrcode.min.js      # vendored QR generator (MIT)
+css/style.css         # Sikh-theme styling (maroon / gold / ivory)
+assets/icon.svg       # PWA home-screen icon
+build.js              # builds dist/ for static hosting
+serve.js              # tiny dev server with live config
 ```
 
-> <sup>Despite so many new Bollywood and English song options, I preferred to use a two-decade-old song, **[Din Shagna Da](https://youtu.be/X0MDALpV29s)**! Ever attended a North Indian Wedding? As soon as the DJ plays [Din Shagna Da](https://youtu.be/Mj4eK5YViCs) song, it means that the much-awaited moment is here and the bride is all set to put her first foot forward to the wedding venue under a breathtaking phoolon ki chaadar. Let's keep the sky-high status of this song untouched! When the website is backed up with a soul-stirring track, the feeling becomes absolutely surreal. **Choose a heart-touching track!** :musical_note: :heart: </sup>
-
-## शुभ विवाह 🎉  ~ Hindi version of this website 👇
-
-[![Wedding Website](https://github-readme-stats.vercel.app/api/pin/?username=vinitshahdeo&repo=wedding-website)](https://github.com/vinitshahdeo/wedding-website/)
-
-### Show your support by leaving a star! :hugs:
-
-[![Stargazers repo roster for @vinitshahdeo/Wedding-Invitation](https://reporoster.com/stars/vinitshahdeo/Wedding-Invitation)](https://github.com/vinitshahdeo/Wedding-Invitation/stargazers)
-
-Tag me to share your wedding story on Twitter([@Vinit_Shahdeo](https://twitter.com/Vinit_Shahdeo)) :yellow_heart:
-
-> [!NOTE]
-> **Learn what I'm up to now at [vinitshahdeo.com](https://vinitshahdeo.com/)!**
-
-<br><sup><i>With warm regards,<br>
-**Vinit Shahdeo**<i></sup><br>
-[![Twitter Follow @Vinit_Shahdeo](https://img.shields.io/twitter/follow/Vinit_Shahdeo?style=social)](https://twitter.com/Vinit_Shahdeo)
-
-
-<!--
-
-    ████████████████████████████████████████████████████████████████████████████████
-    ████████████████████████████████▀▀▀╚╙╙╙╙╙▀██████████████████████████████████████
-    ████████████████████████████▀╙╙└.  -      '╙▀▀██████████████████████████████████
-    █████████████████████████▀╙"                  `╙╙▀██████████████████████████████
-    ██████████████████████▀╙-                         ╙█████████████████████████████
-    █████████████████████▒-                _.,╓░,._   ╚╫████████████████████████████
-    █████████████████████▒ `          _.,░=j╠╠╠D▒░░░._ ╙████████████████████████████
-    █████████████████████▒       _.;|░░░╦╠╠╠╠╠╠╠╠╠╠░░░` ║███████████████████████████
-    █████████████████████▒  _==░░░|░[░░╠╠╠╠╠╠╠╠╠╠╠╠░░░⌐`[███████████████████████████
-    █████████████████████▌- .|░░░░░▒░╠╠╠╠╠╠╠╠╠╠╠R╚╠░░░░ ║███████████████████████████
-    ██████████████████████▒.:[░░╚╙╚╚╚╚╚╚░░░╚², .,░░░╠░░ ╠███████████████████████████
-    ██████████████████████▌⌐|[[░░»=-  -![╔▒░: ``^░░░░[░`j╚██████████████████████████
-    ██████████████████████▌H:ÜÜ░░░= _=:░╠╠▒▒░=░░|░░╔╠╠░░╩░║█████████████████████████
-    ██████████████████████▒|░|▒░░░░░░╔╔░╠╠D╠╠▒░╔╠║╣▒▒╠╠░░╚║█████████████████████████
-    ██████████████████████▒╚░╠╠╠╠╠╠╠╠╠╠╠╠╠D╠╠╠╠╠╠╬╬╠╠╠ÜÜ╠║║█████████████████████████
-    ███████████████████████▒╚░╠╠╠╠╠╠╠░|╚╚╠╚╙╙╚╠╠╠╠╠╠╠╠░░╦╠╟█████████████████████████
-    ███████████████████████▒R░╚░╠╠╚Ü░╚╚╙╙²╙^²²╚╠╠╠░░╚░░░║███████████████████████████
-    ████████████████████████▄▄H╚░░░░^:=░░░░|░░==²!╚Ü░░░j████████████████████████████
-    ███████████████████████████░░░░░░╔╔[╠╠▒╠░╔░╔╔░░░░░-╟████████████████████████████
-    ███████████████████████████▌░╚░░░╚╠╠░╚╙╙╙░[╠░░░░² ╔█████████████████████████████
-    █████████████████████████████░²^-²░╚╚RjjKKR░░░`  j██████████████████████████████
-    █████████████████████████████▒H░  ''=╙╙²╙░²'`  _|░██████████████████████████████
-    ████████████████████████████▀╙╠Ü░░__         _|░|Ü╚█████████████████████████████
-    ██████████████████████████D⌐  ╠╠░░░░░░=░░░╔░░░|░╠╠ └╚███████████████████████████
-    █████████████████████████D░░ [╠╠╠╠╠╠╔╠╔▒░[╠░░|╠░╠╠H :╙▀█████████████████████████
-    ████████████████████████D░░░.'[╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠H:░░░╙╙▀▀████████████████████
-    ████████████████████▀╙╙:░░░░░░²╚╠╠╠╠╠╠╠╠╠╠╠╠╠╠░╠╠╠╠H=░░░░░░░░░╙╙▀▀██████████████
-    ████████████████▀╙░:,,,:░░░░░░░:╚╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠H|░░░░░░░|[░░░░░░░╙╚▀████████
-    █████████████▀╙└:::::-,:░░░░░░░░,!╚╠╠╠╠╠╠╠╠╠╠╠╠║╣╣╝░|╠╙╚░░░░░░░░░░░|░░░░░╚██████
-    ██████████▀╙:=:::::,:,-,░░░░░='`   ░"╙╚╠╠╠╠╠╠║╣▒▒R╚╚╚╙    `╙||░░░░░░░Ü░░░░╚█████
-    ██████▀╙░»::::::::::::,-:░='            '╙╠╠╣╣▒╬▒         _╓╔|[░Ü░|░░░░░░:-╚████
-    ████╙└:░░░░░░░░░░░░░::::,____ ``-----_    ²╚╣▒▒▒░=   `,;╔░░░░░╠░░░░░░░|░⌐:⌐|║███
-    ██▌░-::::░░░░░░░░░░░░░░░░:,,,--,,,,,-,--.-` ╙╣▒░=` `,|░░░░░░░░░░░░░░░:|░:=░'╚███
-    ██Ü-,::,:-:░░░░░░░░░░░░░░:,:::,::::::::::²!░░░=. ░,,|░░░░Ü░░░░░░░░░░░░░∩░': ░║██
-    █▒----::----::░░░░░░=░░░░::::::::::::░░░░░░░░^ `||░░░░░░[░░░░░░░░░░░:░░--`- |║██
-    █░-----::--`-::===░░░░░░░░░░░░░░░░░░░░░░░░░░░,|░░░░░░░░░Ü░░░░░░░░░░░:░░-  ` |║██
-    
-
-                                                                                 
-,--------. ,--.                        ,--.                ,---.                 
-'--.  .--' |  ,---.   ,--,--. ,--,--,  |  |,-.   ,---.    /  .-'  ,---.  ,--.--. 
-   |  |    |  .-.  | ' ,-.  | |      \ |     /  (  .-'    |  `-, | .-. | |  .--' 
-   |  |    |  | |  | \ '-'  | |  ||  | |  \  \  .-'  `)   |  .-' ' '-' ' |  |    
-   `--'    `--' `--'  `--`--' `--''--' `--'`--' `----'    `--'    `---'  `--'    
-                                                                                 
-                                                                                  ,---. 
-   ,--.                                 ,--.                    ,--.              |   | 
- ,-|  | ,--.--.  ,---.   ,---.   ,---.  `--' ,--,--,   ,---.    |  |-.  ,--. ,--. |  .' 
-' .-. | |  .--' | .-. | | .-. | | .-. | ,--. |      \ | .-. |   | .-. '  \  '  /  |  |  
-\ `-' | |  |    ' '-' ' | '-' ' | '-' ' |  | |  ||  | ' '-' '   | `-' |   \   '   `--'  
- `---'  `--'     `---'  |  |-'  |  |-'  `--' `--''--' .`-  /     `---'  .-'  /    .--.  
-                        `--'    `--'                  `---'             `---'     '--'  
-                                                                                                                                              
-,------.         ,--. ,--.                                                                ,----.    ,--.   ,--.   ,--.  ,--.          ,--.    
-|  .---'  ,---.  |  | |  |  ,---.  ,--.   ,--.   ,--,--,--.  ,---.     ,---.  ,--,--,    '  .-./    `--' ,-'  '-. |  '--'  | ,--.,--. |  |-.  
-|  `--,  | .-. | |  | |  | | .-. | |  |.'.|  |   |        | | .-. :   | .-. | |      \   |  | .---. ,--. '-.  .-' |  .--.  | |  ||  | | .-. ' 
-|  |`    ' '-' ' |  | |  | ' '-' ' |   .'.   |   |  |  |  | \   --.   ' '-' ' |  ||  |   '  '--'  | |  |   |  |   |  |  |  | '  ''  ' | `-' | 
-`--'      `---'  `--' `--'  `---'  '--'   '--'   `--`--`--'  `----'    `---'  `--''--'    `------'  `--'   `--'   `--'  `--'  `----'   `---'  
-                                                                                                                                              
-                                                                                                             
- ,----.             ,--.          ,--.   ,--.           ,--.               ,--.         ,--.                 
-'   ,  | ,--.  ,--. `--' ,--,--,  `--' ,-'  '-.  ,---.  |  ,---.   ,--,--. |  ,---.   ,-|  |  ,---.   ,---.  
-|  |   /  \  `'  /  ,--. |      \ ,--. '-.  .-' (  .-'  |  .-.  | ' ,-.  | |  .-.  | ' .-. | | .-. : | .-. | 
-'  '--'|   \    /   |  | |  ||  | |  |   |  |   .-'  `) |  | |  | \ '-'  | |  | |  | \ `-' | \   --. ' '-' ' 
- `----'     `--'    `--' `--''--' `--'   `--'   `----'  `--' `--'  `--`--' `--' `--'  `---'   `----'  `---'  
-                                                                                                             
-
-
-
-
---->
+Save the date: **6 December 2026** — we look forward to celebrating with you. ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਿਹ!
