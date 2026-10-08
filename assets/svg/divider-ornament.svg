@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 44" width="140" height="44" role="img" aria-label="Ornamental divider">
+  <defs>
+    <linearGradient id="dg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c8a24b" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#c8a24b" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#e5c46d" stop-opacity="1"/>
+      <stop offset="78%" stop-color="#c8a24b" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#c8a24b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#dg)" stroke-width="1.1" stroke-linecap="round">
+    <path d="M6 22 H54 M86 22 H134"/>
+    <path d="M14 22 C20 16 26 28 32 22" stroke-width="0.8" opacity="0.7"/>
+    <path d="M108 22 C114 16 120 28 126 22" stroke-width="0.8" opacity="0.7"/>
+    <!-- centre rosette -->
+    <ellipse cx="70" cy="22" rx="5" ry="9"/>
+    <ellipse cx="70" cy="22" rx="2" ry="4" fill="url(#dg)" stroke="none"/>
+    <path d="M58 22 C62 15 66 29 70 22 C74 15 78 29 82 22" stroke-width="0.9"/>
+  </g>
+  <g fill="url(#dg)">
+    <circle cx="48" cy="22" r="1.6"/>
+    <circle cx="92" cy="22" r="1.6"/>
+  </g>
+</svg>

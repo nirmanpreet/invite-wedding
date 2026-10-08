@@ -132,24 +132,32 @@ ${qrLib}
       <div class="intro-gate" id="intro-gate">
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
-          <h2>${esc(p1)} ${esc(connector)} ${esc(p2)}</h2>
+          <h2>${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</h2>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
           <div class="lang-pick" id="intro-lang-pick">
             <button type="button" data-lang="en" class="active">English</button>
             <button type="button" data-lang="pa">ਪੰਜਾਬੀ</button>
           </div>
-          <div class="gate-hint">Tap your language to enter</div>
+          <div class="gate-hint" id="gate-hint">Tap your language to enter</div>
         </div>
       </div>
 
       <!-- Petals -->
       <div class="sakura-falling" id="sakura-falling"></div>
 
+      <!-- Royal ornament frame -->
+      <div class="royal-frame" aria-hidden="true">
+        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+      </div>
+
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
       <div class="blessing" id="invite-blessing"></div>
 
       <div class="ornament" aria-hidden="true">
-        <img src="assets/svg/ornament.svg" alt="">
+        <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
       <!-- Anand Karaj ceremonial art (background blended away) -->
@@ -187,18 +195,19 @@ ${qrLib}
 
       <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;">ੴ</div>
-          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;">ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ</div>
+          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥</div>
           <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;">${esc(p1)}</div>
-          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;">${esc(connector)}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;">${esc(p2)}</div>
-          <div style="font-size:15px; letter-spacing:2px; text-transform:uppercase; color:#a4813a; margin-bottom:12px;">Wedding Reception &bull; ${esc(att(config, 'date', ''))}</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;">${esc(att(config, 'time', ''))}</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;" id="pdf-name-1">${esc(p1)}</div>
+          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;" id="pdf-connector">${esc(connector)}</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;" id="pdf-name-2">${esc(p2)}</div>
+          <div style="font-size:15px; letter-spacing:2px; color:#a4813a; margin-bottom:12px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
+          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
+          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-venue-line">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
           <div id="pdf-qr" class="pdf-qr"></div>
           <div style="margin-top:26px; border-top:1px solid #e3d5b3; padding-top:14px; font-size:13px; color:#4a1220;" id="pdf-footer-note">${esc(att(config, '_pdf.footerNote', 'With love and joy, together with their families'))}</div>
-          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;">${esc(att(config, 'footer.contact', ''))}</div>
+          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;" id="pdf-contact">${esc(att(config, 'footer.contact', ''))}</div>
         </div>
       </div>
 
@@ -237,6 +246,10 @@ const ornamentSrc = path.join(ROOT, 'assets/svg/ornament.svg');
 if (fs.existsSync(ornamentSrc)) {
   fs.copyFileSync(ornamentSrc, path.join(svgDist, 'ornament.svg'));
 }
+['corner-ornament.svg', 'divider-ornament.svg'].forEach(function (f) {
+  const s = path.join(ROOT, 'assets/svg', f);
+  if (fs.existsSync(s)) fs.copyFileSync(s, path.join(svgDist, f));
+});
 const imgDist = path.join(iconDist, 'img');
 fs.mkdirSync(imgDist, { recursive: true });
 const artSrc = path.join(ROOT, 'assets/img/anand-karaj.jpg');

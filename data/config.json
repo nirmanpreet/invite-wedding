@@ -4,7 +4,10 @@
     "partner1": "Nirman",
     "partner2": "Simran",
     "connector": "&",
-    "tagline": "Wedding Reception"
+    "tagline": "Wedding Reception",
+    "partner1Pa": "ਨਿਰਮਾਣ",
+    "partner2Pa": "ਸਿਮਰਨ",
+    "connectorPa": "ਅਤੇ"
   },
   "date": "6 December 2026",
   "time": "10:00 AM onwards",
@@ -12,27 +15,33 @@
   "venue": {
     "name": "Park City Resort",
     "address": "Malout, Fazilka Rd, Malout Rural, Punjab 152107, India",
-    "placeId": "0x39171158dd88b441:0x9f804e11dfae20d1"
+    "namePa": "ਪਾਰਕ ਸਿਟੀ ਰਿਜ਼ੌਰਟ",
+    "addressPa": "ਮਲੋਟ, ਫਾਜ਼ਿਲਕਾ ਰੋਡ, ਮਲੋਟ ਦਿਹਾਤੀ, ਪੰਜਾਬ 152107, ਭਾਰਤ",
+    "lat": 30.220634,
+    "lng": 74.47324
   },
   "rsvp": {
     "enabled": true,
-    "note": "Kindly RSVP by 22 November 2026"
+    "note": "Kindly RSVP by 22 November 2026",
+    "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
     "message": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
-    "phoneHref": "+61423594009"
+    "phoneHref": "+61423594009",
+    "contactLabelPa": "ਕਿਸੇ ਵੀ ਜਾਣਕਾਰੀ ਲਈ:"
   },
   "seo": {
     "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!"
   },
   "links": {
-    "venueMap": "https://www.google.com/maps/dir//Park+City+Resort,+Malout+Fazilka+Rd,+Malout+Rural,+Punjab+152107,+India/@-37.8132132,144.6643489,13z/data=!4m8!4m7!1m0!1m5!1m1!1s0x39171158dd88b441:0x9f804e11dfae20d1!2m2!1d74.472693!2d30.2203695?entry=ttu&g_ep=EgoyMDI2MTAwNC4wIKXMDSoASAFQAw%3D%3D",
+    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220634,74.473240&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
     "downloadCard": "#",
     "downloadLabel": "DOWNLOAD INVITATION CARD",
-    "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1"
+    "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1",
+    "venueMapShort": "https://maps.app.goo.gl/1UAqJJasDmb49PSq8"
   },
   "music": {
     "enabled": false,
@@ -65,7 +74,6 @@
   "features": {
     "_comment": "Toggle optional features without editing code.",
     "venueMapEmbed": true,
-    "countdown": true,
     "sakura": true,
     "photoSection": false,
     "rsvpWhatsApp": true,
@@ -75,11 +83,12 @@
     "divider": true,
     "printButton": true,
     "calendarIcs": true,
-    "qrCode": true
+    "qrCode": true,
+    "saveTheDate": true
   },
   "qr": {
-    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl opens venue directions; the contact QR is a vCard for Nirman (his phone) with the venue address.",
-    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Park+City+Resort+Malout+Punjab+India",
+    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl uses real coordinates (GPS needs Latin/ASCII - never the Punjabi address). The contact QR is a vCard for Nirman (his phone) with the venue address.",
+    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220634,74.473240&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
     "vcardName": "Nirman"
   },
   "rsvpWhatsApp": {
@@ -88,7 +97,15 @@
     "labelEn": "RSVP via WhatsApp",
     "labelPa": "ਵਟਸਐਪ ਰਾਹੀਂ RSVP",
     "defaultMessageEn": "I'm replying to the Wedding Reception of Nirman & Simran on 6 December 2026.",
-    "defaultMessagePa": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ 6 ਦਸੰਬਰ 2026 ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ ਲਈ ਮੇਰਾ ਜਵਾਬ:"
+    "defaultMessagePa": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ 6 ਦਸੰਬਰ 2026 ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਲਈ ਮੇਰਾ ਜਵਾਬ:",
+    "nameLabelEn": "Name",
+    "nameLabelPa": "ਨਾਮ",
+    "attendingLabelEn": "Attending",
+    "attendingLabelPa": "ਹਾਜ਼ਰੀ",
+    "attendYesEn": "Yes",
+    "attendYesPa": "ਹਾਂ",
+    "attendNoEn": "No",
+    "attendNoPa": "ਨਹੀਂ"
   },
   "rsvpForm": {
     "enabled": true,
@@ -103,7 +120,7 @@
     "noLabelEn": "No, I can't make it",
     "noLabelPa": "ਨਹੀਂ, ਮੈਂ ਨਹੀਂ ਆ ਸਕਦਾ/ਸਕਦੀ",
     "noteEn": "Your RSVP will open in WhatsApp — just press send to confirm.",
-    "notePa": "ਤੁਹਾਡਾ RSVP ਵਟਸਐਪ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗਾ — ਭੇਜੋ ਦਬਾ ਕੇ ਪੱਕਾ ਕਰੋ।"
+    "notePa": "ਤੁਹਾਡਾ RSVP ਵਟਸਐਪ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗਾ — ਪੱਕਾ ਕਰਨ ਲਈ ਭੇਜੋ ਦਬਾਓ।"
   },
   "photos": {
     "_comment": "Photo section disabled by features.photoSection. Leave empty.",
@@ -143,10 +160,22 @@
         "qrTitle": "Scan me for venue",
         "qrMap": "Venue Map",
         "qrContact": "Contact Details",
-        "qrNote": "Scan with your phone camera"
+        "qrNote": "Scan with your phone camera",
+        "gateHint": "Tap your language to enter",
+        "saveTheDateTitle": "Save the Date",
+        "saveTheDateNote": "Add the reception to your calendar so you do not miss it.",
+        "weekdays": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
       },
       "pa": {
-        "dayInfoTitle": "ਰਿਸੈਪਸ਼ਨ ਦੀ ਝਲਕ",
+        "dayInfoTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
         "dayInfoDate": "ਤਾਰੀਖ਼",
         "dayInfoTime": "ਸਮਾਂ",
         "dayInfoVenue": "ਸਥਾਨ",
@@ -155,12 +184,11 @@
         "dressCode": "ਪਰੰਪਰਾਗਤ ਜਾਂ ਸਮਾਰਟ ਕੈਜ਼ੂਅਲ (ਕਿਰਪਾ ਕਰਕੇ ਸਿਰ ਢੱਕ ਕੇ ਆਓ)",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
-        "calendarNote": "ਤੁਹਾਡੀ ਕੈਲੰਡਰ ਐਪ ਵਿੱਚ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
+        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
         "introSub": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
-        "introMeaning": "ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਖੁਸ਼ੀ ਨਾਲ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
+        "introMeaning": "ਇੱਕ ਪਰਮਾਤਮਾ। ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
         "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
         "shareLabel": "ਖੁਸ਼ੀ ਸਾਡੇ ਨਾਲ ਵੰਡੋ!",
-        "countdownOver": "ਖੁਸ਼ੀ ਦਾ ਦਿਨ ਆ ਗਿਆ ਹੈ!",
         "pdfTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
         "pdfSubtext": "ਤੁਹਾਨੂੰ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ",
         "pdfFooterNote": "ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਦੋਵਾਂ ਪਰਿਵਾਰਾਂ ਸਮੇਤ",
@@ -173,12 +201,25 @@
         "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
         "receptionHeading": "ਰਿਸੈਪਸ਼ਨ",
         "onWording": "ਨੂੰ",
-        "atWording": "ਵੇਲੇ",
-        "inviteTitle": "ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ",
+        "atWording": "",
+        "inviteTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ",
         "qrTitle": "ਸਥਾਨ ਲਈ ਸਕੈਨ ਕਰੋ",
         "qrMap": "ਸਥਾਨ ਦਾ ਨਕਸ਼ਾ",
         "qrContact": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
-        "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ"
+        "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ",
+        "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
+        "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
+        "saveTheDateNote": "ਰਿਸੈਪਸ਼ਨ ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰ ਲਓ ਤਾਂ ਕਿਸੇ ਵੀ ਦਿਨ ਨਾ ਛੁੱਟੇ।",
+        "weekdays": [
+          "ਐਤਵਾਰ",
+          "ਸੋਮਵਾਰ",
+          "ਮੰਗਲਵਾਰ",
+          "ਬੁਧਵਾਰ",
+          "ਵੀਰਵਾਰ",
+          "ਸ਼ੁਕ੍ਰਵਾਰ",
+          "ਸਨਿਵਾਰ"
+        ],
+        "pdfWorking": "ਤਿਆਰ ਹੋ ਰਿਹਾ ਹੈ..."
       }
     },
     "en": {
@@ -188,7 +229,6 @@
       "downloadBtn": "DOWNLOAD INVITATION CARD",
       "socialLabel": "Join us in our happiness!",
       "shareLabel": "Share the happiness!",
-      "countdownOver": "Bless the couple for a happy life!",
       "pdfTitle": "Wedding Reception Invitation",
       "pdfSubtext": "With the blessings of Waheguru, you are cordially invited to the Reception of",
       "pdfFooterNote": "With love and joy, together with their families",
@@ -199,18 +239,18 @@
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!"
+      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
-      "inviteTitle": "ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ",
+      "inviteTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ",
       "venueBtn": "ਸਥਾਨ ਵੇਖੋ",
       "downloadBtn": "ਸੱਦਾ-ਪੱਤਰ ਡਾਊਨਲੋਡ ਕਰੋ",
       "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
       "shareLabel": "ਖੁਸ਼ੀ ਸਾਡੇ ਨਾਲ ਵੰਡੋ!",
       "countdownOver": "ਖੁਸ਼ੀ ਦਾ ਦਿਨ ਆ ਗਿਆ ਹੈ!",
       "pdfTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
-      "pdfSubtext": "ਤੁਹਾਨੂੰ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ",
+      "pdfSubtext": "ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਤੁਹਾਨੂੰ ਇਨ੍ਹਾਂ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ:",
       "pdfFooterNote": "ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਦੋਵਾਂ ਪਰਿਵਾਰਾਂ ਸਮੇਤ",
       "consoleSaveTheDate": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ: {date}!",
       "consolePresence": "ਤੁਹਾਡੀ ਹਾਜ਼ਰੀ ਦੀ ਉਡੀਕ ਰਹੇਗੀ!",
@@ -221,5 +261,7 @@
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
       "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥"
     }
-  }
+  },
+  "datePa": "6 ਦਸੰਬਰ 2026",
+  "timePa": "ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ"
 }

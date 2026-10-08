@@ -19,6 +19,8 @@
   var footerPhone = (config.footer && config.footer.phone) || '';
   var footerPhoneHref = (config.footer && config.footer.phoneHref) || '';
   var mapUrl = (config.links && config.links.venueMap) || 'https://maps.google.com';
+  var eventDate = new Date(config.countdownTarget || 'Dec 6, 2026 10:00:00');
+  if (isNaN(eventDate.getTime())) eventDate = new Date('Dec 6, 2026 10:00:00');
   var social = config.social || {};
   var socialEnabled = !!(social.enabled && social.url);
   var features = config.features || {};
@@ -63,6 +65,55 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
+  // ---------- Language-aware values ----------
+  // Punjabi mode uses the *Pa variants; English mode the plain Latin values.
+  function isPa() { return currentLang === 'pa'; }
+  function v(enKey, paKey, fallback) {
+    if (isPa() && paKey) {
+      var pv = (function () {
+        var parts = paKey.split('.');
+        var o = config;
+        for (var i = 0; i < parts.length; i++) { if (!o) return ''; o = o[parts[i]]; }
+        return o;
+      })();
+      if (pv) return String(pv);
+    }
+    return fallback === undefined ? '' : String(fallback === null ? '' : fallback);
+  }
+  function name1() { return isPa() && couple.partner1Pa ? String(couple.partner1Pa) : p1; }
+  function name2() { return isPa() && couple.partner2Pa ? String(couple.partner2Pa) : p2; }
+  function name1Latin() { return p1; }
+  function name2Latin() { return p2; }
+  function conn() { return isPa() && couple.connectorPa ? String(couple.connectorPa) : connector; }
+  function dateText() { return isPa() && config.datePa ? String(config.datePa) : date; }
+  function timeText() { return isPa() && config.timePa ? String(config.timePa) : time; }
+  function venueNameText() { return isPa() && config.venue && config.venue.namePa ? String(config.venue.namePa) : venueName; }
+  function venueAddrText() { return isPa() && config.venue && config.venue.addressPa ? String(config.venue.addressPa) : venueAddress; }
+  function rsvpNoteText() {
+    if (isPa() && config.rsvp && config.rsvp.notePa) return String(config.rsvp.notePa);
+    return (config.rsvp && config.rsvp.note) ? String(config.rsvp.note) : '';
+  }
+  function contactLabelText() {
+    if (isPa() && config.footer && config.footer.contactLabelPa) return String(config.footer.contactLabelPa);
+    return footerContactLabel;
+  }
+  // Weekday name in the active language
+  function weekdayText() {
+    var arr = txList('weekdays');
+    if (!arr.length) return '';
+    return arr[eventDate.getDay()] || arr[0];
+  }
+  function txList(key) {
+    var block = extraBlock[currentLang] || extraBlock[defaultLang] || {};
+    var a = block[key];
+    return Array.isArray(a) ? a : [];
+  }
+  function txOr(key, fb) {
+    var block = extraBlock[currentLang] || extraBlock[defaultLang] || {};
+    var s = block[key];
+    if (s === null || s === undefined || s === '') s = fb || '';
+    return String(s);
+  }
   function whatsappEscape(s) {
     return String(s === null || s === undefined ? '' : s)
       .replace(/%/g, '%25').replace(/&/g, '%26').replace(/=/g, '%3D')
@@ -72,12 +123,9 @@
   // ---------- Gurmukhi literals (ASCII \uXXXX) ----------
   var G = {
     headingPa: '\u0A30\u0A3F\u0A38\u0A48\u0A2A\u0A38\u0A3C\u0A28',
-    introSubPa: '\u0A38\u0A3C\u0A3E\u0A26\u0A40 \u0A26\u0A3E \u0A28\u0A3F\u0A2E\u0A28\u0A24\u0A30\u0A28',
     headRsvpPa: 'RSVP',
     pdfSubPa: 'ਤੁਹਾਨੂੰ ਰਿਸੈਪ਼ਣ ਲਈ ਸੱਦਾ ਦਿੱਤਾ ਗਿਆ ਹੈ',
     pdfFootPa: 'ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਉਨ੍ਹਾਂ ਦੇ ਪਰਿਵਾਰਾਂ ਦੇ ਨਾਲ',
-    cdLabelsEn: 'Days, Hours, Minutes, Seconds',
-    cdLabelsPa: 'ਦਿਨ, ਘੰਟੇ, ਮਿੰਟ, ਸਕਿੰਟ'
   };
 
   // ---------- Language switching ----------
@@ -98,21 +146,33 @@
     updatePdfLang();
     renderLangToggle();
     updateIntroGate();
-    if (countdownTick) countdownTick();
+    renderSaveTheDate();
   }
 
   // ---------- Invite ----------
   function renderInvite() {
     var titleEl = document.getElementById('invite-title');
     if (titleEl) {
+      var n1 = name1();
+      var n2 = name2();
+      // Punjabi mode: Gurmukhi name with the Latin name underneath.
+      var n1Sub = isPa() ? '<span class="name-latin">' + esc(name1Latin()) + '</span>' : '';
+      var n2Sub = isPa() ? '<span class="name-latin">' + esc(name2Latin()) + '</span>' : '';
+      // Punjabi puts the "on" marker (ਨੂੰ) AFTER the date; English before it.
+      var datePart, timePart = '';
+      if (isPa()) {
+        datePart = '<span class="date">' + esc(dateText()) + '</span> ' + esc(tx('onWording', 'ਨੂੰ'));
+        timePart = timeText() ? ' &middot; ' + esc(timeText()) : '';
+      } else {
+        datePart = esc(tx('onWording', 'on')) + ' <span class="date">' + esc(dateText()) + '</span>';
+        timePart = time ? ' &middot; ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(timeText()) + '</span>' : '';
+      }
       titleEl.innerHTML =
-        '<h1>' + esc(p1) + '</h1>' +
-        '<h2>' + esc(connector) + '</h2>' +
-        '<h1>' + esc(p2) + '</h1>' +
-        '<h3>' + esc(t('inviteTitle') || 'Are getting married') + '</h3>' +
-        '<p>' + esc(tx('onWording', 'on')) + ' <span class="date">' + esc(date) + '</span>' +
-        (time ? ' &middot; ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(time) + '</span>' : '') +
-        '</p>';
+        '<h1>' + esc(n1) + n1Sub + '</h1>' +
+        '<h2>' + esc(conn()) + '</h2>' +
+        '<h1>' + esc(n2) + n2Sub + '</h1>' +
+        '<h3>' + esc(t('inviteTitle') || 'Wedding Reception') + '</h3>' +
+        '<p>' + datePart + timePart + '</p>';
     }
     // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
@@ -136,7 +196,7 @@
     if (footerEl) {
       var contactLine = '';
       if (footerContactLabel && footerPhone) {
-        contactLine = esc(footerContactLabel) + ' <a class="phone" href="tel:' + esc(footerPhoneHref) + '">' + esc(footerPhone) + '</a>';
+        contactLine = esc(contactLabelText()) + ' <a class="phone" href="tel:' + esc(footerPhoneHref) + '">' + esc(footerPhone) + '</a>';
       } else if (footerContact) {
         contactLine = esc(footerContact);
       }
@@ -168,18 +228,28 @@
     if (!el) return;
     if (features.dayInfo === false) { el.innerHTML = ''; return; }
     var isPa = (currentLang === 'pa');
-    var heading = isPa ? G.headingPa : tx('receptionHeading', 'Reception');
+    // Both languages must use the same occasion wording - "Reception" was
+    // leaking through as English inside Punjabi mode.
+    var heading = tx('receptionHeading', 'Reception');
     var items = '';
     el.innerHTML =
       '<h4>' + esc(heading) + '</h4>' +
       '<div class="day-grid">' + items +
-      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(date) + '</div></div>' +
-      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(time || '-') + '</div></div>' +
-      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoVenue', 'Venue')) + '</div><div class="value">' + esc(venueName) + (venueAddress ? ', ' + esc(venueAddress) : '') + '</div></div>' +
+      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(dateText()) + '</div></div>' +
+      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(timeText() || '-') + '</div></div>' +
+      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoVenue', 'Venue')) + '</div><div class="value">' + esc(venueNameText()) + (venueAddrText() ? '<br>' + esc(venueAddrText()) : '') + '</div></div>' +
       '</div>';
   }
 
   // ---------- RSVP ----------
+  // "Yes"/"No" -> Punjabi, for the outgoing WhatsApp message
+  function translateAttend(v) {
+    var s = String(v || '');
+    if (/^yes$/i.test(s)) return rsvpWhatsApp.attendYesPa || 'ਹਾਂ';
+    if (/^no$/i.test(s)) return rsvpWhatsApp.attendNoPa || 'ਨਹੀਂ';
+    return s;
+  }
+
   function buildWhatsappRsvpLink(attending, guestName, guests) {
     var phone = (rsvpWhatsApp && rsvpWhatsApp.phone) ? String(rsvpWhatsApp.phone).replace(/[^0-9+]/g, '') : '';
     if (!phone) return null;
@@ -197,8 +267,10 @@
       parts.push(gKey + guests);
     }
     if (attending) {
-      var aKey = isPa ? '\u0A06\u0A35\u0A23\u0A3E: ' : 'Attending: ';
-      parts.push(aKey + attending);
+      // The button carries data-attend="Yes"/"No"; the outgoing message
+      // must state it in the reader's language, not echo the English token.
+      var aKey = isPa ? 'ਹਾਜ਼ਰੀ: ' : 'Attending: ';
+      parts.push(aKey + (isPa ? translateAttend(attending) : attending));
     }
     var msg = parts.length ? parts.join(' | ') + ' | ' + baseMsg : baseMsg;
     return 'https://wa.me/' + phone + '?text=' + whatsappEscape(msg);
@@ -230,7 +302,7 @@
     var noLbl = isPa
       ? (rsvpForm.noLabelPa || '\u0A28\u0A39\u0A40\u0A02, \u0A2E\u0A48\u0A02 \u0A28\u0A39\u0A40\u0A02 \u0A06 \u0A38\u0A15\u0A26\u0A3E')
       : (rsvpForm.noLabelEn || "No, I can't make it");
-    var rsvpByName = (config.rsvp && config.rsvp.note) ? config.rsvp.note : '';
+    var rsvpByName = rsvpNoteText();
     var rsvpBy = (config.rsvp && config.rsvp.displayNote !== false && rsvpByName)
       ? '<div class="rsvp-by">' + esc(rsvpByName) + '</div>' : '';
 
@@ -286,12 +358,13 @@
     var el = document.getElementById('venue-map-embed');
     if (!el) return;
     if (features.venueMapEmbed === false) { el.innerHTML = ''; return; }
-    var q = encodeURIComponent((venueName + ' ' + venueAddress).trim());
-    var placeId = (config.venue && config.venue.placeId) || '';
-    // place_id embed is the most reliable form; fall back to a text query.
-    var embedUrl = placeId
-      ? 'https://maps.google.com/maps?q=place_id:' + encodeURIComponent(placeId) + '&z=15&hl=en&output=embed'
-      : 'https://maps.google.com/maps?q=' + q + '&z=15&hl=en&output=embed';
+    // Always query with the LATIN address + coordinates - never the Punjabi text,
+    // and never place_id (that form returns an empty 1.4KB shell with no place).
+    var lat = (config.venue && config.venue.lat);
+    var lng = (config.venue && config.venue.lng);
+    var embedUrl = (lat && lng)
+      ? 'https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=15&hl=en&output=embed'
+      : 'https://maps.google.com/maps?q=' + encodeURIComponent((venueName + ' ' + venueAddress).trim()) + '&z=15&hl=en&output=embed';
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
@@ -304,23 +377,27 @@
     if (features.calendarIcs === false) { el.innerHTML = ''; return; }
     var label = tx('calendarLabel', 'Add to calendar');
     var note = tx('calendarNote', 'Opens your calendar app with the event pre-filled.');
-    var monthMap = { January:'01', February:'02', March:'03', April:'04', May:'05', June:'06',
-                     July:'07', August:'08', September:'09', October:'10', November:'11', December:'12' };
-    var dparts = String(date).split(' ');
-    var day = String(dparts[1] || '1').replace(/[^0-9]/g, '');
-    if (day.length < 2) day = '0' + day;
-    var mon = monthMap[dparts[0]] || '12';
-    var year = dparts[2] || '2026';
-    var icsDate = year + mon + day;
-    var startHM = /\d{1,2}:\d{2}\s*(AM|PM)/i.exec(time || '');
-    var startT = 'T100000';
-    if (startHM) {
-      var h = parseInt(startHM[1], 10);
-      var isPM = /pm/i.test(startHM[0]);
-      if (isPM && h < 12) h += 12;
-      if (!isPM && h === 12) h = 0;
-      startT = 'T' + (h < 10 ? '0' + h : h) + '0000';
+    // Derive YYYYMMDD + HHMMSS from the parsed Date, not by splitting the
+    // display string. The old parser assumed "Month Day Year" but the config
+    // is "6 December 2026", so it emitted 2026120; and it read the AM/PM
+    // capture group as the hour, producing DTSTART ...TNaN0000.
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    // Day/month/year from the Date using LOCAL getters: the wedding is on
+    // 6 December 2026, and UTC getters would shift it to the 5th for
+    // anyone east of Greenwich.
+    var icsDate = eventDate.getFullYear() + pad(eventDate.getMonth() + 1) + pad(eventDate.getDate());
+    // The start time is a wall-clock time in India (TZID below), NOT the
+    // viewer's local time, so it must come from the config string.
+    var hm = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(time || '');
+    var icsHour = 10, icsMin = 0;
+    if (hm) {
+      icsHour = parseInt(hm[1], 10);
+      icsMin = parseInt(hm[2], 10);
+      var mer = (hm[3] || '').toUpperCase();
+      if (mer === 'PM' && icsHour < 12) icsHour += 12;
+      if (mer === 'AM' && icsHour === 12) icsHour = 0;
     }
+    var startT = 'T' + pad(icsHour) + pad(icsMin) + '00';
     var icsContent =
       'BEGIN:VCALENDAR\r\n' +
       'VERSION:2.0\r\n' +
@@ -332,6 +409,7 @@
       'DTSTART;TZID=Asia/Kolkata:' + icsDate + startT + '\r\n' +
       'DTEND;TZID=Asia/Kolkata:' + icsDate + 'T235900\r\n' +
       'DESCRIPTION:Wedding Reception for ' + p1 + ' & ' + p2 + ' on ' + date + ' at ' + venueName + '\r\n' +
+      // LOCATION stays Latin: calendar apps + GPS need the ASCII address.
       'LOCATION:' + venueName + (venueAddress ? ', ' + venueAddress : '') + '\r\n' +
       'END:VEVENT\r\n' +
       'END:VCALENDAR';
@@ -354,9 +432,9 @@
       var isPa = (currentLang === 'pa');
       headerEl.innerHTML =
         '<h1>' + esc(p1 + ' ' + connector + ' ' + p2) + '</h1>' +
-        '<p>' + esc(isPa ? G.headingPa : tx('receptionHeading', 'Reception')) +
-        ' \u2022 ' + esc(date) + (time ? ' \u2022 ' + esc(time) : '') + '</p>' +
-        '<p>' + esc(venueName) + (venueAddress ? ', ' + esc(venueAddress) : '') + '</p>';
+        '<p>' + esc(tx('receptionHeading', 'Reception')) +
+        ' \u2022 ' + esc(dateText()) + (timeText() ? ' \u2022 ' + esc(timeText()) : '') + '</p>' +
+        '<p>' + esc(venueNameText()) + (venueAddrText() ? ', ' + esc(venueAddrText()) : '') + '</p>';
     }
   }
 
@@ -371,6 +449,22 @@
   // Render a QR as a table, padded with white modules so both QRs share the
   // exact same grid size (and therefore the exact same physical size).
   // wrapInLink: 'map' | 'contact' | null - wraps the QR in <a> for click-to-open
+  // html2canvas (the PDF renderer) cannot rasterise the QR in ANY form: a
+  // <table> with border-collapse, a <canvas>, and inline SVG all came out
+  // as blank white squares in the downloaded card. So the PDF card keeps an
+  // empty white box of the correct size for html2canvas to capture, and the
+  // modules are painted straight onto html2canvas's output canvas afterwards
+  // (see paintQrCodesOnto). The live page still uses real <table> QRs.
+  function qrBlankBox(cellPx, targetN) {
+    var side = targetN * cellPx;
+    var pad = cellPx * 4;
+    var el = document.createElement('div');
+    el.className = 'qr-wrap qr-wrap-blank';
+    el.style.cssText = 'width:' + side + 'px;height:' + side + 'px;background:#fff;' +
+      'padding:0;border-radius:10px;';
+    return el;
+  }
+
   function qrTableHtml(qr, cellPx, targetN, wrapInLink) {
     var n = qr.getModuleCount();
     var top = Math.floor((targetN - n) / 2);
@@ -412,6 +506,11 @@
     return lines.join('\r\n');
   }
 
+// QR placeholders recorded by renderQrSection and painted onto the PDF
+  // canvas after html2canvas runs. Declared here because renderQrSection
+  // runs on every language change.
+  var qrPaintList = [];
+
   function renderQrSection() {
     var el = document.getElementById('qr-section');
     if (!el) return;
@@ -424,53 +523,124 @@
     var contactLbl = esc(tx('qrContact', 'Contact Details'));
     var note = esc(tx('qrNote', 'Scan with your phone camera'));
 
+    var q1 = makeQr(mapText);
+    var q2 = makeQr(vcard);
     // Both QRs share one grid size (the larger module count), so they render
-    // at the exact same size — on the page and identically on the PDF card.
-    function buildPair(cellPx, forPdf) {
-      var q1 = makeQr(mapText);
-      var q2 = makeQr(vcard);
-      var targetN = Math.max(q1.getModuleCount(), q2.getModuleCount());
-      // On page (not PDF), wrap in clickable links
-      var wrapMap = forPdf ? null : 'map';
-      var wrapContact = forPdf ? null : 'contact';
-      return {
-        map: qrTableHtml(q1, cellPx, targetN, wrapMap),
-        contact: qrTableHtml(q2, cellPx, targetN, wrapContact)
-      };
-    }
+    // at the exact same size - on the page and identically on the PDF card.
+    var targetN = Math.max(q1.getModuleCount(), q2.getModuleCount());
+    var cellPx = 3;
 
-    var pagePair = buildPair(3, false);
+    // Live page: real <table> QRs, each wrapped in a clickable link.
     el.innerHTML =
       '<h4>' + title + '</h4>' +
       '<div class="qr-grid">' +
-        '<div class="qr-item">' + pagePair.map +
+        '<div class="qr-item">' + qrTableHtml(q1, cellPx, targetN, 'map') +
           '<div class="qr-label">' + mapLbl + '</div></div>' +
-        '<div class="qr-item">' + pagePair.contact +
+        '<div class="qr-item">' + qrTableHtml(q2, cellPx, targetN, 'contact') +
           '<div class="qr-label">' + contactLbl + '</div></div>' +
       '</div>' +
       '<div class="qr-note">' + note + '</div>';
 
+    // PDF card: blank white boxes of identical size, plus a record of what to
+    // paint into each one once html2canvas has captured the card.
+    qrPaintList = [];
     var pdfQr = document.getElementById('pdf-qr');
     if (pdfQr) {
-      var pdfPair = buildPair(3, true);
-      pdfQr.innerHTML =
-        '<div class="pdf-qr-title">' + title + '</div>' +
-        '<div class="pdf-qr-grid">' +
-          '<div class="qr-item">' + pdfPair.map +
-            '<div class="qr-label">' + mapLbl + '</div></div>' +
-          '<div class="qr-item">' + pdfPair.contact +
-            '<div class="qr-label">' + contactLbl + '</div></div>' +
-        '</div>';
+      pdfQr.innerHTML = '';
+      var pdfTitle = document.createElement('div');
+      pdfTitle.className = 'pdf-qr-title';
+      pdfTitle.textContent = tx('qrTitle', 'Scan me for venue');
+      var pdfGrid = document.createElement('div');
+      pdfGrid.className = 'pdf-qr-grid';
+      [[q1, tx('qrMap', 'Venue Map')], [q2, tx('qrContact', 'Contact Details')]].forEach(function (entry) {
+        var item = document.createElement('div');
+        item.className = 'qr-item';
+        var box = qrBlankBox(cellPx, targetN);
+        item.appendChild(box);
+        var lbl = document.createElement('div');
+        lbl.className = 'qr-label';
+        lbl.textContent = entry[1];
+        item.appendChild(lbl);
+        pdfGrid.appendChild(item);
+        qrPaintList.push({ box: box, qr: entry[0], cell: cellPx, target: targetN });
+      });
+      pdfQr.appendChild(pdfTitle);
+      pdfQr.appendChild(pdfGrid);
     }
+  }
+
+  // Paint the QR modules straight onto html2canvas's output canvas. html2canvas
+  // cannot rasterise a table, canvas or SVG, so the modules are drawn here.
+  function paintQrCodesOnto(canvas, card) {
+    if (!qrPaintList || !qrPaintList.length) return;
+    var cardRect = card.getBoundingClientRect();
+    var scale = canvas.width / cardRect.width;
+    var ctx = canvas.getContext('2d');
+    // html2canvas leaves its render scale on the context, so draw in device
+    // pixels with an identity transform. Without this every fill lands at
+    // double the intended offset, i.e. off the canvas.
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    qrPaintList.forEach(function (entry) {
+      var br = entry.box.getBoundingClientRect();
+      if (!br.width) return;
+      var side = entry.target * entry.cell;
+      // The QR area sits inside the box; centre it the same way the table
+      // version does (blank rows/cols around a smaller QR).
+      var n = entry.qr.getModuleCount();
+      var off = Math.floor((entry.target - n) / 2);
+      var x0 = (br.left - cardRect.left) * scale + (br.width - side) * scale / 2;
+      var y0 = (br.top - cardRect.top) * scale + (br.height - side) * scale / 2;
+      var px = side * scale / entry.target;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x0, y0, side * scale, side * scale);
+      ctx.fillStyle = '#4a1220';
+      for (var r = 0; r < n; r++) {
+        var runStart = -1;
+        for (var c = 0; c <= n; c++) {
+          var dark = c < n && entry.qr.isDark(r, c);
+          if (dark && runStart < 0) runStart = c;
+          if (!dark && runStart >= 0) {
+            var w = (c - runStart) * px;
+            ctx.fillRect(x0 + (off + runStart) * px, y0 + (off + r) * px, w, px);
+            runStart = -1;
+          }
+        }
+      }
+    });
+    ctx.restore();
   }
 
   // ---------- PDF (lazy-loaded libs) ----------
   function updatePdfLang() {
     var isPa = (currentLang === 'pa');
     var subEl = document.getElementById('pdf-subtext');
-    if (subEl) subEl.textContent = isPa ? G.pdfSubPa : ((config._pdf && config._pdf.subtext) || 'You are cordially invited to the wedding reception of');
+    if (subEl) subEl.textContent = isPa ? (L.pdfSubtext || G.pdfSubPa) : ((config._pdf && config._pdf.subtext) || 'You are cordially invited to the wedding reception of');
     var footEl = document.getElementById('pdf-footer-note');
-    if (footEl) footEl.textContent = isPa ? G.pdfFootPa : ((config._pdf && config._pdf.footerNote) || 'With love and joy, together with their families');
+    if (footEl) footEl.textContent = isPa ? (L.pdfFooterNote || G.pdfFootPa) : ((config._pdf && config._pdf.footerNote) || 'With love and joy, together with their families');
+    // Names + connector
+    var n1 = document.getElementById('pdf-name-1');
+    if (n1) n1.textContent = name1();
+    var n2 = document.getElementById('pdf-name-2');
+    if (n2) n2.textContent = name2();
+    var cn = document.getElementById('pdf-connector');
+    if (cn) cn.textContent = conn();
+    // Event line: "Reception • 6 December 2026"
+    var ev = document.getElementById('pdf-event-line');
+    if (ev) ev.textContent = tx('receptionHeading', 'Reception') + ' \u2022 ' + dateText();
+    var tl = document.getElementById('pdf-time-line');
+    if (tl) tl.textContent = timeText();
+    var vl = document.getElementById('pdf-venue-line');
+    if (vl) vl.textContent = venueNameText() + (venueAddrText() ? ', ' + venueAddrText() : '');
+    var ct = document.getElementById('pdf-contact');
+    if (ct) ct.textContent = contactLabelText() + ' ' + footerPhone;
+    // Gurmukhi blessing lines (same 2 lines as the page, minus Ik Onkar)
+    var bl = document.getElementById('pdf-blessing');
+    if (bl) {
+      var note = t('footerNote') || '';
+      var lines = String(note).split('\u2014')[0].replace(/\\s+$/, '');
+      bl.textContent = lines.trim();
+    }
   }
 
   function loadPdfLibs(cb) {
@@ -505,12 +675,17 @@
       }
       html2canvas(card, { scale: 2, useCORS: true, logging: false })
         .then(function (canvas) {
+          // html2canvas cannot draw the QR modules, so paint them on here.
+          paintQrCodesOnto(canvas, card);
           var imgData = canvas.toDataURL('image/png');
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
           var pw = pdf.internal.pageSize.getWidth();
           var ph = Math.min((canvas.height * pw) / canvas.width, pdf.internal.pageSize.getHeight());
-          pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
+          // Centre the card on the page; otherwise a tall A4 page leaves a
+          // wide empty band under a wide, short card.
+          var offY = Math.max(0, (pdf.internal.pageSize.getHeight() - ph) / 2);
+          pdf.addImage(imgData, 'PNG', 0, offY, pw, ph);
           pdf.save('Invitation - ' + p1 + ' ' + connector + ' ' + p2 + '.pdf');
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
@@ -527,46 +702,22 @@
     });
   }
 
-  // ---------- Countdown ----------
-  var countdownTick = null;
-  function parseArray(s) {
-    var parts = String(s || '').split(',');
-    if (parts.length >= 4) return parts.map(function (x) { return x.trim(); });
-    return ['Days', 'Hours', 'Minutes', 'Seconds'];
-  }
-  function startCountdown() {
-    var target = new Date(config.countdownTarget || 'Dec 6, 2026 18:00:00').getTime();
-    if (isNaN(target)) target = new Date('Dec 6, 2026 18:00:00').getTime();
+    // ---------- Save the Date card (replaces the ticking countdown) ----------
+  function renderSaveTheDate() {
     var el = document.getElementById('time');
     if (!el) return;
-    if (features.countdown === false) { el.style.display = 'none'; return; }
+    if (features.saveTheDate === false) { el.style.display = 'none'; el.innerHTML = ''; return; }
     el.style.display = '';
-    function tick() {
-      var dist = target - Date.now();
-      if (isNaN(dist)) { el.style.display = 'none'; return; }
-      if (dist < 0) { el.style.display = 'none'; return; }
-      var d = Math.floor(dist / 864e5);
-      var h = Math.floor((dist % 864e5) / 36e5);
-      var m = Math.floor((dist % 36e5) / 6e4);
-      var s = Math.floor((dist % 6e4) / 1000);
-      var isPa = (currentLang === 'pa');
-      var labels = isPa ? G.cdLabelsPa : G.cdLabelsEn;
-      var safeH = Math.max(0, Math.min(23, h));
-      var safeM = Math.max(0, Math.min(59, m));
-      var safeS = Math.max(0, Math.min(59, s));
-      var parsable = parseArray(labels);
-      if (parsable.length < 4) parsable = ['Days', 'Hours', 'Minutes', 'Seconds'];
-      el.innerHTML =
-        "<div class='container'>" +
-        "<div class='days block'>" + d + '<br>' + esc(parsable[0]) + '</div>' +
-        "<div class='hours block'>" + safeH + '<br>' + esc(parsable[1]) + '</div>' +
-        "<div class='minutes block'>" + safeM + '<br>' + esc(parsable[2]) + '</div>' +
-        "<div class='seconds block'>" + safeS + '<br>' + esc(parsable[3]) + '</div>' +
-        '</div>';
-    }
-    tick();
-    countdownTick = tick;
-    setInterval(tick, 1000);
+    var wd = weekdayText();
+    var dTxt = dateText();
+    // Punjabi: "ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026"  |  English: "Sunday, 6 December 2026"
+    var full = wd ? wd + ', ' + dTxt : dTxt;
+    el.innerHTML =
+      '<div class="save-date">' +
+        '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
+        '<div class="sd-date">' + esc(full) + '</div>' +
+        '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
+      '</div>';
   }
 
   // ---------- Gold petals ----------
@@ -609,7 +760,7 @@
     langs.forEach(function (key) {
       var label = (i18n[key] && i18n[key].langLabel) || key.toUpperCase();
       var active = (key === currentLang);
-      html += '<a href="#lang=' + esc(key) + '" class="' + (active ? 'active-lang' : '') + '">' + esc(label) + '</a> ';
+      html += '<a href="#lang=' + esc(key) + '" data-lang="' + esc(key) + '" class="' + (active ? 'active-lang' : '') + '">' + esc(label) + '</a> ';
     });
     html += '</span>';
     toggle.innerHTML = html;
@@ -671,16 +822,24 @@
   }
 
   function updateIntroGate() {
-    var isPa = (currentLang === 'pa');
     var subEl = document.getElementById('intro-sub');
-    if (subEl) subEl.textContent = tx('introSub', isPa ? G.introSubPa : 'Wedding Invite');
+    if (subEl) subEl.textContent = txOr('introSub', 'Wedding Reception Invitation');
+    var hintEl = document.getElementById('gate-hint');
+    if (hintEl) hintEl.textContent = txOr('gateHint', 'Tap your language to enter');
+    // The occasion line is static in the HTML, so it never got localised.
+    var medEl = document.getElementById('dance-med');
+    if (medEl) medEl.textContent = tx('receptionHeading', 'Reception');
   }
 
   // ---------- Boot ----------
   function boot() {
+    // Set <html lang> before anything renders: the Punjabi typography rules are
+    // scoped to html[lang="pa"], and setLang() only runs on interaction.
+    document.documentElement.lang = isPa() ? 'pa' : 'en';
     setupIntroGate();
+    updateIntroGate();   // gate copy must match the deep-linked language on load
     renderInvite();
-    startCountdown();
+    renderSaveTheDate();
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();

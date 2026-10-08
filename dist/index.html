@@ -147,13 +147,39 @@ button, input {
   color: var(--maroon);
   margin-bottom: 14px;
 }
+/* Names on the intro gate and the invite heading.
+   Great Vibes is a hairline script: its strokes sit near the edge of
+   legibility on a cream ground at small sizes. These rules keep the
+   elegance but make it readable - proper case, no tracking, a touch
+   larger, and a soft gold glow that visually thickens the strokes. */
 .intro-gate h2 {
   font-family: var(--font-script);
-  font-size: clamp(38px, 9vw, 50px);
+  font-size: clamp(46px, 12vw, 62px);
   font-weight: 400;
+  line-height: 1.18;
   color: var(--royal);
-  margin: 6px 0 2px;
-  letter-spacing: 0.5px;
+  margin: 4px 0 4px;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 247, 0.7),
+    0 0 20px rgba(200, 162, 75, 0.22);
+}
+/* Gurmukhi names on the gate: never script, never tracked */
+html[lang="pa"] .intro-gate h2 {
+  font-family: var(--font-gurmukhi);
+  font-size: clamp(32px, 8vw, 40px);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-shadow: none;
+}
+/* Great Vibes' ampersand swash reaches into the letters either side of it.
+   Breathing room keeps "Nirman & Simran" from reading as one word. */
+.intro-gate h2 .amp {
+  display: inline-block;
+  margin: 0 0.16em;
+  color: var(--gold);
 }
 .intro-gate .sub {
   font-family: var(--font-display);
@@ -178,12 +204,23 @@ button, input {
   border: 1px solid var(--gold);
   border-radius: 2px;
   color: var(--royal);
-  font-family: var(--font-gurmukhi);
+  /* Per-language font + tracking: "English" needs the Latin face, while
+     "ਪੰਜਾਬੀ" must use the Gurmukhi face with no tracking (W3C §5.1/§6).
+     One rule for both would give the Punjabi label the wrong typeface. */
+  font-family: var(--font-body);
   font-size: 15px;
-  letter-spacing: 2px;
+  font-weight: 500;
+  letter-spacing: 2.4px;
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.35s var(--ease), color 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+.intro-gate .lang-pick button[data-lang="pa"] {
+  font-family: var(--font-gurmukhi);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
 }
 .intro-gate .lang-pick button:hover {
   background: rgba(200, 162, 75, 0.12);
@@ -231,11 +268,6 @@ button, input {
 /* ============================================================
    ORNAMENT DIVIDER
    ============================================================ */
-.ornament {
-  width: min(340px, 78%);
-  margin: 26px auto;
-  opacity: 0.9;
-}
 
 /* ============================================================
    ANAND KARAJ ART — white bg removed via multiply blend
@@ -290,6 +322,8 @@ button, input {
   position: relative;
   z-index: 2;
 }
+/* The same hairline-script legibility fix as the intro gate: proper case,
+   never tracked, soft gold glow to lift the strokes off the parchment. */
 .title h1 {
   font-family: var(--font-script);
   font-weight: 400;
@@ -297,6 +331,18 @@ button, input {
   line-height: 1.06;
   margin: 14px 0 0;
   color: var(--royal);
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 247, 0.75),
+    0 0 26px rgba(200, 162, 75, 0.2);
+}
+/* Gurmukhi names are never set in the script face */
+html[lang="pa"] .title h1 {
+  font-family: var(--font-gurmukhi);
+  font-weight: 600;
+  line-height: 1.5;
+  text-shadow: none;
 }
 .title h2 {
   font-family: var(--font-script);
@@ -341,41 +387,44 @@ button, input {
 /* ============================================================
    COUNTDOWN
    ============================================================ */
+/* ============================================================
+   SAVE THE DATE CARD (replaces the countdown)
+   ============================================================ */
 #time {
   position: relative;
   z-index: 2;
-  width: min(560px, 92%);
+  width: min(520px, 92%);
   margin: 26px auto 6px;
-  padding: 20px 16px;
+  padding: 26px 20px;
   box-sizing: border-box;
   background: rgba(255, 253, 248, 0.72);
   border: 1px solid var(--gold-line);
   border-radius: 3px;
   box-shadow: var(--shadow-soft);
+  text-align: center;
 }
-#time .container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: 6px;
-}
-#time .block {
-  flex: 1 1 0;
+.save-date .sd-title {
   font-family: var(--font-display);
-  font-size: clamp(15px, 4.2vw, 21px);
-  line-height: 1.7;
-  color: var(--royal);
-  letter-spacing: 1.5px;
-  position: relative;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  margin-bottom: 10px;
 }
-#time .block + .block::before {
-  content: '';
-  position: absolute;
-  left: -1px;
-  top: 18%;
-  height: 64%;
-  width: 1px;
-  background: var(--gold-line);
+.save-date .sd-date {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 5.6vw, 28px);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--royal);
+  margin-bottom: 8px;
+}
+.save-date .sd-note {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--brown);
+  opacity: 0.9;
 }
 
 /* ============================================================
@@ -442,13 +491,23 @@ button, input {
   display: inline-block;
   padding: 7px 16px;
   margin: 0 4px;
-  font-family: var(--font-gurmukhi);
+  font-family: var(--font-body);
   font-size: 13px;
-  letter-spacing: 2px;
+  font-weight: 500;
+  letter-spacing: 2.4px;
   text-transform: uppercase;
   color: var(--gold-text);
   border-bottom: 1px solid transparent;
   transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+/* The Punjabi label needs the Gurmukhi face, untracked (W3C §5.1/§6) */
+.lang-toggle a[data-lang="pa"],
+.lang-toggle a[href="#lang=pa"] {
+  font-family: var(--font-gurmukhi);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
 }
 .lang-toggle a:hover { color: var(--maroon); }
 .lang-toggle a.active-lang {
@@ -571,6 +630,9 @@ button, input {
   opacity: 0.85;
 }
 .pdf-qr { margin-top: 18px; }
+/* SVG QR sizing for the PDF card (the live page uses <table> QRs) */
+.qr-wrap-svg { line-height: 0; }
+.qr-wrap-svg svg { display: block; }
 .pdf-qr-title {
   font-family: var(--font-display);
   font-size: 13px;
@@ -703,6 +765,195 @@ button, input {
 }
 
 /* ============================================================
+   ROYAL ORNAMENT FRAME + DIVIDER
+   ============================================================ */
+.royal-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.rf-corner {
+  position: absolute;
+  width: 104px;
+  height: 104px;
+  opacity: 0.5;
+}
+.rf-corner.tl { top: 10px; left: 10px; }
+.rf-corner.tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.rf-corner.bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.rf-corner.br { bottom: 10px; right: 10px; transform: scale(-1, -1); }
+
+@media (max-width: 520px) {
+  .rf-corner { width: 74px; height: 74px; }
+  .rf-corner.tl, .rf-corner.tr { top: 6px; }
+  .rf-corner.bl, .rf-corner.br { bottom: 6px; }
+  .rf-corner.tl, .rf-corner.bl { left: 6px; }
+  .rf-corner.tr, .rf-corner.br { right: 6px; }
+}
+
+.ornament {
+  width: min(300px, 74%);
+  margin: 24px auto;
+  opacity: 0.95;
+}
+.ornament img { display: block; width: 100%; height: auto; }
+
+/* Never let the ornament dominate on small screens */
+@media (max-width: 380px) {
+  .ornament { width: 66%; margin: 20px auto; }
+}
+/* ============================================================
+   GURMUKHI TYPOGRAPHY CORRECTIONS
+   Per W3C "Gurmukhi Layout Requirements":
+     §5.1   spacing glyphs are joined together at the top bar, so
+            letter-spacing severs the conjunct and must not be used
+     §6     stacks must not be split apart by letter-spacing
+     §8.3   Gurmukhi needs slightly more vertical space than Latin
+     §5.2   bold is not a traditional feature of Gurmukhi
+     §8.1.1 ੴ must not create line-break opportunities on its own
+   The airy tracked-caps Latin styling is therefore scoped to English
+   only; Punjabi gets normal tracking, no caps, lighter weight.
+   ============================================================ */
+
+/* Latin-only: the airy tracked-caps look (English).
+   NOTE: the names (.intro-gate h2, .title h1) are deliberately NOT in these
+   lists. Upper-casing a script face replaces its lowercase letterforms with
+   swash capitals, which turned "Nirman" into an unreadable "NJRMaN". Script
+   faces are drawn as connected shapes, so they must never be tracked either. */
+html[lang="en"] .intro-gate .sub,
+html[lang="en"] .intro-gate .gate-hint,
+html[lang="en"] .intro-gate .lang-pick button,
+html[lang="en"] .title h3,
+html[lang="en"] .dance-med,
+html[lang="en"] .actions .venue,
+html[lang="en"] .lang-toggle a,
+html[lang="en"] .day-info h4,
+html[lang="en"] .day-info h5,
+html[lang="en"] .qr-section h4,
+html[lang="en"] .rsvp-section h4,
+html[lang="en"] .calendar-section h4,
+html[lang="en"] .print-section h4,
+html[lang="en"] .day-item .label,
+html[lang="en"] .qr-label,
+html[lang="en"] .rsvp-by,
+html[lang="en"] .map-label,
+html[lang="en"] .pdf-qr-title,
+html[lang="en"] .save-date .sd-title {
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+/* Punjabi: never track, never upper-case, lighter weight */
+html[lang="pa"] .intro-gate .sub,
+html[lang="pa"] .intro-gate .gate-hint,
+html[lang="pa"] .intro-gate .lang-pick button,
+html[lang="pa"] .title h3,
+html[lang="pa"] .dance-med,
+html[lang="pa"] .actions .venue,
+html[lang="pa"] .lang-toggle a,
+html[lang="pa"] .day-info h4,
+html[lang="pa"] .day-info h5,
+html[lang="pa"] .qr-section h4,
+html[lang="pa"] .rsvp-section h4,
+html[lang="pa"] .calendar-section h4,
+html[lang="pa"] .print-section h4,
+html[lang="pa"] .day-item .label,
+html[lang="pa"] .qr-label,
+html[lang="pa"] .rsvp-by,
+html[lang="pa"] .map-label,
+html[lang="pa"] .pdf-qr-title,
+html[lang="pa"] .save-date .sd-title {
+  letter-spacing: normal;
+  text-transform: none;
+  font-weight: 500;
+}
+
+/* Every Gurmukhi run must use a Gurmukhi-capable face. Playfair and
+   Cormorant have no Gurmukhi glyphs, so the browser was falling back
+   per-character and mixing font metrics across a single word. */
+html[lang="pa"] .title h1,
+html[lang="pa"] .title h2,
+html[lang="pa"] .title h3,
+html[lang="pa"] .title p,
+html[lang="pa"] .blessing,
+html[lang="pa"] .blessing-text,
+html[lang="pa"] .dance-med,
+html[lang="pa"] .footer,
+html[lang="pa"] .day-info,
+html[lang="pa"] .qr-section,
+html[lang="pa"] .rsvp-section,
+html[lang="pa"] .calendar-section,
+html[lang="pa"] .print-section,
+html[lang="pa"] .lang-toggle,
+html[lang="pa"] .actions,
+html[lang="pa"] .intro-gate,
+html[lang="pa"] .save-date {
+  font-family: 'Noto Sans Gurmukhi', 'Playfair Display', Georgia, serif;
+}
+
+/* §8.3 - Gurmukhi stacks and matras extend below the Latin descender */
+html[lang="pa"] .blessing-text,
+html[lang="pa"] .title p,
+html[lang="pa"] .day-item .value,
+html[lang="pa"] .rsvp-note,
+html[lang="pa"] .cal-note,
+html[lang="pa"] .qr-note,
+html[lang="pa"] .sd-note {
+  line-height: 1.95;
+}
+
+/* Lock ੴ to its line - it must never wrap alone (W3C §8.1.1) */
+.blessing .ik,
+.intro-gate .ik,
+#pdf-ik {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+/* Latin name shown under the Gurmukhi name in Punjabi mode */
+.name-latin {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(15px, 4vw, 19px);
+  font-weight: 400;
+  color: var(--gold-text);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+html[lang="en"] .name-latin,
+html[lang="pa"] .name-latin {
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Long Punjabi place names / addresses must fit narrow phones */
+html[lang="pa"] .day-item .value,
+html[lang="pa"] .sd-date {
+  font-size: clamp(13px, 3.6vw, 16px);
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+  text-wrap: balance;
+}
+
+@media (max-width: 420px) {
+  html[lang="pa"] .day-item .value { font-size: 13px; }
+  html[lang="pa"] .day-grid { grid-template-columns: 1fr 1fr; gap: 14px 8px; }
+  html[lang="pa"] .day-item:last-child { grid-column: 1 / -1; }
+}
+
+/* ---- Final sweep: any remaining Gurmukhi-bearing control in Punjabi mode ---- */
+html[lang="pa"] .qr-note,
+html[lang="pa"] .attend-btn,
+html[lang="pa"] .rsvp-actions button,
+html[lang="pa"] #rsvp-send,
+html[lang="pa"] #print-invite {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ============================================================
    REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -751,7 +1002,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "partner1": "Nirman",
     "partner2": "Simran",
     "connector": "&",
-    "tagline": "Wedding Reception"
+    "tagline": "Wedding Reception",
+    "partner1Pa": "ਨਿਰਮਾਣ",
+    "partner2Pa": "ਸਿਮਰਨ",
+    "connectorPa": "ਅਤੇ"
   },
   "date": "6 December 2026",
   "time": "10:00 AM onwards",
@@ -759,27 +1013,33 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   "venue": {
     "name": "Park City Resort",
     "address": "Malout, Fazilka Rd, Malout Rural, Punjab 152107, India",
-    "placeId": "0x39171158dd88b441:0x9f804e11dfae20d1"
+    "namePa": "ਪਾਰਕ ਸਿਟੀ ਰਿਜ਼ੌਰਟ",
+    "addressPa": "ਮਲੋਟ, ਫਾਜ਼ਿਲਕਾ ਰੋਡ, ਮਲੋਟ ਦਿਹਾਤੀ, ਪੰਜਾਬ 152107, ਭਾਰਤ",
+    "lat": 30.220634,
+    "lng": 74.47324
   },
   "rsvp": {
     "enabled": true,
-    "note": "Kindly RSVP by 22 November 2026"
+    "note": "Kindly RSVP by 22 November 2026",
+    "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
     "message": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
-    "phoneHref": "+61423594009"
+    "phoneHref": "+61423594009",
+    "contactLabelPa": "ਕਿਸੇ ਵੀ ਜਾਣਕਾਰੀ ਲਈ:"
   },
   "seo": {
     "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!"
   },
   "links": {
-    "venueMap": "https://www.google.com/maps/dir//Park+City+Resort,+Malout+Fazilka+Rd,+Malout+Rural,+Punjab+152107,+India/@-37.8132132,144.6643489,13z/data=!4m8!4m7!1m0!1m5!1m1!1s0x39171158dd88b441:0x9f804e11dfae20d1!2m2!1d74.472693!2d30.2203695?entry=ttu&g_ep=EgoyMDI2MTAwNC4wIKXMDSoASAFQAw%3D%3D",
+    "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220634,74.473240&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
     "downloadCard": "#",
     "downloadLabel": "DOWNLOAD INVITATION CARD",
-    "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1"
+    "venuePlace": "https://www.google.com/maps/place/park+city+resort+malout/data=!4m2!3m1!1s0x39171158dd88b441:0x9f804e11dfae20d1",
+    "venueMapShort": "https://maps.app.goo.gl/1UAqJJasDmb49PSq8"
   },
   "music": {
     "enabled": false,
@@ -812,7 +1072,6 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   "features": {
     "_comment": "Toggle optional features without editing code.",
     "venueMapEmbed": true,
-    "countdown": true,
     "sakura": true,
     "photoSection": false,
     "rsvpWhatsApp": true,
@@ -822,11 +1081,12 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "divider": true,
     "printButton": true,
     "calendarIcs": true,
-    "qrCode": true
+    "qrCode": true,
+    "saveTheDate": true
   },
   "qr": {
-    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl opens venue directions; the contact QR is a vCard for Nirman (his phone) with the venue address.",
-    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Park+City+Resort+Malout+Punjab+India",
+    "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl uses real coordinates (GPS needs Latin/ASCII - never the Punjabi address). The contact QR is a vCard for Nirman (his phone) with the venue address.",
+    "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220634,74.473240&destination_place_id=0x39171158dd88b441:0x9f804e11dfae20d1",
     "vcardName": "Nirman"
   },
   "rsvpWhatsApp": {
@@ -835,7 +1095,15 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "labelEn": "RSVP via WhatsApp",
     "labelPa": "ਵਟਸਐਪ ਰਾਹੀਂ RSVP",
     "defaultMessageEn": "I'm replying to the Wedding Reception of Nirman & Simran on 6 December 2026.",
-    "defaultMessagePa": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ 6 ਦਸੰਬਰ 2026 ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ ਲਈ ਮੇਰਾ ਜਵਾਬ:"
+    "defaultMessagePa": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ 6 ਦਸੰਬਰ 2026 ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਲਈ ਮੇਰਾ ਜਵਾਬ:",
+    "nameLabelEn": "Name",
+    "nameLabelPa": "ਨਾਮ",
+    "attendingLabelEn": "Attending",
+    "attendingLabelPa": "ਹਾਜ਼ਰੀ",
+    "attendYesEn": "Yes",
+    "attendYesPa": "ਹਾਂ",
+    "attendNoEn": "No",
+    "attendNoPa": "ਨਹੀਂ"
   },
   "rsvpForm": {
     "enabled": true,
@@ -850,7 +1118,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "noLabelEn": "No, I can't make it",
     "noLabelPa": "ਨਹੀਂ, ਮੈਂ ਨਹੀਂ ਆ ਸਕਦਾ/ਸਕਦੀ",
     "noteEn": "Your RSVP will open in WhatsApp — just press send to confirm.",
-    "notePa": "ਤੁਹਾਡਾ RSVP ਵਟਸਐਪ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗਾ — ਭੇਜੋ ਦਬਾ ਕੇ ਪੱਕਾ ਕਰੋ।"
+    "notePa": "ਤੁਹਾਡਾ RSVP ਵਟਸਐਪ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗਾ — ਪੱਕਾ ਕਰਨ ਲਈ ਭੇਜੋ ਦਬਾਓ।"
   },
   "photos": {
     "_comment": "Photo section disabled by features.photoSection. Leave empty.",
@@ -890,10 +1158,22 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrTitle": "Scan me for venue",
         "qrMap": "Venue Map",
         "qrContact": "Contact Details",
-        "qrNote": "Scan with your phone camera"
+        "qrNote": "Scan with your phone camera",
+        "gateHint": "Tap your language to enter",
+        "saveTheDateTitle": "Save the Date",
+        "saveTheDateNote": "Add the reception to your calendar so you do not miss it.",
+        "weekdays": [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
       },
       "pa": {
-        "dayInfoTitle": "ਰਿਸੈਪਸ਼ਨ ਦੀ ਝਲਕ",
+        "dayInfoTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
         "dayInfoDate": "ਤਾਰੀਖ਼",
         "dayInfoTime": "ਸਮਾਂ",
         "dayInfoVenue": "ਸਥਾਨ",
@@ -902,12 +1182,11 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "dressCode": "ਪਰੰਪਰਾਗਤ ਜਾਂ ਸਮਾਰਟ ਕੈਜ਼ੂਅਲ (ਕਿਰਪਾ ਕਰਕੇ ਸਿਰ ਢੱਕ ਕੇ ਆਓ)",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
-        "calendarNote": "ਤੁਹਾਡੀ ਕੈਲੰਡਰ ਐਪ ਵਿੱਚ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
+        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
         "introSub": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
-        "introMeaning": "ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੀ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਖੁਸ਼ੀ ਨਾਲ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
+        "introMeaning": "ਇੱਕ ਪਰਮਾਤਮਾ। ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
         "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
         "shareLabel": "ਖੁਸ਼ੀ ਸਾਡੇ ਨਾਲ ਵੰਡੋ!",
-        "countdownOver": "ਖੁਸ਼ੀ ਦਾ ਦਿਨ ਆ ਗਿਆ ਹੈ!",
         "pdfTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
         "pdfSubtext": "ਤੁਹਾਨੂੰ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ",
         "pdfFooterNote": "ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਦੋਵਾਂ ਪਰਿਵਾਰਾਂ ਸਮੇਤ",
@@ -920,12 +1199,25 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
         "receptionHeading": "ਰਿਸੈਪਸ਼ਨ",
         "onWording": "ਨੂੰ",
-        "atWording": "ਵੇਲੇ",
-        "inviteTitle": "ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ",
+        "atWording": "",
+        "inviteTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ",
         "qrTitle": "ਸਥਾਨ ਲਈ ਸਕੈਨ ਕਰੋ",
         "qrMap": "ਸਥਾਨ ਦਾ ਨਕਸ਼ਾ",
         "qrContact": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
-        "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ"
+        "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ",
+        "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
+        "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
+        "saveTheDateNote": "ਰਿਸੈਪਸ਼ਨ ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰ ਲਓ ਤਾਂ ਕਿਸੇ ਵੀ ਦਿਨ ਨਾ ਛੁੱਟੇ।",
+        "weekdays": [
+          "ਐਤਵਾਰ",
+          "ਸੋਮਵਾਰ",
+          "ਮੰਗਲਵਾਰ",
+          "ਬੁਧਵਾਰ",
+          "ਵੀਰਵਾਰ",
+          "ਸ਼ੁਕ੍ਰਵਾਰ",
+          "ਸਨਿਵਾਰ"
+        ],
+        "pdfWorking": "ਤਿਆਰ ਹੋ ਰਿਹਾ ਹੈ..."
       }
     },
     "en": {
@@ -935,7 +1227,6 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "downloadBtn": "DOWNLOAD INVITATION CARD",
       "socialLabel": "Join us in our happiness!",
       "shareLabel": "Share the happiness!",
-      "countdownOver": "Bless the couple for a happy life!",
       "pdfTitle": "Wedding Reception Invitation",
       "pdfSubtext": "With the blessings of Waheguru, you are cordially invited to the Reception of",
       "pdfFooterNote": "With love and joy, together with their families",
@@ -946,18 +1237,18 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!"
+      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
-      "inviteTitle": "ਦੀ ਵਿਆਹ ਰਿਸੈਪਸ਼ਨ",
+      "inviteTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ",
       "venueBtn": "ਸਥਾਨ ਵੇਖੋ",
       "downloadBtn": "ਸੱਦਾ-ਪੱਤਰ ਡਾਊਨਲੋਡ ਕਰੋ",
       "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
       "shareLabel": "ਖੁਸ਼ੀ ਸਾਡੇ ਨਾਲ ਵੰਡੋ!",
       "countdownOver": "ਖੁਸ਼ੀ ਦਾ ਦਿਨ ਆ ਗਿਆ ਹੈ!",
       "pdfTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
-      "pdfSubtext": "ਤੁਹਾਨੂੰ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ",
+      "pdfSubtext": "ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਤੁਹਾਨੂੰ ਇਨ੍ਹਾਂ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਲਈ ਦਿਲੋਂ ਸੱਦਾ ਹੈ:",
       "pdfFooterNote": "ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਦੋਵਾਂ ਪਰਿਵਾਰਾਂ ਸਮੇਤ",
       "consoleSaveTheDate": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ: {date}!",
       "consolePresence": "ਤੁਹਾਡੀ ਹਾਜ਼ਰੀ ਦੀ ਉਡੀਕ ਰਹੇਗੀ!",
@@ -968,7 +1259,9 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
       "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥"
     }
-  }
+  },
+  "datePa": "6 ਦਸੰਬਰ 2026",
+  "timePa": "ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ"
 };
       </script>
 
@@ -995,24 +1288,32 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       <div class="intro-gate" id="intro-gate">
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
-          <h2>Nirman &amp; Simran</h2>
+          <h2>Nirman <span class="amp">&amp;</span> Simran</h2>
           <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
           <div class="lang-pick" id="intro-lang-pick">
             <button type="button" data-lang="en" class="active">English</button>
             <button type="button" data-lang="pa">ਪੰਜਾਬੀ</button>
           </div>
-          <div class="gate-hint">Tap your language to enter</div>
+          <div class="gate-hint" id="gate-hint">Tap your language to enter</div>
         </div>
       </div>
 
       <!-- Petals -->
       <div class="sakura-falling" id="sakura-falling"></div>
 
+      <!-- Royal ornament frame -->
+      <div class="royal-frame" aria-hidden="true">
+        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+      </div>
+
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
       <div class="blessing" id="invite-blessing"></div>
 
       <div class="ornament" aria-hidden="true">
-        <img src="assets/svg/ornament.svg" alt="">
+        <img src="assets/svg/divider-ornament.svg" alt="">
       </div>
 
       <!-- Anand Karaj ceremonial art (background blended away) -->
@@ -1050,18 +1351,19 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 
       <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;">ੴ</div>
-          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;">ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ</div>
+          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥</div>
           <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;">Nirman</div>
-          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;">&amp;</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;">Simran</div>
-          <div style="font-size:15px; letter-spacing:2px; text-transform:uppercase; color:#a4813a; margin-bottom:12px;">Wedding Reception &bull; 6 December 2026</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;">10:00 AM onwards</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;" id="pdf-name-1">Nirman</div>
+          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;" id="pdf-connector">&amp;</div>
+          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;" id="pdf-name-2">Simran</div>
+          <div style="font-size:15px; letter-spacing:2px; color:#a4813a; margin-bottom:12px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
+          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-time-line">10:00 AM onwards</div>
+          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
           <div id="pdf-qr" class="pdf-qr"></div>
           <div style="margin-top:26px; border-top:1px solid #e3d5b3; padding-top:14px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
-          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;">For any queries: +61 423 594 009</div>
+          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
         </div>
       </div>
 
