@@ -1,0 +1,80 @@
+# PUNJABI (GURMUKHI) TRANSLATIONS FOR WEDDING INVITATION
+# ==========================================================
+# Please verify/translate each line below. Keep the KEY exactly as shown.
+# Format: KEY = "Gurmukhi text"
+# ==========================================================
+
+# A. INTRO GATE (first visit screen)
+i18n._extra.pa.introSub = "ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਦਾ ਨਿਮੰਤਰਣ"
+i18n._extra.pa.introMeaning = "ਵਾਹਿਗੁਰੂ ਜੀ ਦੀਆਂ ਆਸ਼ੀਰਵਾਦਾਂ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਨ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।"
+
+# B. TOP BLESSING (after ੴ, before names) - CRITICAL: user says not visible
+i18n.pa.footerNote = "ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ"
+
+# C. MAIN HEADING & OCCASION
+i18n.pa.inviteTitle = "ਦਾ ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ"
+i18n._extra.pa.receptionHeading = "ਰਿਸੈਪਸ਼ਨ"
+
+# D. COUNTDOWN
+i18n._extra.pa.countdownOver = "ਦੂਜੀ ਨੂੰ ਸਿਮਰਨ ਕਰੋ।"
+
+# E. RSVP SECTION
+i18n.pa.rsvpTitle = "RSVP"
+i18n._extra.pa.rsvpTitle = "RSVP"
+i18n.rsvpForm.guestNamePlaceholderPa = "ਤੁਹਾਡਾ ਨਾਮ"
+i18n.rsvpForm.attendLabelPa = "ਕੀ ਤੁਸੀਂ ਆਉਣਗੇ?"
+i18n.rsvpForm.yesLabelPa = "ਹਾਂ, ਮੈਂ ਜ਼ਰੂਰ ਆਉਂਗਾ"
+i18n.rsvpForm.noLabelPa = "ਨਹੀਂ, ਮੈਂ ਨਹੀਂ ਆ ਸਕਦਾ"
+i18n.rsvpForm.notePa = "ਤੁਹਾਡਾ RSVP ਵਾਟਸਐਪ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗਾ — ਭੇਜੋ ਦਬਾ ਕੇ ਪੱਕਾ ਕਰੋ।"
+i18n.rsvpForm.submitLabelPa = "ਵਾਟਸਐਪ ਨਾਲ RSVP ਭੇਜੋ"
+i18n.rsvpWhatsApp.labelPa = "ਵਾਟਸਐਪ ਨਾਲ RSVP"
+i18n.rsvpWhatsApp.defaultMessagePa = "ਮੈਂ ਨਿਰਮਾਨ ਅਤੇ ਸਿਮਰਨ ਦੇ 6 ਦਸੰਬਰ 2026 ਦੇ ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਦਾ ਜਵਾਬ ਦੇ ਰਿਹਾ/ਰਹੀ ਹਾਂ।"
+
+# F. DAY INFO CARD
+i18n._extra.pa.dayInfoTitle = "ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਦੀ ਝਲਕ"
+i18n._extra.pa.dayInfoDate = "ਦਿਨ"
+i18n._extra.pa.dayInfoTime = "ਸਮਾਂ"
+i18n._extra.pa.dayInfoVenue = "ਥਾਂ"
+i18n._extra.pa.dayInfoDress = "ਪਹਿਰਾਵਾ"
+i18n._extra.pa.dayInfoContact = "ਸੰਪਰਕ"
+i18n._extra.pa.dressCode = "ਪਾਰੰਪਰਿਕ ਜਾਂ ਸਮਾਰਟ ਕੈਜ਼ੁਅਲ (ਸਿਰ ਢੱਕਾ ਹੋਇਆ)"
+i18n._extra.pa.onWording = "ਨੂੰ"
+i18n._extra.pa.atWording = "ਵੇਲੇ"
+
+# G. BUTTONS & ACTIONS
+i18n.pa.venueBtn = "ਥਾਂ ਦੇਖੋ"
+i18n.pa.downloadBtn = "ਨਿਮੰਤਰ ਡਾਊਨਲੋਡ ਕਰੋ"
+i18n._extra.pa.printLabel = "ਇਹ ਨਿਮੰਤਰ ਪ੍ਰਿੰਟ ਕਰੋ"
+i18n._extra.pa.calendarLabel = "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ"
+i18n._extra.pa.calendarNote = "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਐਪ ਵਿੱਚ ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਤਿਆਰੀ ਨਾਲ ਖੁੱਲ੍ਹੇਗਾ।"
+i18n._extra.pa.venueMapLabel = "ਥਾਂ ਮੈਪ ਤੇ ਦੇਖੋ"
+
+# H. QR CODE SECTION
+i18n._extra.pa.qrTitle = "ਥਾਂ ਲਈ ਸਕੈਨ ਕਰੋ"
+i18n._extra.pa.qrMap = "ਥਾਂ ਦਾ ਨਕਸ਼ਾ"
+i18n._extra.pa.qrContact = "ਸੰਪਰਕ ਜਾਣਕਾਰੀ"
+i18n._extra.pa.qrNote = "ਆਪਣੇ ਫ਼ੋਨ ਦੀ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ"
+
+# I. PDF CARD
+i18n._extra.pa.pdfTitle = "ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਨਿਮੰਤਰ"
+i18n._extra.pa.pdfSubtext = "ਤੁਹਾਨੂੰ ਵੈਡਿੰਗ ਰਿਸੈਪਸ਼ਨ ਲਈ ਸਾਹਮਣੇ ਆਉਣ ਦਾ ਸੱਦਾ ਹੈ"
+i18n._extra.pa.pdfFooterNote = "ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਉਨ੍ਹਾਂ ਦੇ ਪਰਿਵਾਰਾਂ ਦੇ ਨਾਲ"
+
+# J. CONSOLE/LOG MESSAGES (developer tools)
+i18n._extra.pa.consoleSaveTheDate = "ਸਾਵੇਂ ਦਿਨ ਯਾਦ ਰੱਖੋ: {date}!"
+i18n._extra.pa.consolePresence = "ਤੁਹਾਡੀ ਹਾਜ਼ਰੀ ਚਾਹੀਦੀ ਹੈ!"
+i18n._extra.pa.consoleRegards = "ਦੁਆ:: {couple}"
+i18n._extra.pa.consoleShaadi = "ਸ਼ਾਦੀ ਵਿੱਚ ਜ਼ਰੂਰ ਆਉਣਾ!"
+
+# K. LANGUAGE LABEL
+i18n.pa.langLabel = "ਪੰਜਾਬੀ"
+
+# ==========================================================
+# NOTES FOR TRANSLATOR:
+# 1. Keep {date} and {couple} placeholders as-is
+# 2. "ਰਿਸੈਪਸ਼ਨ" = Reception (keep as-is, it's the occasion)
+# 3. "ਨਿਰਮਾਨ ਅਤੇ ਸਿਮਰਨ" = Nirman and Simran (keep names)
+# 4. "ਵਾਹਿਗੁਰੂ" = Waheguru (keep as-is)
+# 5. "ੴ" = Ik Onkar (Sikh symbol, rendered separately in code)
+# 6. "ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ" = "Lakh khushiaan patshahiaan, je satgur nadar kare" (Sacred line - keep exact)
+# ==========================================================

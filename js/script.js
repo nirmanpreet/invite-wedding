@@ -356,7 +356,8 @@
 
   // Render a QR as a table, padded with white modules so both QRs share the
   // exact same grid size (and therefore the exact same physical size).
-  function qrTableHtml(qr, cellPx, targetN) {
+  // wrapInLink: 'map' | 'contact' | null - wraps the QR in <a> for click-to-open
+  function qrTableHtml(qr, cellPx, targetN, wrapInLink) {
     var n = qr.getModuleCount();
     var top = Math.floor((targetN - n) / 2);
     var left = Math.floor((targetN - n) / 2);
@@ -372,8 +373,18 @@
       }
       rows += '</tr>';
     }
-    return '<div class="qr-wrap" style="background:#fff;padding:' + (cellPx * 4) + 'px;display:inline-block;line-height:0;border-radius:10px;">' +
+    var tableHtml = '<div class="qr-wrap" style="background:#fff;padding:' + (cellPx * 4) + 'px;display:inline-block;line-height:0;border-radius:10px;">' +
       '<table class="qr-table" style="border-collapse:collapse;" cellpadding="0" cellspacing="0">' + rows + '</table></div>';
+    if (wrapInLink === 'map') {
+      var mapHref = (config.qr && config.qr.mapUrl) ||
+        ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venueName || '') + ' ' + (venueAddress || '')));
+      return '<a class="qr-link" href="' + esc(mapHref) + '" target="_blank" rel="noopener" aria-label="Open venue map">' + tableHtml + '</a>';
+    }
+    if (wrapInLink === 'contact') {
+      var phoneHref = (config.footer && config.footer.phoneHref) || '+61423594009';
+      return '<a class="qr-link" href="tel:' + esc(phoneHref) + '" aria-label="Call ' + esc(phoneHref) + '">' + tableHtml + '</a>';
+    }
+    return tableHtml;
   }
 
   function buildVCard() {
@@ -401,17 +412,20 @@
 
     // Both QRs share one grid size (the larger module count), so they render
     // at the exact same size — on the page and identically on the PDF card.
-    function buildPair(cellPx) {
+    function buildPair(cellPx, forPdf) {
       var q1 = makeQr(mapText);
       var q2 = makeQr(vcard);
       var targetN = Math.max(q1.getModuleCount(), q2.getModuleCount());
+      // On page (not PDF), wrap in clickable links
+      var wrapMap = forPdf ? null : 'map';
+      var wrapContact = forPdf ? null : 'contact';
       return {
-        map: qrTableHtml(q1, cellPx, targetN),
-        contact: qrTableHtml(q2, cellPx, targetN)
+        map: qrTableHtml(q1, cellPx, targetN, wrapMap),
+        contact: qrTableHtml(q2, cellPx, targetN, wrapContact)
       };
     }
 
-    var pagePair = buildPair(3);
+    var pagePair = buildPair(3, false);
     el.innerHTML =
       '<h4>' + title + '</h4>' +
       '<div class="qr-grid">' +
@@ -424,7 +438,7 @@
 
     var pdfQr = document.getElementById('pdf-qr');
     if (pdfQr) {
-      var pdfPair = buildPair(3);
+      var pdfPair = buildPair(3, true);
       pdfQr.innerHTML =
         '<div class="pdf-qr-title">' + title + '</div>' +
         '<div class="pdf-qr-grid">' +

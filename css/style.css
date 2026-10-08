@@ -423,6 +423,21 @@ body.intro-done #invite-social {
 .qr-wrap {
   box-shadow: 0 6px 18px rgba(109, 26, 45, 0.14);
 }
+.qr-link {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.qr-link:hover, .qr-link:focus {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(109, 26, 45, 0.22);
+  outline: none;
+}
+.qr-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
 .qr-label {
   margin-top: 8px;
   font-size: 12px;
