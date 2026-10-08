@@ -141,8 +141,20 @@ ${qrLib}
       <!-- Petals -->
       <div class="sakura-falling" id="sakura-falling"></div>
 
-      <!-- Blessing: Ik Onkar + lakh khushiaan pathshahiaan + Waheguru blessing -->
+      <!-- Sikh decorative top -->
+      <div class="sikh-decor top" aria-hidden="true">
+        <img src="assets/svg/khanda.svg" alt="" width="80" height="80">
+        <img src="assets/svg/floral-corner.svg" alt="" width="80" height="80">
+      </div>
+
+      <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
       <div class="blessing" id="invite-blessing"></div>
+
+      <!-- Sikh decorative bottom -->
+      <div class="sikh-decor bottom" aria-hidden="true">
+        <img src="assets/svg/floral-corner.svg" alt="" width="80" height="80">
+        <img src="assets/svg/khanda.svg" alt="" width="80" height="80">
+      </div>
 
       <!-- Print-only header -->
       <div id="print-header" class="print-header"></div>

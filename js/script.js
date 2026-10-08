@@ -122,6 +122,8 @@
       if (blessingText === '' || blessingText === undefined || blessingText === null) {
         blessingText = footerMsg;
       }
+      // Convert newlines to <br> for HTML rendering
+      blessingText = blessingText.replace(/\n/g, '<br>');
       blessingEl.innerHTML =
         '<span class="ik" aria-hidden="true">ੴ</span>' +
         '<div class="blessing-text">' + esc(blessingText) + '</div>';

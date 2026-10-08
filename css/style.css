@@ -48,6 +48,272 @@ body {
 }
 
 img { max-width: 100%; height: auto; }
+
+/* ============================================================
+   Intro Gate — Card Opening Animation
+   ============================================================ */
+.intro-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ivory) 0%, #f6ecd9 100%);
+  perspective: 1000px;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.intro-gate.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.intro-gate .card {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  padding: 48px 32px;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(200, 162, 75, 0.15), transparent 70%),
+    linear-gradient(145deg, #fffdf7 0%, #faf0e0 100%);
+  box-shadow:
+    0 20px 60px rgba(109, 26, 45, 0.25),
+    0 0 0 1px rgba(200, 162, 75, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) scale(1);
+  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+  opacity: 1;
+  overflow: hidden;
+}
+.intro-gate.hide .card {
+  transform: rotateX(-90deg) scale(0.95) translateY(40px);
+  opacity: 0;
+}
+.intro-gate .card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--gold), var(--maroon), var(--gold));
+  z-index: -1;
+  opacity: 0;
+  animation: cardGlow 3s ease-in-out infinite;
+}
+@keyframes cardGlow {
+  0%, 100% { opacity: 0.3; filter: blur(8px); }
+  50% { opacity: 0.6; filter: blur(16px); }
+}
+.intro-gate .ik {
+  font-size: 56px;
+  line-height: 1;
+  color: var(--maroon);
+  margin-bottom: 16px;
+  display: block;
+  animation: ikPulse 2.5s ease-in-out infinite;
+}
+@keyframes ikPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+.intro-gate h2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 36px;
+  color: var(--maroon);
+  margin: 8px 0 4px;
+  letter-spacing: 0.5px;
+}
+.intro-gate .sub {
+  font-size: 16px;
+  color: var(--gold-text);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+.intro-gate .lang-pick {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.intro-gate .lang-pick button {
+  appearance: none;
+  border: 2px solid var(--gold-line);
+  background: #fff;
+  color: var(--dark);
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
+  box-shadow: 0 4px 12px rgba(109, 26, 45, 0.1);
+}
+.intro-gate .lang-pick button:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(109, 26, 45, 0.18);
+}
+.intro-gate .lang-pick button.active,
+.intro-gate .lang-pick button:focus {
+  background: linear-gradient(135deg, var(--maroon), var(--highlight));
+  border-color: var(--maroon);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(109, 26, 45, 0.35);
+}
+.intro-gate .gate-hint {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--gold-text);
+  opacity: 0.8;
+  animation: hintFade 2s ease-in-out infinite;
+}
+@keyframes hintFade {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   Blessing Section — Gurbani lines with elegant styling
+   ============================================================ */
+.blessing {
+  margin: 32px auto 24px;
+  padding: 0 20px;
+  max-width: 700px;
+  text-align: center;
+}
+.blessing .ik {
+  font-size: 48px;
+  color: var(--maroon);
+  display: block;
+  margin-bottom: 12px;
+  animation: ikFloat 3s ease-in-out infinite;
+}
+@keyframes ikFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.blessing .blessing-text {
+  font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
+  font-size: 19px;
+  line-height: 2.0;
+  color: var(--dark);
+  white-space: pre-line;
+}
+.blessing .blessing-text br + br { margin-top: 4px; }
+
+/* ============================================================
+   Sikh Decorative Images (Anand Karaj style)
+   ============================================================ */
+.sikh-decor {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px auto;
+  flex-wrap: wrap;
+}
+.sikh-decor img {
+  max-width: 100px;
+  height: auto;
+  opacity: 0.15;
+  filter: drop-shadow(0 4px 8px rgba(109, 26, 45, 0.12));
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.sikh-decor img:hover {
+  opacity: 0.35;
+  transform: scale(1.05);
+}
+.sikh-decor.top {
+  margin-bottom: 8px;
+}
+.sikh-decor.bottom {
+  margin-top: 8px;
+}
+
+/* ============================================================
+   Page Reveal Animation (after intro gate)
+   ============================================================ */
+.wrap {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+body.intro-done .wrap {
+  opacity: 1;
+  transform: translateY(0);
+}
+body.intro-done .blessing,
+body.intro-done #invite-blessing,
+body.intro-done .qr-section,
+body.intro-done #qr-section,
+body.intro-done .day-info,
+body.intro-done #day-info,
+body.intro-done .rsvp-section,
+body.intro-done #rsvp-section,
+body.intro-done .photos,
+body.intro-done #photos,
+body.intro-done .venue-map,
+body.intro-done #venue-map-embed,
+body.intro-done .calendar-section,
+body.intro-done #calendar-section,
+body.intro-done .print-section,
+body.intro-done #print-section,
+body.intro-done .footer {
+  animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+body.intro-done .blessing       { animation-delay: 0.1s; }
+body.intro-done #invite-blessing { animation-delay: 0.1s; }
+body.intro-done .qr-section     { animation-delay: 0.2s; }
+body.intro-done #qr-section     { animation-delay: 0.2s; }
+body.intro-done .day-info       { animation-delay: 0.3s; }
+body.intro-done #day-info       { animation-delay: 0.3s; }
+body.intro-done .rsvp-section   { animation-delay: 0.4s; }
+body.intro-done #rsvp-section   { animation-delay: 0.4s; }
+body.intro-done .photos         { animation-delay: 0.5s; }
+body.intro-done #photos         { animation-delay: 0.5s; }
+body.intro-done .venue-map      { animation-delay: 0.6s; }
+body.intro-done #venue-map-embed { animation-delay: 0.6s; }
+body.intro-done .calendar-section { animation-delay: 0.7s; }
+body.intro-done #calendar-section { animation-delay: 0.7s; }
+body.intro-done .print-section  { animation-delay: 0.8s; }
+body.intro-done #print-section  { animation-delay: 0.8s; }
+body.intro-done .footer         { animation-delay: 0.9s; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .intro-gate .card,
+  .intro-gate .ik,
+  .intro-gate .gate-hint,
+  .blessing .ik,
+  .wrap,
+  body.intro-done .blessing,
+  body.intro-done #invite-blessing,
+  body.intro-done .qr-section,
+  body.intro-done #qr-section,
+  body.intro-done .day-info,
+  body.intro-done #day-info,
+  body.intro-done .rsvp-section,
+  body.intro-done #rsvp-section,
+  body.intro-done .photos,
+  body.intro-done #photos,
+  body.intro-done .venue-map,
+  body.intro-done #venue-map-embed,
+  body.intro-done .calendar-section,
+  body.intro-done #calendar-section,
+  body.intro-done .print-section,
+  body.intro-done #print-section,
+  body.intro-done .footer {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
 a { text-decoration: none; }
 
 button, a, input, select { touch-action: manipulation; }

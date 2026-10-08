@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="floralGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e5c46d"/>
+      <stop offset="50%" stop-color="#c8a24b"/>
+      <stop offset="100%" stop-color="#b8862e"/>
+    </linearGradient>
+    <linearGradient id="floralMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8c2340"/>
+      <stop offset="100%" stop-color="#6d1a2d"/>
+    </linearGradient>
+  </defs>
+  <!-- Main paisley motif -->
+  <path d="M100 20 
+           C140 20, 170 50, 180 90 
+           C188 130, 150 170, 100 180 
+           C50 170, 12 130, 20 90 
+           C30 50, 60 20, 100 20 Z" 
+        fill="url(#floralGold)" stroke="url(#floralMaroon)" stroke-width="2"/>
+  <!-- Inner paisley -->
+  <path d="M100 35 
+           C128 35, 150 58, 156 88 
+           C160 118, 132 145, 100 152 
+           C68 145, 40 118, 44 88 
+           C50 58, 72 35, 100 35 Z" 
+        fill="url(#floralMaroon)" opacity="0.6"/>
+  <!-- Decorative dots around -->
+  <g fill="url(#floralGold)">
+    <circle cx="100" cy="45" r="3"/>
+    <circle cx="75" cy="75" r="2.5"/>
+    <circle cx="125" cy="75" r="2.5"/>
+    <circle cx="60" cy="110" r="2"/>
+    <circle cx="140" cy="110" r="2"/>
+    <circle cx="100" cy="135" r="2.5"/>
+  </g>
+  <!-- Small floral accents at corners -->
+  <g transform="translate(25, 25)" fill="url(#floralGold)" opacity="0.7">
+    <circle cx="0" cy="0" r="4"/>
+    <circle cx="8" cy="0" r="2"/>
+    <circle cx="4" cy="8" r="2"/>
+  </g>
+  <g transform="translate(175, 25)" fill="url(#floralGold)" opacity="0.7">
+    <circle cx="0" cy="0" r="4"/>
+    <circle cx="-8" cy="0" r="2"/>
+    <circle cx="-4" cy="8" r="2"/>
+  </g>
+  <g transform="translate(25, 175)" fill="url(#floralGold)" opacity="0.7">
+    <circle cx="0" cy="0" r="4"/>
+    <circle cx="8" cy="0" r="2"/>
+    <circle cx="4" cy="-8" r="2"/>
+  </g>
+  <g transform="translate(175, 175)" fill="url(#floralGold)" opacity="0.7">
+    <circle cx="0" cy="0" r="4"/>
+    <circle cx="-8" cy="0" r="2"/>
+    <circle cx="-4" cy="-8" r="2"/>
+  </g>
+</svg>

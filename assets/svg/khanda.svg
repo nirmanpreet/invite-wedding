@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c8a24b"/>
+      <stop offset="50%" stop-color="#e5c46d"/>
+      <stop offset="100%" stop-color="#b8862e"/>
+    </linearGradient>
+    <linearGradient id="maroonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d1a2d"/>
+      <stop offset="100%" stop-color="#a4243b"/>
+    </linearGradient>
+  </defs>
+  <!-- Chakkar (circle) -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="url(#goldGrad)" stroke-width="6"/>
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="52" fill="none" stroke="url(#maroonGrad)" stroke-width="3"/>
+  <!-- Khanda (double-edged sword) -->
+  <path d="M100 15 L100 185" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M65 100 L135 100" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
+  <!-- Sword handle -->
+  <rect x="92" y="15" width="16" height="25" rx="2" fill="url(#maroonGrad)"/>
+  <!-- Kirpans (crossed swords) -->
+  <g transform="rotate(-35 100 100)">
+    <path d="M100 35 L60 165" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M95 40 L65 110" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="100" cy="32" rx="8" ry="5" fill="url(#maroonGrad)"/>
+  </g>
+  <g transform="rotate(35 100 100)">
+    <path d="M100 35 L140 165" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M105 40 L135 110" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="100" cy="32" rx="8" ry="5" fill="url(#maroonGrad)"/>
+  </g>
+  <!-- Center dot -->
+  <circle cx="100" cy="100" r="6" fill="url(#goldGrad)"/>
+</svg>
