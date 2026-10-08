@@ -250,7 +250,7 @@ const ornamentSrc = path.join(ROOT, 'assets/svg/ornament.svg');
 if (fs.existsSync(ornamentSrc)) {
   fs.copyFileSync(ornamentSrc, path.join(svgDist, 'ornament.svg'));
 }
-['corner-ornament.svg', 'divider-ornament.svg'].forEach(function (f) {
+['corner-ornament.svg', 'divider-ornament.svg', 'rose-petal.svg'].forEach(function (f) {
   const s = path.join(ROOT, 'assets/svg', f);
   if (fs.existsSync(s)) fs.copyFileSync(s, path.join(svgDist, f));
 });

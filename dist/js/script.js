@@ -720,7 +720,10 @@
       '</div>';
   }
 
-  // ---------- Gold petals ----------
+// ---------- Rose petals ----------
+  // A sparse shower over the hero only: one rose every 3s in soft pink/cream,
+  // stopping once the hero scrolls away so the rest of the page stays calm and
+  // readable. Respects prefers-reduced-motion.
   function startPetal() {
     if (features.sakura === false) return;
     var container = document.getElementById('sakura-falling');
@@ -728,28 +731,44 @@
     var reducedMotion = false;
     try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
     if (reducedMotion) return;
-    var isSmall = window.innerWidth < 600;
-    var interval = isSmall ? 900 : 550;
-    var maxAge = isSmall ? 9000 : 12000;
-    var colors = ['#c8a24b', '#e5c46d', '#f6e2a1', '#b8862e', '#d9b865'];
+
+    var COLORS = ['#e9aec0', '#f2cdd9', '#fbe9ee', '#d98fa8', '#f7dfe6'];
+    var INTERVAL = 3000;   // sparse on purpose - was 550ms and read as rain
+    var MAX_AGE = 14000;
+
+    var hero = document.querySelector('.wrap') || document.body;
+    var inView = true;
+
     function spawn() {
+      if (!inView) return;
       var petal = document.createElement('div');
-      petal.className = 'sakura';
-      var size = isSmall ? (5 + Math.random() * 6) : (7 + Math.random() * 9);
+      petal.className = 'rose-petal';
+      var size = 9 + Math.random() * 5;
       petal.style.width = size + 'px';
       petal.style.height = size + 'px';
-      petal.style.background = colors[Math.floor(Math.random() * colors.length)];
-      petal.style.borderRadius = '50% 50% 50% 0';
-      petal.style.left = (Math.random() * 100) + '%';
-      petal.style.animationDuration = (5 + Math.random() * 5) + 's';
-      petal.style.animationDelay = (Math.random() * 2) + 's';
+      petal.style.setProperty('--petal', COLORS[Math.floor(Math.random() * COLORS.length)]);
+      petal.style.left = (6 + Math.random() * 88) + '%';
+      petal.style.animationDuration = (11 + Math.random() * 6) + 's';
+      petal.style.animationDelay = (Math.random() * 2.5) + 's';
       container.appendChild(petal);
       setTimeout(function () {
         if (petal.parentNode) petal.parentNode.removeChild(petal);
-      }, maxAge);
+      }, MAX_AGE);
     }
+
+    // Stop once the hero scrolls away; resume if the guest scrolls back up.
+    if (typeof IntersectionObserver === 'function') {
+      var io = new IntersectionObserver(function (entries) {
+        inView = entries[0].isIntersecting;
+      }, { threshold: 0.1 });
+      io.observe(hero);
+    }
+    document.addEventListener('visibilitychange', function () {
+      inView = !document.hidden;
+    });
+
     spawn();
-    setInterval(spawn, interval);
+    setInterval(spawn, INTERVAL);
   }
 
   // ---------- Language toggle ----------
