@@ -50,7 +50,7 @@ body {
 img { max-width: 100%; height: auto; }
 
 /* ============================================================
-   Intro Gate — Card Opening Animation
+   Intro Gate — Classical Card Opening
    ============================================================ */
 .intro-gate {
   position: fixed;
@@ -60,8 +60,7 @@ img { max-width: 100%; height: auto; }
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--ivory) 0%, #f6ecd9 100%);
-  perspective: 1000px;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 .intro-gate.hide {
   opacity: 0;
@@ -73,49 +72,26 @@ img { max-width: 100%; height: auto; }
   width: 90%;
   max-width: 420px;
   padding: 48px 32px;
-  border-radius: 20px;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(200, 162, 75, 0.15), transparent 70%),
-    linear-gradient(145deg, #fffdf7 0%, #faf0e0 100%);
+  border-radius: 16px;
+  background: #fffdf7;
+  border: 1px solid var(--gold-line);
   box-shadow:
-    0 20px 60px rgba(109, 26, 45, 0.25),
-    0 0 0 1px rgba(200, 162, 75, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transform-style: preserve-3d;
-  transform: rotateX(0deg) scale(1);
-  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+    0 12px 40px rgba(109, 26, 45, 0.18),
+    0 0 0 1px rgba(200, 162, 75, 0.2);
+  transform: scale(1) translateY(0);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
   opacity: 1;
-  overflow: hidden;
 }
 .intro-gate.hide .card {
-  transform: rotateX(-90deg) scale(0.95) translateY(40px);
+  transform: scale(0.92) translateY(20px);
   opacity: 0;
-}
-.intro-gate .card::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, var(--gold), var(--maroon), var(--gold));
-  z-index: -1;
-  opacity: 0;
-  animation: cardGlow 3s ease-in-out infinite;
-}
-@keyframes cardGlow {
-  0%, 100% { opacity: 0.3; filter: blur(8px); }
-  50% { opacity: 0.6; filter: blur(16px); }
 }
 .intro-gate .ik {
-  font-size: 56px;
+  font-size: 52px;
   line-height: 1;
   color: var(--maroon);
   margin-bottom: 16px;
   display: block;
-  animation: ikPulse 2.5s ease-in-out infinite;
-}
-@keyframes ikPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.05); opacity: 1; }
 }
 .intro-gate h2 {
   font-family: 'Dancing Script', cursive;
@@ -125,7 +101,7 @@ img { max-width: 100%; height: auto; }
   letter-spacing: 0.5px;
 }
 .intro-gate .sub {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--gold-text);
   margin-bottom: 24px;
   font-weight: 500;
@@ -146,36 +122,30 @@ img { max-width: 100%; height: auto; }
   font-weight: 600;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
-  box-shadow: 0 4px 12px rgba(109, 26, 45, 0.1);
+  box-shadow: 0 2px 8px rgba(109, 26, 45, 0.08);
 }
 .intro-gate .lang-pick button:hover {
   border-color: var(--gold);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(109, 26, 45, 0.18);
+  box-shadow: 0 4px 14px rgba(109, 26, 45, 0.12);
 }
 .intro-gate .lang-pick button.active,
 .intro-gate .lang-pick button:focus {
-  background: linear-gradient(135deg, var(--maroon), var(--highlight));
+  background: var(--maroon);
   border-color: var(--maroon);
   color: #fff;
-  box-shadow: 0 6px 20px rgba(109, 26, 45, 0.35);
+  box-shadow: 0 4px 14px rgba(109, 26, 45, 0.25);
 }
 .intro-gate .gate-hint {
   margin-top: 18px;
   font-size: 13px;
   color: var(--gold-text);
-  opacity: 0.8;
-  animation: hintFade 2s ease-in-out infinite;
-}
-@keyframes hintFade {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  opacity: 0.7;
 }
 
 /* ============================================================
-   Blessing Section — Gurbani lines with elegant styling
+   Blessing Section — Classical Gurbani Styling
    ============================================================ */
 .blessing {
   margin: 32px auto 24px;
@@ -188,11 +158,6 @@ img { max-width: 100%; height: auto; }
   color: var(--maroon);
   display: block;
   margin-bottom: 12px;
-  animation: ikFloat 3s ease-in-out infinite;
-}
-@keyframes ikFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
 }
 .blessing .blessing-text {
   font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
@@ -216,13 +181,11 @@ img { max-width: 100%; height: auto; }
 .sikh-decor img {
   max-width: 100px;
   height: auto;
-  opacity: 0.15;
-  filter: drop-shadow(0 4px 8px rgba(109, 26, 45, 0.12));
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0.12;
+  transition: opacity 0.3s ease;
 }
 .sikh-decor img:hover {
-  opacity: 0.35;
-  transform: scale(1.05);
+  opacity: 0.25;
 }
 .sikh-decor.top {
   margin-bottom: 8px;
@@ -232,12 +195,12 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   Page Reveal Animation (after intro gate)
+   Page Reveal — Gentle Fade In
    ============================================================ */
 .wrap {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateY(16px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 body.intro-done .wrap {
   opacity: 1;
@@ -260,36 +223,35 @@ body.intro-done #calendar-section,
 body.intro-done .print-section,
 body.intro-done #print-section,
 body.intro-done .footer {
-  animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeInUp 0.6s ease forwards;
 }
-body.intro-done .blessing       { animation-delay: 0.1s; }
-body.intro-done #invite-blessing { animation-delay: 0.1s; }
-body.intro-done .qr-section     { animation-delay: 0.2s; }
-body.intro-done #qr-section     { animation-delay: 0.2s; }
-body.intro-done .day-info       { animation-delay: 0.3s; }
-body.intro-done #day-info       { animation-delay: 0.3s; }
-body.intro-done .rsvp-section   { animation-delay: 0.4s; }
-body.intro-done #rsvp-section   { animation-delay: 0.4s; }
-body.intro-done .photos         { animation-delay: 0.5s; }
-body.intro-done #photos         { animation-delay: 0.5s; }
-body.intro-done .venue-map      { animation-delay: 0.6s; }
-body.intro-done #venue-map-embed { animation-delay: 0.6s; }
-body.intro-done .calendar-section { animation-delay: 0.7s; }
-body.intro-done #calendar-section { animation-delay: 0.7s; }
-body.intro-done .print-section  { animation-delay: 0.8s; }
-body.intro-done #print-section  { animation-delay: 0.8s; }
-body.intro-done .footer         { animation-delay: 0.9s; }
+body.intro-done .blessing       { animation-delay: 0.08s; }
+body.intro-done #invite-blessing { animation-delay: 0.08s; }
+body.intro-done .qr-section     { animation-delay: 0.16s; }
+body.intro-done #qr-section     { animation-delay: 0.16s; }
+body.intro-done .day-info       { animation-delay: 0.24s; }
+body.intro-done #day-info       { animation-delay: 0.24s; }
+body.intro-done .rsvp-section   { animation-delay: 0.32s; }
+body.intro-done #rsvp-section   { animation-delay: 0.32s; }
+body.intro-done .photos         { animation-delay: 0.4s; }
+body.intro-done #photos         { animation-delay: 0.4s; }
+body.intro-done .venue-map      { animation-delay: 0.48s; }
+body.intro-done #venue-map-embed { animation-delay: 0.48s; }
+body.intro-done .calendar-section { animation-delay: 0.56s; }
+body.intro-done #calendar-section { animation-delay: 0.56s; }
+body.intro-done .print-section  { animation-delay: 0.64s; }
+body.intro-done #print-section  { animation-delay: 0.64s; }
+body.intro-done .footer         { animation-delay: 0.72s; }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .intro-gate .card,
-  .intro-gate .ik,
-  .intro-gate .gate-hint,
-  .blessing .ik,
   .wrap,
   body.intro-done .blessing,
   body.intro-done #invite-blessing,
@@ -314,7 +276,8 @@ body.intro-done .footer         { animation-delay: 0.9s; }
     opacity: 1 !important;
   }
 }
-a { text-decoration: none; }
+
+
 
 button, a, input, select { touch-action: manipulation; }
 
@@ -328,83 +291,6 @@ button, a, input, select { touch-action: manipulation; }
   max-width: 820px;
   padding: 0 16px;
   box-sizing: border-box;
-}
-
-/* ---------- Blessing (top of page) ---------- */
-.blessing {
-  margin: 22px auto 0;
-  max-width: 640px;
-  padding: 0 16px;
-  text-align: center;
-}
-.blessing .ik {
-  font-size: clamp(24px, 6vw, 32px);
-  color: var(--highlight);
-  display: block;
-  margin-bottom: 4px;
-}
-.blessing-text {
-  font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
-  font-size: clamp(13px, 3.4vw, 15px);
-  color: var(--dark);
-  letter-spacing: 0.5px;
-  line-height: 1.8;
-}
-
-/* ---------- Titles ---------- */
-.title h1 {
-  font-family: 'Dancing Script', cursive;
-  font-weight: bold;
-  font-style: normal;
-  font-size: clamp(44px, 11vw, 64px);
-  margin: 18px 0 4px;
-  color: var(--maroon);
-  line-height: 1.1;
-}
-
-.title h2 {
-  font-family: 'Dancing Script', cursive;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  font-size: clamp(22px, 5.5vw, 30px);
-  color: var(--gold-2);
-  line-height: 1.2;
-}
-
-.title h3 {
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: clamp(2px, 1.2vw, 5px);
-  font-size: clamp(15px, 3.8vw, 22px);
-  color: var(--gold-text);
-  margin: 10px 0 0;
-}
-
-.title p {
-  color: var(--dark);
-  margin: 22px auto 0;
-  text-transform: none;
-  letter-spacing: 0.5px;
-  font-size: clamp(14px, 3.8vw, 17px);
-  line-height: 1.8;
-  max-width: 640px;
-}
-
-.title { margin-bottom: 26px; }
-
-.date, .place {
-  color: var(--highlight);
-  font-weight: 700;
-}
-
-.dance-med {
-  font-family: 'Dancing Script', cursive;
-  font-weight: bold;
-  font-size: clamp(24px, 6vw, 32px);
-  color: var(--maroon);
-  margin: 14px 16px 6px;
-  text-align: center;
 }
 
 /* ---------- Countdown ---------- */
@@ -531,204 +417,6 @@ button, a, input, select { touch-action: manipulation; }
   10%  { opacity: 0.9; }
   90%  { opacity: 0.2; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-}
-
-.sakura { animation: sakuraFall linear infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .sakura { display: none; }
-  html { scroll-behavior: auto; }
-}
-
-/* ---------- Music (disabled) ---------- */
-.music { display: none; }
-
-/* ---------- Intro gate (first visit) ---------- */
-.intro-gate {
-  position: fixed;
-  inset: 0;
-  background: rgba(250, 246, 236, 0.97);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  padding: 20px;
-  text-align: center;
-  transition: opacity 0.45s ease, visibility 0.45s ease;
-}
-.intro-gate.hide {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.intro-gate .card {
-  max-width: 460px;
-  width: 100%;
-  background: var(--ivory-2);
-  border-radius: 20px;
-  padding: clamp(24px, 6vw, 40px) clamp(18px, 5vw, 30px);
-  border: 1px solid var(--gold-line);
-  box-shadow: 0 14px 44px rgba(109, 26, 45, 0.16);
-  box-sizing: border-box;
-}
-.intro-gate .ik {
-  font-size: 34px;
-  color: var(--highlight);
-  line-height: 1.2;
-}
-.intro-gate h2 {
-  font-family: 'Dancing Script', cursive;
-  font-size: clamp(26px, 6.5vw, 36px);
-  color: var(--maroon);
-  margin: 8px 0 6px;
-  line-height: 1.25;
-}
-.intro-gate .sub {
-  color: var(--brown);
-  font-size: 15px;
-  margin: 4px 0 18px;
-}
-.intro-gate .lang-pick {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.intro-gate .lang-pick button {
-  flex: 1 1 150px;
-  max-width: 220px;
-  padding: 14px 12px;
-  border-radius: 16px;
-  border: 1.5px solid var(--maroon);
-  background: #fff;
-  color: var(--maroon);
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 52px;
-  transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
-}
-.intro-gate .lang-pick button:hover { transform: translateY(-2px); }
-.intro-gate .lang-pick button:active { transform: translateY(0); }
-.intro-gate .lang-pick button:hover {
-  background: var(--maroon);
-  color: #f6e2a1;
-}
-.intro-gate .gate-hint {
-  margin-top: 14px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--gold-text);
-}
-
-/* ---------- Reveal after intro ---------- */
-body:not(.intro-done) .blessing,
-body:not(.intro-done) #invite-blessing,
-body:not(.intro-done) .qr-section,
-body:not(.intro-done) #qr-section,
-body:not(.intro-done) .wrap,
-body:not(.intro-done) #time,
-body:not(.intro-done) .dance-med,
-body:not(.intro-done) .actions,
-body:not(.intro-done) #invite-footer,
-body:not(.intro-done) #lang-toggle,
-body:not(.intro-done) #day-info,
-body:not(.intro-done) #photos,
-body:not(.intro-done) #rsvp-section,
-body:not(.intro-done) #venue-map-embed,
-body:not(.intro-done) #calendar-section,
-body:not(.intro-done) #print-section,
-body:not(.intro-done) #invite-social {
-  opacity: 0;
-  pointer-events: none;
-}
-body.intro-done .blessing,
-body.intro-done #invite-blessing,
-body.intro-done .qr-section,
-body.intro-done #qr-section,
-body.intro-done .wrap,
-body.intro-done #time,
-body.intro-done .dance-med,
-body.intro-done .actions,
-body.intro-done #invite-footer,
-body.intro-done #lang-toggle,
-body.intro-done #day-info,
-body.intro-done #photos,
-body.intro-done #rsvp-section,
-body.intro-done #venue-map-embed,
-body.intro-done #calendar-section,
-body.intro-done #print-section,
-body.intro-done #invite-social {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.4s ease;
-}
-
-/* ---------- QR codes ---------- */
-.qr-section {
-  text-align: center;
-  margin: 26px auto 10px;
-  padding: 0 16px;
-}
-.qr-section h4 {
-  font-family: 'Noto Sans Gurmukhi', 'Arvo', Georgia, serif;
-  color: var(--maroon);
-  font-size: 17px;
-  margin: 0 0 14px;
-  letter-spacing: 0.5px;
-}
-.qr-grid {
-  display: flex;
-  justify-content: center;
-  gap: 26px;
-  flex-wrap: wrap;
-}
-.qr-item { text-align: center; }
-.qr-wrap {
-  box-shadow: 0 6px 18px rgba(109, 26, 45, 0.14);
-}
-.qr-link {
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.qr-link:hover, .qr-link:focus {
-  transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(109, 26, 45, 0.22);
-  outline: none;
-}
-.qr-link:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-.qr-label {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--gold-text);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 600;
-}
-.qr-note {
-  margin-top: 12px;
-  font-size: 12px;
-  color: var(--dark);
-  opacity: 0.75;
-}
-.pdf-qr { margin-top: 18px; }
-.pdf-qr-title {
-  font-size: 14px;
-  color: #6d1a2d;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-.pdf-qr-grid {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
 }
 
 /* ---------- Language toggle ---------- */
