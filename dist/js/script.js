@@ -620,9 +620,21 @@
     if (footEl) footEl.textContent = isPa ? (L.pdfFooterNote || G.pdfFootPa) : ((config._pdf && config._pdf.footerNote) || 'With love and joy, together with their families');
     // Names + connector
     var n1 = document.getElementById('pdf-name-1');
-    if (n1) n1.textContent = name1();
+    if (n1) {
+      n1.textContent = name1();
+      // Great Vibes has no Gurmukhi glyphs, so Punjabi names fell back to an
+      // arbitrary font on the card. Switch the face with the language.
+      n1.style.fontFamily = isPa
+        ? "'Noto Sans Gurmukhi', 'Cormorant Garamond', serif"
+        : "'Playfair Display', 'Cormorant Garamond', serif";
+      n1.style.fontWeight = '700';
+    }
     var n2 = document.getElementById('pdf-name-2');
-    if (n2) n2.textContent = name2();
+    if (n2) {
+      n2.textContent = name2();
+      if (n1) n2.style.fontFamily = n1.style.fontFamily;
+      n2.style.fontWeight = '700';
+    }
     var cn = document.getElementById('pdf-connector');
     if (cn) cn.textContent = conn();
     // Event line: "Reception • 6 December 2026"
@@ -732,9 +744,10 @@
     try { reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
     if (reducedMotion) return;
 
-    var COLORS = ['#e9aec0', '#f2cdd9', '#fbe9ee', '#d98fa8', '#f7dfe6'];
-    var INTERVAL = 3000;   // sparse on purpose - was 550ms and read as rain
-    var MAX_AGE = 14000;
+    // Royal palette: theme burgundy + antique gold, with a blush for softness.
+    var COLORS = ['#c76a86', '#a4243b', '#8c2340', '#d9b865', '#e5c46d', '#e9aec0'];
+    var INTERVAL = 1500;
+    var MAX_AGE = 15000;
 
     var hero = document.querySelector('.wrap') || document.body;
     var inView = true;
@@ -743,13 +756,13 @@
       if (!inView) return;
       var petal = document.createElement('div');
       petal.className = 'rose-petal';
-      var size = 9 + Math.random() * 5;
+      var size = 17 + Math.random() * 11;
       petal.style.width = size + 'px';
       petal.style.height = size + 'px';
       petal.style.setProperty('--petal', COLORS[Math.floor(Math.random() * COLORS.length)]);
       petal.style.left = (6 + Math.random() * 88) + '%';
-      petal.style.animationDuration = (11 + Math.random() * 6) + 's';
-      petal.style.animationDelay = (Math.random() * 2.5) + 's';
+      petal.style.animationDuration = (10 + Math.random() * 6) + 's';
+      petal.style.animationDelay = (Math.random() * 3) + 's';
       container.appendChild(petal);
       setTimeout(function () {
         if (petal.parentNode) petal.parentNode.removeChild(petal);
