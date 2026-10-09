@@ -431,18 +431,12 @@
     // 6 December 2026, and UTC getters would shift it to the 5th for
     // anyone east of Greenwich.
     var icsDate = eventDate.getFullYear() + pad(eventDate.getMonth() + 1) + pad(eventDate.getDate());
-    // The start time is a wall-clock time in India (TZID below), NOT the
-    // viewer's local time, so it must come from the config string.
-    var hm = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(time || '');
-    var icsHour = 10, icsMin = 0;
-    if (hm) {
-      icsHour = parseInt(hm[1], 10);
-      icsMin = parseInt(hm[2], 10);
-      var mer = (hm[3] || '').toUpperCase();
-      if (mer === 'PM' && icsHour < 12) icsHour += 12;
-      if (mer === 'AM' && icsHour === 12) icsHour = 0;
-    }
-    var startT = 'T' + pad(icsHour) + pad(icsMin) + '00';
+    // ALL-DAY event (RFC 5545 VALUE=DATE): no time, no TZID, so every
+    // guest's calendar shows the whole of 6 December regardless of their
+    // own zone. DTEND for an all-day event is EXCLUSIVE, i.e. the next day.
+    var endDate = new Date(eventDate.getTime());
+    endDate.setDate(endDate.getDate() + 1);
+    var icsDateEnd = endDate.getFullYear() + pad(endDate.getMonth() + 1) + pad(endDate.getDate());
     var icsContent =
       'BEGIN:VCALENDAR\r\n' +
       'VERSION:2.0\r\n' +
@@ -453,8 +447,8 @@
       'UID:' + icsDate + '-nirman-simran@wedding\r\n' +
       'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z\r\n' +
       'SUMMARY:' + p1 + ' & ' + p2 + ' - Wedding Reception\r\n' +
-      'DTSTART;TZID=Asia/Kolkata:' + icsDate + startT + '\r\n' +
-      'DTEND;TZID=Asia/Kolkata:' + icsDate + 'T235900\r\n' +
+      'DTSTART;VALUE=DATE:' + icsDate + '\r\n' +
+      'DTEND;VALUE=DATE:' + icsDateEnd + '\r\n' +
       'DESCRIPTION:Wedding Reception for ' + p1 + ' & ' + p2 + ' on ' + date + ' at ' + venueName + '\r\n' +
       // LOCATION stays Latin: calendar apps + GPS need the ASCII address.
       'LOCATION:' + venueName + (venueAddress ? ', ' + venueAddress : '') + '\r\n' +
@@ -466,6 +460,14 @@
         return (la && ln) ? 'GEO:' + la + ';' + ln + '\r\n' : '';
       })() +
       'STATUS:CONFIRMED\r\n' +
+      // 1-day-before reminder. TRIGGER is a negative DURATION relative to
+      // DTSTART, which is the form that survives all-day events across
+      // Google Calendar, Apple Calendar and Outlook.
+      'BEGIN:VALARM\r\n' +
+      'ACTION:DISPLAY\r\n' +
+      'DESCRIPTION:' + p1 + ' & ' + p2 + ' Wedding Reception tomorrow\r\n' +
+      'TRIGGER:-P1D\r\n' +
+      'END:VALARM\r\n' +
       'END:VEVENT\r\n' +
       'END:VCALENDAR';
     return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
@@ -849,34 +851,17 @@
     var container = document.getElementById('sakura-falling');
     if (!container) return;
 
-    /* Reduced motion should mean "stop MOVING things", not "remove the
-       decoration". This used to return early and build no canvas at all,
-       which was wrong twice over:
-         - it coupled a purely decorative feature to an accessibility
-           preference that should only govern motion
-         - Android Chrome reports prefers-reduced-motion: reduce far more
-           often than desktop ("Remove animations" in Accessibility or in
-           Developer options, and Battery Saver can set it). So a huge
-           number of Android visitors silently got no roses.
-
-       Now the canvas is always built. Under reduced motion the roses are
-       drawn ONCE, static and scattered, with no rAF loop and no falling -
-       the visual stays, the motion does not. */
-    var reduced = false;
-    try {
-      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    } catch (e) {}
-
-    /* Whether petals FALL is now a preference, not a hard-coded reaction to
-       the OS setting. Default: fall normally, EXCEPT under reduced motion
-       where they start as the static scatter. The visible toggle button
-       (added below) lets a guest on a Battery-Saver Android - where reduce
-       is reported constantly - turn the falling back on, and lets anyone
-       pause it (WCAG 2.2.2). The choice is remembered. */
+    /* Petals are OFF by default. Guests opt IN via the toggle button
+       (added below), and the choice is remembered. This was a deliberate
+       request: the shower should not compete with the couple's names and
+       the Gurbani blessing on first paint. Anyone who wants them back taps
+       once, which also satisfies WCAG 2.2.2 (a pause/resume mechanism for
+       perpetual motion). Under reduced motion the canvas still renders, but
+       as the static scatter with no rAF loop. */
     var PAUSE_KEY = 'wedding-petals';
     var storedPref = null;
     try { storedPref = localStorage.getItem(PAUSE_KEY); } catch (e) {}
-    var enabled = storedPref === 'on' ? true : (storedPref === 'off' ? false : !reduced);
+    var enabled = storedPref === 'on';
 
     var supportsCanvas = !!document.createElement('canvas').getContext;
     if (!supportsCanvas) return;
