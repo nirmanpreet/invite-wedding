@@ -26,7 +26,7 @@
     "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
-    "message": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
+    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
@@ -164,7 +164,7 @@
         "gateHint": "Tap your language to enter",
         "saveTheDateTitle": "Save the Date",
         "saveTheDateNote": "Add the reception to your calendar so you do not miss it.",
-  "saveTheDateCta": "Tap to add it to your calendar",
+        "saveTheDateCta": "Tap to add it to your calendar",
         "weekdays": [
           "Sunday",
           "Monday",
@@ -211,7 +211,7 @@
         "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
         "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
         "saveTheDateNote": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਤਾਰੀਖ਼ ਨੂੰ ਸੇਵ ਕਰੋ ਤਾਂ ਜੋ ਤੁਸੀਂ ਇਸ ਤਾਰੀਖ਼ ਨੂੰ ਨਾ ਭੁੱਲੋ।",
-  "saveTheDateCta": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਇੱਥੇ ਟੈਪ ਕਰੋ",
+        "saveTheDateCta": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਇੱਥੇ ਟੈਪ ਕਰੋ",
         "weekdays": [
           "ਐਤਵਾਰ",
           "ਸੋਮਵਾਰ",
@@ -241,7 +241,7 @@
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
@@ -261,7 +261,7 @@
       "rsvpTitle": "RSVP",
       "venueMapLabel": "ਨਕਸ਼ੇ 'ਤੇ ਸਥਾਨ ਵੇਖੋ",
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
-      "footerNote": "ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥"
     }
   },
   "datePa": "6 ਦਸੰਬਰ 2026",
