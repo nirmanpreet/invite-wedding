@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+  Share-card template for og:image.
+
+  Rendered by tools/make-og.js through headless Chrome at exactly 1200x630
+  (the size WhatsApp, Facebook, iMessage and Slack all crop for), then
+  encoded to JPEG. Deliberately NOT a screenshot of the live page: a phone
+  screenshot is 390px wide with a language gate on top and half the date
+  below the fold, which makes a poor preview. This composition leads with
+  the four things a guest needs to know: who, what, when, where.
+
+  Copy is read from data/config.json at render time, never hardcoded here,
+  so the card cannot drift out of sync with the invitation.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Dancing+Script:wght@400;700&family=Noto+Sans+Gurmukhi:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    background:
+      radial-gradient(760px 420px at 50% -6%, rgba(200,162,75,0.22), transparent 62%),
+      radial-gradient(520px 380px at 50% 112%, rgba(164,36,59,0.10), transparent 60%),
+      linear-gradient(168deg, #fffdf8 0%, #fdf6e9 58%, #faf0dd 100%);
+    color: #4a2c2f;
+    position: relative;
+  }
+  /* gold hairline frame, inset from the edge */
+  .frame {
+    position: absolute;
+    inset: 26px;
+    border: 1px solid rgba(198,160,90,0.55);
+    border-radius: 3px;
+  }
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(198,160,90,0.26);
+    border-radius: 2px;
+  }
+  /* corner lozenges */
+  .corner {
+    position: absolute;
+    width: 13px; height: 13px;
+    background: #c6a05a;
+    transform: rotate(45deg);
+    opacity: 0.85;
+  }
+  .corner.tl { left: 19px;  top: 19px; }
+  .corner.tr { right: 19px; top: 19px; }
+  .corner.bl { left: 19px;  bottom: 19px; }
+  .corner.br { right: 19px; bottom: 19px; }
+
+  .card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* bottom padding clears the absolutely-positioned domain line, which
+       otherwise collides with the venue on a 630px canvas */
+    padding: 40px 90px 92px;
+  }
+
+  .ik {
+    font-family: 'Noto Sans Gurmukhi', serif;
+    font-size: 36px;
+    color: #8c2340;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .gurbani {
+    font-family: 'Noto Sans Gurmukhi', serif;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.6;
+    color: #6d1a2d;
+    margin-bottom: 4px;
+  }
+  .blessing-en {
+    font-size: 17px;
+    letter-spacing: 1.1px;
+    color: #8a6a4a;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+
+  /* ceremony art */
+  .art {
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+  .art img {
+    height: 100%;
+    width: auto;
+    filter: sepia(0.12) saturate(1.04) brightness(1.02) contrast(0.97);
+  }
+
+  .names {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    /* letter-spacing must stay 0: this is a connected script face */
+    letter-spacing: 0;
+    font-size: 96px;
+    line-height: 1.02;
+    color: #8c2340;
+    margin-bottom: 4px;
+  }
+  .names .amp {
+    display: inline-block;
+    margin: 0 0.06em;
+    color: #c6a05a;
+  }
+  .heading {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #a9813a;
+    margin-bottom: 16px;
+  }
+
+  .rule {
+    width: 300px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(198,160,90,0.7), transparent);
+    margin-bottom: 16px;
+  }
+
+  .details {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #5c3238;
+  }
+  .details .sep {
+    width: 5px; height: 5px;
+    background: #c6a05a;
+    transform: rotate(45deg);
+    flex: 0 0 auto;
+  }
+  .venue {
+    font-size: 21px;
+    font-weight: 400;
+    color: #8a6a4a;
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+  }
+  .domain {
+    position: absolute;
+    bottom: 40px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 15px;
+    letter-spacing: 3.6px;
+    text-transform: uppercase;
+    color: rgba(138,106,74,0.85);
+  }
+</style>
+</head>
+<body>
+  <div class="frame"></div>
+  <span class="corner tl"></span><span class="corner tr"></span>
+  <span class="corner bl"></span><span class="corner br"></span>
+
+  <div class="card" id="card">
+    <div class="ik">ੴ</div>
+    <div class="gurbani" id="gurbani"></div>
+    <div class="blessing-en">With the blessings of Waheguru</div>
+
+    <div class="art"><img src="../assets/img/anand-karaj.webp" alt=""></div>
+
+    <div class="names" id="names"></div>
+    <div class="heading">Wedding Reception</div>
+
+    <div class="rule"></div>
+
+    <div class="details" id="details"></div>
+    <div class="venue" id="venue"></div>
+  </div>
+
+  <div class="domain" id="domain"></div>
+
+<script>
+/* Copy is injected by tools/make-og.js from data/config.json. */
+  window.__OG__ = { gurbani: ['', ''], p1: '', p2: '', connector: '&', date: '', time: '', venue: '', domain: '' };
+  function paint() {
+    var o = window.__OG__;
+    document.getElementById('gurbani').innerHTML = o.gurbani[0] + '<br>' + o.gurbani[1];
+    document.getElementById('names').innerHTML =
+      o.p1 + ' <span class="amp">' + o.connector + '</span> ' + o.p2;
+    document.getElementById('details').innerHTML =
+      '<span>' + o.date + '</span><span class="sep"></span><span>' + o.time + '</span>';
+    document.getElementById('venue').textContent = o.venue;
+    document.getElementById('domain').textContent = o.domain;
+  }
+  paint();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(paint).catch(function () {});
+  }
+</script>
+</body>
+</html>

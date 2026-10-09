@@ -215,7 +215,7 @@
       if (socialEnabled) {
         socialEl.style.display = 'block';
         socialEl.innerHTML = esc(tx('shareLabel', 'Share the happiness!')) +
-          '<br><a href="' + esc(social.url) + '" target="_blank" rel="noopener" class="twitter"><i class="fa fa-whatsapp"></i></a>';
+          '<br><a href="' + esc(social.url) + '" target="_blank" rel="noopener" class="twitter"><svg class="icon-whatsapp" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.38 9.38 0 0 1 4.51-14.35 9.4 9.4 0 0 1 9.4 9.4c0 1.98-.72 3.86-2.03 5.35a9.36 9.36 0 0 1-2.63 2.22M20.5 3.49A11.76 11.76 0 0 0 12.04 0C5.5 0 .19 5.31.19 11.85c0 2.09.55 4.13 1.59 5.93L.09 24l6.36-1.67a11.85 11.85 0 0 0 5.59 1.42h.01c6.54 0 11.85-5.31 11.85-11.85a11.77 11.77 0 0 0-3.4-8.41z"/></svg></a>';
       } else {
         socialEl.style.display = 'none';
       }
@@ -371,12 +371,9 @@
   }
 
   // ---------- Calendar (.ics) ----------
-  function renderCalendarSection() {
-    var el = document.getElementById('calendar-section');
-    if (!el) return;
-    if (features.calendarIcs === false) { el.innerHTML = ''; return; }
-    var label = tx('calendarLabel', 'Add to calendar');
-    var note = tx('calendarNote', 'Opens your calendar app with the event pre-filled.');
+  /* Build the .ics payload once, so the Save the Date card and the calendar
+     section can never disagree about the event details. */
+  function buildIcsHref() {
     // Derive YYYYMMDD + HHMMSS from the parsed Date, not by splitting the
     // display string. The old parser assumed "Month Day Year" but the config
     // is "6 December 2026", so it emitted 2026120; and it read the AM/PM
@@ -402,6 +399,8 @@
       'BEGIN:VCALENDAR\r\n' +
       'VERSION:2.0\r\n' +
       'PRODID:-//NirmanSimranWedding//EN\r\n' +
+      'CALSCALE:GREGORIAN\r\n' +
+      'METHOD:PUBLISH\r\n' +
       'BEGIN:VEVENT\r\n' +
       'UID:' + icsDate + '-nirman-simran@wedding\r\n' +
       'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z\r\n' +
@@ -411,11 +410,32 @@
       'DESCRIPTION:Wedding Reception for ' + p1 + ' & ' + p2 + ' on ' + date + ' at ' + venueName + '\r\n' +
       // LOCATION stays Latin: calendar apps + GPS need the ASCII address.
       'LOCATION:' + venueName + (venueAddress ? ', ' + venueAddress : '') + '\r\n' +
+      // GEO lets a calendar app drop a pin. Read straight from config rather
+      // than via a variable that may not exist.
+      (function () {
+        var la = config.venue && config.venue.lat;
+        var ln = config.venue && config.venue.lng;
+        return (la && ln) ? 'GEO:' + la + ';' + ln + '\r\n' : '';
+      })() +
+      'STATUS:CONFIRMED\r\n' +
       'END:VEVENT\r\n' +
       'END:VCALENDAR';
-    var icsData = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+  }
+
+  function icsDownloadName() {
+    return p1 + '_' + p2 + '_reception.ics';
+  }
+
+  function renderCalendarSection() {
+    var el = document.getElementById('calendar-section');
+    if (!el) return;
+    if (features.calendarIcs === false) { el.innerHTML = ''; return; }
+    var label = tx('calendarLabel', 'Add to calendar');
+    var note = tx('calendarNote', 'Opens your calendar app with the event pre-filled.');
+    var icsData = buildIcsHref();
     el.innerHTML =
-      '<a href="' + esc(icsData) + '" download="' + esc(p1 + '_' + p2 + '_reception.ics') + '">' + esc(label) + '</a>' +
+      '<a href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' + esc(label) + '</a>' +
       '<div class="cal-note">' + esc(note) + '</div>';
   }
 
@@ -724,12 +744,20 @@
     var dTxt = dateText();
     // Punjabi: "ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026"  |  English: "Sunday, 6 December 2026"
     var full = wd ? wd + ', ' + dTxt : dTxt;
+    /* The whole card is a link, not just its title. It carries the same .ics as
+       the calendar section, so tapping the date the guest came to read is the
+       same action as tapping "Add to calendar" lower down.
+       The href is a data: URI carrying the correct text/calendar MIME type,
+       which is what makes iOS and Android calendar apps open it rather than
+       showing the raw file; `download` covers desktop browsers. */
+    var icsData = buildIcsHref();
     el.innerHTML =
-      '<div class="save-date">' +
+      '<a class="save-date" id="save-date-link" href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' +
         '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
-      '</div>';
+        '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +
+      '</a>';
   }
 
 // ---------- Rose petals ----------
@@ -768,13 +796,23 @@
     var container = document.getElementById('sakura-falling');
     if (!container) return;
 
-    // Respect prefers-reduced-motion by not building the canvas at all.
+    /* Reduced motion should mean "stop MOVING things", not "remove the
+       decoration". This used to return early and build no canvas at all,
+       which was wrong twice over:
+         - it coupled a purely decorative feature to an accessibility
+           preference that should only govern motion
+         - Android Chrome reports prefers-reduced-motion: reduce far more
+           often than desktop ("Remove animations" in Accessibility or in
+           Developer options, and Battery Saver can set it). So a huge
+           number of Android visitors silently got no roses.
+
+       Now the canvas is always built. Under reduced motion the roses are
+       drawn ONCE, static and scattered, with no rAF loop and no falling -
+       the visual stays, the motion does not. */
     var reduced = false;
     try {
-      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-                window.matchMedia('(prefers-reduced-motion)').matches;
+      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {}
-    if (reduced) return;
 
     var supportsCanvas = !!document.createElement('canvas').getContext;
     if (!supportsCanvas) return;
@@ -799,9 +837,26 @@
        mix toward the soft end so the shower stays light over cream. */
     var PICK = [4, 4, 4, 4, 5, 5, 5, 3, 3, 2, 2, 0, 1];
 
-    var MAX_ALIVE = 14;      // bound the cost on low-end phones
-    var SPAWN_MS = 1200;
+    /* Density. The canvas costs one draw loop regardless of how many petals
+       are alive - they are shapes in a loop, not DOM nodes - so this is far
+       cheaper than the old per-element version ever was. These are tuned so
+       the hero reads as a gentle shower rather than a blizzard, and so a
+       mid-range phone is not asked to fill too many pixels per frame. */
+    var MAX_ALIVE_DESKTOP = 34;
+    var MAX_ALIVE_MOBILE = 22;
+    var SPAWN_MS_DESKTOP = 620;
+    var SPAWN_MS_MOBILE = 900;
     var GRAVITY = 26;        // px per second
+
+    // One decision, reused by both the spawn gate and the frame loop.
+    var maxAlive = MAX_ALIVE_MOBILE;
+    var spawnEvery = SPAWN_MS_MOBILE;
+    function tuneForViewport() {
+      var roomy = window.innerWidth >= 900;
+      maxAlive = roomy ? MAX_ALIVE_DESKTOP : MAX_ALIVE_MOBILE;
+      spawnEvery = roomy ? SPAWN_MS_DESKTOP : SPAWN_MS_MOBILE;
+    }
+    tuneForViewport();
     var petals = [];
     var last = 0;
     var spawnAt = 0;
@@ -897,9 +952,9 @@
 
       ctx.clearRect(0, 0, dims.w, dims.h);
 
-      if (running && inHero() && petals.length < MAX_ALIVE && now >= spawnAt) {
+      if (running && inHero() && petals.length < maxAlive && now >= spawnAt) {
         spawn(dims.w, dims.h);
-        spawnAt = now + SPAWN_MS + Math.random() * 900;
+        spawnAt = now + spawnEvery + Math.random() * spawnEvery * 0.5;
       }
 
       for (var i = petals.length - 1; i >= 0; i--) {
@@ -927,28 +982,55 @@
     // Stop while the tab is hidden: no work, no battery drain.
     document.addEventListener('visibilitychange', function () {
       running = !document.hidden;
-      if (running) {
-        last = 0; // avoid a huge dt jump on the first frame back
-      }
+      if (running) last = 0; // avoid a huge dt jump on the first frame back
       if (!running && rafId) {
         window.cancelAnimationFrame(rafId);
         rafId = null;
-        ctx.clearRect(0, 0, dims.w, dims.h);
-        petals.length = 0;
-      } else if (running && !rafId) {
+      } else if (running && !rafId && !reduced) {
         rafId = window.requestAnimationFrame(frame);
       }
+      if (reduced) drawStatic();
     });
 
     window.addEventListener('resize', function () {
       dims = size();
+      if (reduced) drawStatic();
     });
     window.addEventListener('orientationchange', function () {
-      setTimeout(function () { dims = size(); }, 250);
+      setTimeout(function () { dims = size(); if (reduced) drawStatic(); }, 250);
     });
 
+    /* Reduced motion: scatter a fixed set of roses across the viewport and
+       draw them once. No falling, no sway, no rAF loop at all - so there is
+       genuinely zero motion, but the page still has its decoration. */
+    function drawStatic() {
+      ctx.clearRect(0, 0, dims.w, dims.h);
+      var count = Math.round((dims.w * dims.h) / 46000);
+      count = Math.max(5, Math.min(count, 18));
+      for (var i = 0; i < count; i++) {
+        // deterministic scatter, so a resize does not reshuffle the pattern
+        var seed = i * 2.399963; // golden angle, for an even spread
+        var x = ((i + 0.5) / count * dims.w + Math.sin(seed) * 34 + dims.w) % dims.w;
+        var y = ((i * 0.6180339887) % 1) * dims.h;
+        petals[i] = {
+          x: x,
+          y: y,
+          r: 13 + ((i * 7) % 12),
+          rot: (seed % (Math.PI * 2)),
+          pal: PALETTE[PICK[i % PICK.length]]
+        };
+        drawRose(petals[i], 0.55);
+      }
+    }
+
+    if (reduced) {
+      tuneForViewport();
+      drawStatic();
+      return;
+    }
+
     // Seed a few so the hero is never empty on arrival.
-    for (var k = 0; k < 4; k++) spawn(dims.w, dims.h);
+    for (var k = 0; k < 6; k++) spawn(dims.w, dims.h);
     petals.forEach(function (p) { p.y = Math.random() * dims.h * 0.5; });
 
     rafId = window.requestAnimationFrame(frame);
@@ -1076,9 +1158,13 @@
     var card = document.querySelector('.intro-gate .card');
     var gate = document.getElementById('intro-gate');
     if (!card || !gate || gate.classList.contains('hide')) return;
+    if (!window.gsap) return;
     var reduce = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!window.gsap || reduce) return;
+    if (reduce) {
+      gsap.from(card, { opacity: 0, duration: 0.4, ease: 'none' });
+      return;
+    }
     gsap.from(card, {
       opacity: 0, y: 26, duration: 1.1, ease: 'power2.out', delay: 0.15
     });
@@ -1097,9 +1183,19 @@
       el.style.opacity = '';
       el.style.transform = '';
     });
-    if (!window.gsap || reduce) return;
 
+    if (!window.gsap) return;
     document.body.classList.add('royal-animating');
+
+    /* Under reduced motion, do a plain cross-fade: opacity only, no
+       translate/scale. Previously this returned early, so on Android - where
+       reduce is set far more often - the page simply appeared with no reveal
+       at all. A fade is well within what reduced-motion is asking for: no
+       movement, no parallax, no vestibular trigger, just a soft arrival. */
+    if (reduce) {
+      gsap.from(targets, { opacity: 0, duration: 0.45, ease: 'none', stagger: 0.03 });
+      return;
+    }
 
     var tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
     tl.from('#invite-blessing', { opacity: 0, y: 18, duration: 1.0 })

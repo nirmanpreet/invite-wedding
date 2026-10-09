@@ -1235,3 +1235,190 @@ html[lang="pa"] #print-invite {
   
   .footer .phone { color: #000; }
 }
+
+/* ============================================================
+   CLICKABLE SAVE-THE-DATE, FRAME, DIVIDERS, GATE
+   --------------------------------------------------------------
+   Grouped and scoped to @media screen so it cannot interfere with the
+   print stylesheet, which must stay the last word when printing.
+   ============================================================ */
+@media screen {
+
+  /* ---- 1. Save the Date is now a link --------------------------
+     The card was a plain <div> with an "Add to calendar" link sitting
+     much further down the page. It is now the <a> itself, carrying the
+     same .ics, so tapping the date the guest actually came to read does
+     the thing the page was already asking them to do. */
+  a.save-date {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      transform 0.15s ease;
+  }
+  a.save-date:hover,
+  a.save-date:focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 6px 22px rgba(140, 35, 64, 0.14);
+  }
+  a.save-date:active {
+    transform: translateY(1px);
+  }
+  /* Keyboard users get a ring; pointer users do not see one. */
+  a.save-date:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  .save-date .sd-cta {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 7px 16px;
+    font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 2.6px;
+    text-transform: uppercase;
+    color: var(--royal);
+    background: rgba(198, 160, 90, 0.14);
+    border: 1px solid var(--gold-line);
+    border-radius: 3px;
+  }
+  a.save-date:hover .sd-cta,
+  a.save-date:focus-visible .sd-cta {
+    background: rgba(198, 160, 90, 0.24);
+  }
+
+  /* ---- 2. Gold hairline frame around the ceremony artwork ------
+     The aura alone left the illustration feeling like it floated. A
+     hairline well outside the art's own bounding box turns it into a
+     composed panel instead. Drawn on .ceremony-image::after, which sits
+     behind the picture (z-index -1) so it never sits over the art. */
+  .ceremony-image::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 118%;
+    height: 122%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(198, 160, 90, 0.34);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: -1;
+  }
+  /* Corner ticks, so the frame reads as a deliberate mount. */
+  .ceremony-image picture { position: relative; z-index: 1; }
+
+  @media (max-width: 420px) {
+    .ceremony-image::after { width: 126%; height: 132%; }
+  }
+
+  /* ---- 3. Section dividers -------------------------------------
+     The page is a long run of same-weight cards. A short gold rule
+     with a centred lozenge between the major sections gives the
+     scroll a rhythm and stops it reading as one undifferentiated
+     column. */
+  #day-info::before,
+  #qr-section::before,
+  #rsvp-section::before,
+  #venue-map-embed::before,
+  #calendar-section::before {
+    content: "";
+    display: block;
+    position: relative;
+    width: 128px;
+    height: 1px;
+    margin: 0 auto 24px;
+    background: linear-gradient(90deg,
+      rgba(198, 160, 90, 0) 0%,
+      rgba(198, 160, 90, 0.55) 30%,
+      rgba(198, 160, 90, 0.55) 70%,
+      rgba(198, 160, 90, 0) 100%);
+  }
+  #day-info::after,
+  #qr-section::after,
+  #rsvp-section::after,
+  #venue-map-embed::after,
+  #calendar-section::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    margin-top: -2.5px;
+    transform: rotate(45deg);
+    background: rgba(198, 160, 90, 0.75);
+  }
+  /* Anchor the lozenge to each section's own box. */
+  #day-info, #qr-section, #rsvp-section,
+  #venue-map-embed, #calendar-section {
+    position: relative;
+  }
+
+  /* ---- 4. Intro gate on wide screens ---------------------------
+     On a desktop the gate stretched nearly the full viewport height
+     for a little content, which left it sitting high and cramped.
+     Cap it and let it breathe. */
+  @media (min-width: 900px) {
+    .intro-gate .card {
+      max-width: 470px;
+      padding: 46px 44px 38px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .intro-gate h2 {
+      font-size: clamp(46px, 5.4vw, 62px);
+    }
+  }
+
+  /* Very short viewports (landscape laptops, landscape phones): the
+     gate must always be reachable without scrolling. */
+  @media (max-height: 560px) and (orientation: landscape) {
+    .intro-gate { padding: 12px; align-items: flex-start; overflow-y: auto; }
+    .intro-gate .card {
+      padding: 26px 28px 22px;
+      margin: auto 0;
+      max-height: none;
+    }
+    .intro-gate .ik { font-size: 30px; margin-bottom: 6px; }
+    .intro-gate h2 { font-size: 34px; }
+    .intro-gate .gate-blessing { font-size: 13px; line-height: 1.5; }
+  }
+}
+
+/* The single social icon is an inline SVG now, not a Font Awesome glyph: the
+   Font Awesome CDN pulled a render-blocking stylesheet and a ~150 KB webfont
+   from a third party for one icon. Sized to match the surrounding text. */
+.icon-whatsapp {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.18em;
+  fill: currentColor;
+}
+
+/* Punjabi Save-the-Date CTA.
+   The CTA sits under an uppercase, letter-spaced Latin label. Gurmukhi must
+   never inherit either: letter-spacing pulls joined conjuncts apart, which
+   breaks shaping (W3C 5.1 / 6), and Gurmukhi has no case to transform.
+   Caught by the CDP guard "Gurmukhi never letter-spaced / upper-cased". */
+html[lang="pa"] .save-date .sd-cta {
+  font-family: "Noto Sans Gurmukhi", var(--font-gurmukhi), sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 12.5px;
+  padding: 8px 15px;
+}
+html[lang="pa"] .save-date .sd-title,
+html[lang="pa"] .save-date .sd-date {
+  letter-spacing: 0;
+  text-transform: none;
+}
