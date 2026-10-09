@@ -379,7 +379,14 @@
         }
         rsvpError('');
         var link = buildWhatsappRsvpLink(selectedAttend, name, '');
-        if (link) window.open(link, '_blank', 'noopener');
+        // Use an options OBJECT, not the positional features string.
+        // window.open(link, '_blank', 'noopener') treats 'noopener' as a
+        // window-FEATURES string: the browser opens a window literally named
+        // "noopener" with no opener, and in several mobile in-app browsers
+        // (and headless Chrome) nothing is shown at all - so the guest's RSVP
+        // silently went nowhere. The options object sets the opener policy
+        // correctly and always opens the chat.
+        if (link) window.open(link, '_blank', { noopener: true, noreferrer: true });
       });
     }
     var directOnly = document.getElementById('rsvp-direct-only');
