@@ -4,12 +4,15 @@
   <link rel="shortcut icon" href="favicon.png" type="image/png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout, Punjab. With the blessings of Waheguru, we joyfully invite you to celebrate!">
+  <meta name="description" content="Wedding reception of Nirman & Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited.">
   <meta name="author" content="Nirman & Simran">
   <meta name="theme-color" content="#6d1a2d">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://invite.nirmanpreet.com/">
+  <link rel="apple-touch-icon" href="assets/img/icon-180.png">
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Nirman & Simran | Wedding Reception | 6 December 2026" />
-  <meta property="og:description" content="Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout, Punjab. With the blessings of Waheguru, we joyfully invite you to celebrate!" />
+  <meta property="og:description" content="Wedding reception of Nirman & Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited." />
   <meta property="og:url" content="https://invite.nirmanpreet.com/" />
   <meta property="og:site_name" content="Nirman &amp; Simran" />
   <meta property="og:locale" content="en_US" />
@@ -21,7 +24,7 @@
   <meta property="og:image:alt" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026 — Wedding Reception on 6 December 2026 at Park City Resort, Malout" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Nirman & Simran | Wedding Reception | 6 December 2026" />
-  <meta name="twitter:description" content="Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!" />
+  <meta name="twitter:description" content="Wedding reception of Nirman & Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited." />
   <meta name="twitter:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
   <title>Nirman & Simran | Wedding Reception | 6 December 2026</title>
 
@@ -40,10 +43,8 @@
 
   <link rel="stylesheet" href="./css/style.css">
 
-  <!-- GSAP Animation Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  
+  <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
+
   <script src="./js/qrcode.min.js"></script>
   <script src="./config.js"></script>
 
@@ -59,7 +60,7 @@
       "name": "Park City Resort",
       "address": "Malout, Fazilka Rd, Malout Rural, Punjab 152107, India"
     },
-    "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout, Punjab. With the blessings of Waheguru, we joyfully invite you to celebrate!",
+    "description": "Wedding reception of Nirman & Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited.",
     "organizer": { "@type": "Person", "name": "Nirman & Simran" }
   }
   </script>
@@ -75,7 +76,7 @@
         ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
         ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
       </div>
-      <h2>Nirman <span class="amp">&amp;</span> Simran</h2>
+      <div class="gate-names">Nirman <span class="amp">&amp;</span> Simran</div>
       <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
       <div class="lang-pick" id="intro-lang-pick">
         <button type="button" data-lang="en">English</button>
@@ -97,6 +98,7 @@
   </div>
 
   <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
+  <main id="invite-main">
   <div class="blessing" id="invite-blessing"></div>
 
   <div class="ornament" aria-hidden="true">
@@ -111,7 +113,7 @@
   <div class="ceremony-image" aria-hidden="true">
     <picture>
       <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-      <img src="assets/img/anand-karaj-fallback.png" alt="" loading="eager" fetchpriority="high" decoding="async">
+      <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
     </picture>
   </div>
 
@@ -136,6 +138,7 @@
   <div id="calendar-section" class="calendar-section"></div>
   <div id="print-section" class="print-section"></div>
   <p class="happiness" id="invite-social"></p>
+  </main>
 
   <div class="music" id="music-container" style="display:none;">
     <audio src="" id="my_audio" loop="loop"></audio>

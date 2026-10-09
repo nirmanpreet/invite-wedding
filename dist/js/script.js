@@ -147,6 +147,8 @@
     renderLangToggle();
     updateIntroGate();
     renderSaveTheDate();
+    // Petal toggle label + any lang-dependent chrome re-render with it.
+    try { window.dispatchEvent(new CustomEvent('wedding-langchange')); } catch (e) {}
   }
 
   // ---------- Invite ----------
@@ -167,11 +169,15 @@
         datePart = esc(tx('onWording', 'on')) + ' <span class="date">' + esc(dateText()) + '</span>';
         timePart = time ? ' &middot; ' + esc(tx('atWording', 'at')) + ' <span class="place">' + esc(timeText()) + '</span>' : '';
       }
+      /* One <h1> holding the couple (two h1s plus a skipped level below them
+         failed axe's heading-order rule). The connector is a styled span
+         inside the h1; the occasion becomes a real <h2>, so the outline is
+         h1 > h2 everywhere on the page. */
       titleEl.innerHTML =
-        '<h1>' + esc(n1) + n1Sub + '</h1>' +
-        '<h2>' + esc(conn()) + '</h2>' +
-        '<h1>' + esc(n2) + n2Sub + '</h1>' +
-        '<h3>' + esc(t('inviteTitle') || 'Wedding Reception') + '</h3>' +
+        '<h1 class="title-names"><span class="name-a">' + esc(n1) + n1Sub + '</span>' +
+        '<span class="amp-title">' + esc(conn()) + '</span>' +
+        '<span class="name-b">' + esc(n2) + n2Sub + '</span></h1>' +
+        '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
     // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
@@ -197,6 +203,12 @@
       var contactLine = '';
       if (footerContactLabel && footerPhone) {
         contactLine = esc(contactLabelText()) + ' <a class="phone" href="tel:' + esc(footerPhoneHref) + '">' + esc(footerPhone) + '</a>';
+        // Second contact number (India). Same label, second tel: link.
+        var phone2 = (config.footer && config.footer.phone2) || '';
+        var phone2Href = (config.footer && config.footer.phone2Href) || String(phone2).replace(/[^0-9+]/g, '');
+        if (phone2) {
+          contactLine += ' &middot; <a class="phone" href="tel:' + esc(phone2Href) + '">' + esc(phone2) + '</a>';
+        }
       } else if (footerContact) {
         contactLine = esc(footerContact);
       }
@@ -233,7 +245,7 @@
     var heading = tx('receptionHeading', 'Reception');
     var items = '';
     el.innerHTML =
-      '<h4>' + esc(heading) + '</h4>' +
+      '<h2>' + esc(heading) + '</h2>' +
       '<div class="day-grid">' + items +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(dateText()) + '</div></div>' +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(timeText() || '-') + '</div></div>' +
@@ -307,10 +319,11 @@
       ? '<div class="rsvp-by">' + esc(rsvpByName) + '</div>' : '';
 
     el.innerHTML =
-      '<h4>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h4>' + rsvpBy +
+      '<h2>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h2>' + rsvpBy +
       (formEnabled
         ? '<label class="sr-only" for="rsvp-name">' + esc(namePh) + '</label>' +
           '<input id="rsvp-name" type="text" placeholder="' + esc(namePh) + '" autocomplete="name">' +
+          '<p class="rsvp-error" id="rsvp-error" role="alert" hidden></p>' +
           '<div class="rsvp-attend-label">' + esc(attendLbl) + '</div>' +
           '<div class="rsvp-attending" role="group" aria-label="' + esc(attendLbl) + '">' +
             '<button type="button" class="attend-btn" data-attend="Yes" aria-pressed="false">' + esc(yesLbl) + '</button>' +
@@ -337,11 +350,34 @@
     });
 
     var sendBtn = document.getElementById('rsvp-send');
+    var errEl = document.getElementById('rsvp-error');
+    // Silent validation (focus with no message) failed the a11y review:
+    // a screen-reader or slow-tap guest had no idea why nothing happened.
+    function rsvpError(msg) {
+      if (!errEl) return;
+      errEl.textContent = msg || '';
+      errEl.hidden = !msg;
+    }
+    var nameInput = document.getElementById('rsvp-name');
+    if (nameInput) {
+      nameInput.addEventListener('input', function () { rsvpError(''); });
+    }
+    Array.prototype.forEach.call(el.querySelectorAll('.attend-btn'), function (btn) {
+      btn.addEventListener('click', function () { rsvpError(''); });
+    });
     if (sendBtn) {
       sendBtn.addEventListener('click', function () {
-        var nameEl = document.getElementById('rsvp-name');
-        var name = nameEl ? nameEl.value.trim() : '';
-        if (!name) { if (nameEl) nameEl.focus(); return; }
+        var name = nameInput ? nameInput.value.trim() : '';
+        if (!name) {
+          rsvpError(txWith('rsvpErrorName', 'Please enter your name.'));
+          if (nameInput) nameInput.focus();
+          return;
+        }
+        if (!selectedAttend) {
+          rsvpError(txWith('rsvpErrorAttend', 'Please tap Yes or No so we know.'));
+          return;
+        }
+        rsvpError('');
         var link = buildWhatsappRsvpLink(selectedAttend, name, '');
         if (link) window.open(link, '_blank', 'noopener');
       });
@@ -365,8 +401,13 @@
     var embedUrl = (lat && lng)
       ? 'https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=15&hl=en&output=embed'
       : 'https://maps.google.com/maps?q=' + encodeURIComponent((venueName + ' ' + venueAddress).trim()) + '&z=15&hl=en&output=embed';
+    // The iframe needs a title: an unlabelled frame fails axe and leaves
+    // screen readers announcing just "frame".
+    var frameTitle = venueName
+      ? (venueName + ' — Google Maps')
+      : 'Venue — Google Maps';
     el.innerHTML =
-      '<iframe src="' + esc(embedUrl) + '" allowfullscreen loading="lazy"></iframe>' +
+      '<iframe src="' + esc(embedUrl) + '" title="' + esc(frameTitle) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
   }
 
@@ -518,8 +559,10 @@
   function buildVCard() {
     var name = (config.qr && config.qr.vcardName) || p1;
     var phone = (config.qr && config.qr.vcardPhone) || (config.footer && config.footer.phoneHref) || '';
+    var phone2 = (config.qr && config.qr.vcardPhone2) || (config.footer && config.footer.phone2Href) || '';
     var lines = ['BEGIN:VCARD', 'VERSION:3.0', 'FN:' + name];
     if (phone) lines.push('TEL;TYPE=CELL:' + phone);
+    if (phone2 && phone2 !== phone) lines.push('TEL;TYPE=CELL:' + phone2);
     if (venueName || venueAddress) lines.push('ADR:;;' + [venueName, venueAddress].filter(Boolean).join(', '));
     if (date) lines.push('NOTE:Wedding Reception ' + date);
     lines.push('END:VCARD');
@@ -552,7 +595,7 @@
 
     // Live page: real <table> QRs, each wrapped in a clickable link.
     el.innerHTML =
-      '<h4>' + title + '</h4>' +
+      '<h2>' + title + '</h2>' +
       '<div class="qr-grid">' +
         '<div class="qr-item">' + qrTableHtml(q1, cellPx, targetN, 'map') +
           '<div class="qr-label">' + mapLbl + '</div></div>' +
@@ -665,7 +708,10 @@
     var vl = document.getElementById('pdf-venue-line');
     if (vl) vl.textContent = venueNameText() + (venueAddrText() ? ', ' + venueAddrText() : '');
     var ct = document.getElementById('pdf-contact');
-    if (ct) ct.textContent = contactLabelText() + ' ' + footerPhone;
+    if (ct) {
+      var phone2 = (config.footer && config.footer.phone2) || '';
+      ct.textContent = contactLabelText() + ' ' + footerPhone + (phone2 ? ' \u00B7 ' + phone2 : '');
+    }
     // Gurmukhi blessing lines (same 2 lines as the page, minus Ik Onkar)
     var bl = document.getElementById('pdf-blessing');
     if (bl) {
@@ -814,6 +860,17 @@
       reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {}
 
+    /* Whether petals FALL is now a preference, not a hard-coded reaction to
+       the OS setting. Default: fall normally, EXCEPT under reduced motion
+       where they start as the static scatter. The visible toggle button
+       (added below) lets a guest on a Battery-Saver Android - where reduce
+       is reported constantly - turn the falling back on, and lets anyone
+       pause it (WCAG 2.2.2). The choice is remembered. */
+    var PAUSE_KEY = 'wedding-petals';
+    var storedPref = null;
+    try { storedPref = localStorage.getItem(PAUSE_KEY); } catch (e) {}
+    var enabled = storedPref === 'on' ? true : (storedPref === 'off' ? false : !reduced);
+
     var supportsCanvas = !!document.createElement('canvas').getContext;
     if (!supportsCanvas) return;
 
@@ -952,7 +1009,7 @@
 
       ctx.clearRect(0, 0, dims.w, dims.h);
 
-      if (running && inHero() && petals.length < maxAlive && now >= spawnAt) {
+      if (enabled && running && inHero() && petals.length < maxAlive && now >= spawnAt) {
         spawn(dims.w, dims.h);
         spawnAt = now + spawnEvery + Math.random() * spawnEvery * 0.5;
       }
@@ -986,18 +1043,18 @@
       if (!running && rafId) {
         window.cancelAnimationFrame(rafId);
         rafId = null;
-      } else if (running && !rafId && !reduced) {
+      } else if (running && enabled && !rafId) {
         rafId = window.requestAnimationFrame(frame);
       }
-      if (reduced) drawStatic();
+      if (!enabled) drawStatic();
     });
 
     window.addEventListener('resize', function () {
       dims = size();
-      if (reduced) drawStatic();
+      if (!enabled) drawStatic();
     });
     window.addEventListener('orientationchange', function () {
-      setTimeout(function () { dims = size(); if (reduced) drawStatic(); }, 250);
+      setTimeout(function () { dims = size(); if (!enabled) drawStatic(); }, 250);
     });
 
     /* Reduced motion: scatter a fixed set of roses across the viewport and
@@ -1023,17 +1080,48 @@
       }
     }
 
-    if (reduced) {
-      tuneForViewport();
+    if (!enabled) {
       drawStatic();
-      return;
+    } else {
+      // Seed a few so the hero is never empty on arrival.
+      for (var k = 0; k < 6; k++) spawn(dims.w, dims.h);
+      petals.forEach(function (p) { p.y = Math.random() * dims.h * 0.5; });
+      rafId = window.requestAnimationFrame(frame);
     }
 
-    // Seed a few so the hero is never empty on arrival.
-    for (var k = 0; k < 6; k++) spawn(dims.w, dims.h);
-    petals.forEach(function (p) { p.y = Math.random() * dims.h * 0.5; });
-
-    rafId = window.requestAnimationFrame(frame);
+    // The visible pause/play control. Fixed bottom-left, out of the way of
+    // the RSVP thumb zone, hidden when printing.
+    var toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'petals-toggle';
+    function petalBtnText() {
+      var block = extraBlock[currentLang] || extraBlock[defaultLang] || {};
+      return String(enabled ? (block.petalToggleOn || 'Petals: on')
+                            : (block.petalToggleOff || 'Petals: off'));
+    }
+    toggleBtn.textContent = petalBtnText();
+    toggleBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    document.body.appendChild(toggleBtn);
+    toggleBtn.addEventListener('click', function () {
+      enabled = !enabled;
+      try { localStorage.setItem(PAUSE_KEY, enabled ? 'on' : 'off'); } catch (e) {}
+      toggleBtn.textContent = petalBtnText();
+      toggleBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+      last = 0;
+      if (!enabled) {
+        petals.length = 0;
+        if (rafId) { window.cancelAnimationFrame(rafId); rafId = null; }
+        drawStatic();
+      } else if (!document.hidden && !rafId) {
+        ctx.clearRect(0, 0, dims.w, dims.h);
+        for (var k2 = 0; k2 < 4; k2++) spawn(dims.w, dims.h);
+        rafId = window.requestAnimationFrame(frame);
+      }
+    });
+    // Keep the button label in step with the active language.
+    window.addEventListener('wedding-langchange', function () {
+      toggleBtn.textContent = petalBtnText();
+    });
   }
 
   // ---------- Language toggle ----------
@@ -1117,6 +1205,9 @@
 
   // ---------- Boot ----------
   function boot() {
+    // Reveal styles only apply when JS is running: content is visible by
+    // default so a JS failure can never leave the invite blank.
+    document.documentElement.classList.add('js-reveal');
     // Set <html lang> before anything renders: the Punjabi typography rules are
     // scoped to html[lang="pa"], and setLang() only runs on interaction.
     document.documentElement.lang = isPa() ? 'pa' : 'en';
@@ -1152,75 +1243,56 @@
     var art = document.querySelector('.ceremony-image img');
     if (art) out.push(art);
     return out.concat(Array.prototype.slice.call(orn));
+  }  function playIntroCard() {
+    // The gate card's entrance is a pure CSS animation now (see
+    // .intro-gate .card in style.css) - no library, no JS timing, and it
+    // cannot strand content at opacity 0 the way the GSAP path could.
   }
 
-  function playIntroCard() {
-    var card = document.querySelector('.intro-gate .card');
-    var gate = document.getElementById('intro-gate');
-    if (!card || !gate || gate.classList.contains('hide')) return;
-    if (!window.gsap) return;
-    var reduce = window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      gsap.from(card, { opacity: 0, duration: 0.4, ease: 'none' });
-      return;
-    }
-    gsap.from(card, {
-      opacity: 0, y: 26, duration: 1.1, ease: 'power2.out', delay: 0.15
-    });
-  }
-
+  /* ============================================================
+     REVEAL LAYER - CSS transitions + IntersectionObserver
+     ------------------------------------------------------------
+     Replaces GSAP/ScrollTrigger (two render-blocking CDN scripts for a
+     fade-up). Rules that keep this safe by construction:
+       - content is visible by default; the hidden state only exists once
+         JS adds .reveal-target to an element (html.js-reveal is set at boot)
+       - no JS is ever REQUIRED for visibility: no-IO browsers get an
+         instant .is-in on everything, and a timed failsafe force-reveals
+         anything still hidden in the viewport
+       - reduced motion gets instant visibility via CSS, not a JS branch
+     ============================================================ */
   function playRoyalReveal() {
     if (royalAnimated) return;
     royalAnimated = true;
-    var reduce = window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var targets = revealTargets();
     if (!targets.length) return;
 
-    // Always make content visible first so it can never be stuck hidden.
-    targets.forEach(function (el) {
-      el.style.opacity = '';
-      el.style.transform = '';
-    });
-
-    if (!window.gsap) return;
-    document.body.classList.add('royal-animating');
-
-    /* Under reduced motion, do a plain cross-fade: opacity only, no
-       translate/scale. Previously this returned early, so on Android - where
-       reduce is set far more often - the page simply appeared with no reveal
-       at all. A fade is well within what reduced-motion is asking for: no
-       movement, no parallax, no vestibular trigger, just a soft arrival. */
-    if (reduce) {
-      gsap.from(targets, { opacity: 0, duration: 0.45, ease: 'none', stagger: 0.03 });
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(function (el) { el.classList.add('revealed'); });
       return;
     }
-
-    var tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-    tl.from('#invite-blessing', { opacity: 0, y: 18, duration: 1.0 })
-      .from('.ornament', { opacity: 0, scaleX: 0.4, duration: 0.9 }, '-=0.6')
-      .from('.ceremony-image img', { opacity: 0, y: 24, duration: 1.1 }, '-=0.5')
-      .from('#invite-title', { opacity: 0, y: 20, duration: 0.9 }, '-=0.6')
-      .from('#time', { opacity: 0, y: 18, duration: 0.8 }, '-=0.55')
-      .from('#invite-actions', { opacity: 0, y: 14, duration: 0.7 }, '-=0.45')
-      .from(['#invite-footer', '#lang-toggle'], { opacity: 0, y: 12, duration: 0.6 }, '-=0.4')
-      .from(['#day-info', '#qr-section', '#rsvp-section', '#venue-map-embed',
-        '#calendar-section', '#print-section'], {
-        opacity: 0, y: 16, duration: 0.7, stagger: 0.12
-      }, '-=0.35');
-
-    if (window.ScrollTrigger) {
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.to('.ceremony-image img', {
-        yPercent: 6, ease: 'none',
-        scrollTrigger: { trigger: '.ceremony-image', start: 'top bottom', end: 'bottom top', scrub: 0.6 }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('revealed');
+          io.unobserve(en.target);
+        }
       });
-    }
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+
+    targets.forEach(function (el) { el.classList.add('reveal-target'); io.observe(el); });
+
+    // Failsafe: if the observer never fires (odd WebViews, restored bfcache
+    // sessions), anything already inside the viewport is shown anyway.
+    setTimeout(function () {
+      targets.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add('revealed');
+      });
+    }, 2500);
   }
 
   function initAnimations() {
-    playIntroCard();
     var gate = document.getElementById('intro-gate');
     var already = document.body.classList.contains('intro-done');
     if (already || !gate || gate.classList.contains('hide')) {

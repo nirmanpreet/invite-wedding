@@ -31,10 +31,12 @@
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
     "phoneHref": "+61423594009",
+    "phone2": "+91 78884 79610",
+    "phone2Href": "+917888479610",
     "contactLabelPa": "ਕਿਸੇ ਵੀ ਜਾਣਕਾਰੀ ਲਈ:"
   },
   "seo": {
-    "description": "Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!"
+    "description": "Wedding reception of Nirman & Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited."
   },
   "links": {
     "venueMap": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
@@ -89,7 +91,8 @@
   "qr": {
     "_comment": "QR codes shown on the page, the PDF card, and print. mapUrl points at the Park City Resort pin in Malout using coordinates only - the place_id previously carried here was dead (no title/description/coords returned) and could resolve anywhere. GPS needs Latin/ASCII, so never the Punjabi address. The contact QR is a vCard for Nirman (his phone) with the venue address.",
     "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=30.220481,74.472704",
-    "vcardName": "Nirman"
+    "vcardName": "Nirman",
+    "vcardPhone2": "+917888479610"
   },
   "rsvpWhatsApp": {
     "enabled": true,
@@ -143,9 +146,11 @@
         "dayInfoDate": "Date",
         "dayInfoTime": "Time",
         "dayInfoVenue": "Venue",
-        "dayInfoDress": "Dress code",
         "dayInfoContact": "Contact",
-        "dressCode": "Traditional / Smart casual (head covered)",
+        "rsvpErrorName": "Please enter your name.",
+        "rsvpErrorAttend": "Please tap Yes or No so we know.",
+        "petalToggleOn": "Petals: on",
+        "petalToggleOff": "Petals: off",
         "printLabel": "Print this invitation",
         "calendarLabel": "Add to calendar",
         "calendarNote": "Opens your calendar app with the Wedding Reception event pre-filled.",
@@ -180,9 +185,11 @@
         "dayInfoDate": "ਤਾਰੀਖ਼",
         "dayInfoTime": "ਸਮਾਂ",
         "dayInfoVenue": "ਸਥਾਨ",
-        "dayInfoDress": "ਪਹਿਰਾਵਾ",
         "dayInfoContact": "ਸੰਪਰਕ",
-        "dressCode": "ਪਰੰਪਰਾਗਤ ਜਾਂ ਸਮਾਰਟ ਕੈਜ਼ੂਅਲ (ਕਿਰਪਾ ਕਰਕੇ ਸਿਰ ਢੱਕ ਕੇ ਆਓ)",
+        "rsvpErrorName": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਨਾਮ ਲਿਖੋ।",
+        "rsvpErrorAttend": "ਹਾਂ ਜਾਂ ਨਹੀਂ ਚੁਣੋ ਤਾਂ ਜੋ ਸਾਨੂੰ ਪਤਾ ਲੱਗੇ।",
+        "petalToggleOn": "ਪੰਜੀਆ: ਚਾਲੂ",
+        "petalToggleOff": "ਪੰਜੀਆ: ਬੰਦ",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
         "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",

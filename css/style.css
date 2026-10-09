@@ -131,7 +131,8 @@ button, input {
    elegance but make it readable - proper case, no tracking, a touch
    larger, and a soft gold glow that visually thickens the strokes. */
 /* Gurmukhi names on the gate: never script, never tracked */
-html[lang="pa"] .intro-gate h2 {
+html[lang="pa"] .intro-gate h2,
+html[lang="pa"] .intro-gate .gate-names {
   font-family: var(--font-gurmukhi);
   font-size: clamp(32px, 8vw, 40px);
   font-weight: 600;
@@ -290,7 +291,8 @@ html[lang="pa"] .title h1 {
   line-height: 1.5;
   text-shadow: none;
 }
-.title h3 {
+.title h3,
+.title .title-sub {
   font-family: var(--font-display);
   font-weight: 500;
   font-size: clamp(13px, 3.4vw, 17px);
@@ -427,7 +429,9 @@ html[lang="pa"] .title h1 {
   text-align: center;
 }
 .lang-toggle a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 7px 16px;
   margin: 0 4px;
   font-family: var(--font-body);
@@ -476,8 +480,11 @@ html[lang="pa"] .title h1 {
   box-shadow: var(--shadow-soft);
 }
 .day-info h4,
+.day-info h2,
 .qr-section h4,
+.qr-section h2,
 .rsvp-section h4,
+.rsvp-section h2,
 .calendar-section h4,
 .print-section h4 {
   font-family: var(--font-display);
@@ -647,6 +654,8 @@ html[lang="pa"] .title h1 {
   border-color: var(--gold-line);
   text-align: center;
   background: rgba(255, 255, 255, 0.6);
+  /* 16px is iOS's zoom threshold: anything smaller zooms the page on focus. */
+  font-size: 16px;
 }
 #rsvp-name:focus { border-color: var(--gold); outline: none; }
 #rsvp-send, #print-invite {
@@ -780,7 +789,8 @@ html[lang="pa"] .title h1 {
     0 2px 14px rgba(140, 35, 64, 0.14);
 }
 
-.intro-gate h2 {
+.intro-gate h2,
+.intro-gate .gate-names {
   font-family: var(--font-script);
   font-weight: 700;
   font-size: clamp(44px, 11.5vw, 70px);
@@ -794,7 +804,12 @@ html[lang="pa"] .title h1 {
     0 2px 12px rgba(140, 35, 64, 0.12);
 }
 
-.title h2 {
+/* The couple is one <h1> (axe: heading order); its inner spans keep the
+   old stacked look - name, connector, name - so nothing moves visually. */
+.title .title-names > span {
+  display: block;
+}
+.title .amp-title {
   font-family: var(--font-script);
   font-weight: 400;
   font-size: clamp(30px, 8vw, 44px);
@@ -805,7 +820,8 @@ html[lang="pa"] .title h1 {
   text-transform: none;
 }
 
-.intro-gate h2 .amp {
+.intro-gate h2 .amp,
+.intro-gate .gate-names .amp {
   display: inline-block;
   margin: 0 0.08em;
   color: var(--gold);
@@ -848,10 +864,14 @@ html[lang="en"] .title h3,
 html[lang="en"] .dance-med,
 html[lang="en"] .actions .venue,
 html[lang="en"] .lang-toggle a,
+html[lang="en"] .title .title-sub,
 html[lang="en"] .day-info h4,
+html[lang="en"] .day-info h2,
 html[lang="en"] .day-info h5,
 html[lang="en"] .qr-section h4,
+html[lang="en"] .qr-section h2,
 html[lang="en"] .rsvp-section h4,
+html[lang="en"] .rsvp-section h2,
 html[lang="en"] .calendar-section h4,
 html[lang="en"] .print-section h4,
 html[lang="en"] .day-item .label,
@@ -872,10 +892,15 @@ html[lang="pa"] .title h3,
 html[lang="pa"] .dance-med,
 html[lang="pa"] .actions .venue,
 html[lang="pa"] .lang-toggle a,
+html[lang="pa"] .title .amp-title,
+html[lang="pa"] .title .title-sub,
 html[lang="pa"] .day-info h4,
+html[lang="pa"] .day-info h2,
 html[lang="pa"] .day-info h5,
 html[lang="pa"] .qr-section h4,
+html[lang="pa"] .qr-section h2,
 html[lang="pa"] .rsvp-section h4,
+html[lang="pa"] .rsvp-section h2,
 html[lang="pa"] .calendar-section h4,
 html[lang="pa"] .print-section h4,
 html[lang="pa"] .day-item .label,
@@ -895,6 +920,8 @@ html[lang="pa"] .save-date .sd-title {
 html[lang="pa"] .title h1,
 html[lang="pa"] .title h2,
 html[lang="pa"] .title h3,
+html[lang="pa"] .title .amp-title,
+html[lang="pa"] .title .title-sub,
 html[lang="pa"] .title p,
 html[lang="pa"] .blessing,
 html[lang="pa"] .blessing-text,
@@ -1043,8 +1070,8 @@ html[lang="pa"] #print-invite {
    ============================================================ */
 .ceremony-image {
   position: relative;
-  margin: 16px auto 28px;
-  width: min(460px, 90%);
+  margin: 18px auto 30px;
+  width: min(500px, 92%);
   text-align: center;
 }
 
@@ -1054,7 +1081,9 @@ html[lang="pa"] #print-invite {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 124%;
+  /* min() with 96vw: the aura used to be 124% of a 92%-wide box, i.e.
+     wider than the viewport - the 3-5px horizontal overflow (QA F1). */
+  width: min(124%, 96vw);
   height: 130%;
   transform: translate(-50%, -50%);
   background:
@@ -1078,7 +1107,7 @@ html[lang="pa"] #print-invite {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 300px;
+  max-height: 340px;
   object-fit: contain;
   margin: 0 auto;
 
@@ -1100,9 +1129,9 @@ html[lang="pa"] #print-invite {
 /* Small phones: the blessing and the couple's names must still share the
    first screen, so the art takes whatever vertical room is left over. */
 @media (max-width: 420px) {
-  .ceremony-image { width: min(320px, 86%); margin: 12px auto 22px; }
-  .ceremony-image img { max-height: 215px; }
-  .ceremony-image::before { width: 130%; height: 135%; }
+  .ceremony-image { width: min(344px, 92%); margin: 14px auto 24px; }
+  .ceremony-image img { max-height: 260px; }
+  .ceremony-image::before { width: min(130%, 96vw); height: 135%; }
 }
 
 /* Short screens (landscape phones, very small handsets). The names win. */
@@ -1303,7 +1332,7 @@ html[lang="pa"] #print-invite {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 118%;
+    width: min(118%, 97vw);
     height: 122%;
     transform: translate(-50%, -50%);
     border: 1px solid rgba(198, 160, 90, 0.34);
@@ -1315,7 +1344,7 @@ html[lang="pa"] #print-invite {
   .ceremony-image picture { position: relative; z-index: 1; }
 
   @media (max-width: 420px) {
-    .ceremony-image::after { width: 126%; height: 132%; }
+    .ceremony-image::after { width: min(126%, 97vw); height: 132%; }
   }
 
   /* ---- 3. Section dividers -------------------------------------
@@ -1375,7 +1404,8 @@ html[lang="pa"] #print-invite {
       flex-direction: column;
       justify-content: center;
     }
-    .intro-gate h2 {
+    .intro-gate h2,
+    .intro-gate .gate-names {
       font-size: clamp(46px, 5.4vw, 62px);
     }
   }
@@ -1390,7 +1420,7 @@ html[lang="pa"] #print-invite {
       max-height: none;
     }
     .intro-gate .ik { font-size: 30px; margin-bottom: 6px; }
-    .intro-gate h2 { font-size: 34px; }
+    .intro-gate h2, .intro-gate .gate-names { font-size: 34px; }
     .intro-gate .gate-blessing { font-size: 13px; line-height: 1.5; }
   }
 }
@@ -1421,4 +1451,124 @@ html[lang="pa"] .save-date .sd-title,
 html[lang="pa"] .save-date .sd-date {
   letter-spacing: 0;
   text-transform: none;
+}
+
+/* ============================================================
+   QA FIX BUNDLE (report: F1, F3, E2, M4, H2, G5, petals/WCAG 2.2.2)
+   ============================================================ */
+
+/* F3 — tap targets. Language links now have a 44px min box. */
+.lang-toggle a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* F3 — the "Add to calendar" and "Print" links were ~19px tall. */
+.calendar-section a:not(.venue),
+.print-section a:not(.venue) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* F3 — footer phone links (+61 and +91) need a 44px tap box. */
+.footer a.phone {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* H2 — scroll reveal. Hidden state only ever applies once JS confirms it
+   can observe + reveal (html.js-reveal is added by script.js). Without JS
+   these elements stay fully visible, so nothing can get stranded at
+   opacity:0 — the failure mode the GSAP path had on Android. */
+html.js-reveal .reveal-target {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
+}
+html.js-reveal .reveal-target.revealed {
+  opacity: 1;
+  transform: none;
+}
+/* Reduced motion: no slide, no transition — just appear. */
+@media (prefers-reduced-motion: reduce) {
+  html.js-reveal .reveal-target {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* The gate card entrance is CSS-only now (GSAP removed). */
+@keyframes gate-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+.intro-gate .card {
+  animation: gate-in .8s var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-gate .card { animation: none; }
+}
+
+/* Petal pause/play control (WCAG 2.2.2: any auto-moving decoration needs a
+   visible way to stop it). Sits bottom-left, clear of the RSVP thumb zone. */
+.petals-toggle {
+  position: fixed;
+  left: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--gold-line);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.85);
+  color: var(--royal);
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.petals-toggle:focus-visible {
+  outline: 2px solid var(--royal);
+  outline-offset: 2px;
+}
+
+/* F1 — the aura/frame used to exceed the viewport by 3–5px on phones,
+   causing horizontal scroll. Overflow is clipped at the root instead of
+   resizing the art (which would shift the layout). */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* G5 — forced-colors (High Contrast). The QR must keep its own colours or
+   it stops scanning, so it opts out; interactive controls get a system
+   border instead of relying on the theme's gold hairline. */
+@media (forced-colors: active) {
+  .qr-wrap { forced-color-adjust: none; }
+  .attend-btn,
+  #rsvp-send,
+  #print-invite,
+  .petals-toggle,
+  .lang-toggle a {
+    border: 1px solid CanvasText;
+  }
+  .attend-btn[aria-pressed="true"] {
+    forced-color-adjust: none;
+  }
+}
+
+/* RSVP inline validation message (E2). */
+.rsvp-error {
+  color: var(--maroon);
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  margin: 6px auto 2px;
+  max-width: 320px;
+  min-height: 1.2em;
 }

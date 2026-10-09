@@ -49,10 +49,20 @@ const seoDesc = att(config, 'seo.description', att(config, 'footer.message', 'We
 const monthMap = { January:'01', February:'02', March:'03', April:'04', May:'05', June:'06',
                    July:'07', August:'08', September:'09', October:'10', November:'11', December:'12' };
 function isoDate(d) {
-  const parts = String(d || '').split(' ');
-  const day = String(parts[1] || '1').replace(/[^0-9]/g, '');
-  const mon = monthMap[parts[0]] || '12';
-  const year = parts[2] || '2026';
+  const parts = String(d || '').trim().split(/\s+/);
+  if (parts.length < 3) return '';
+  // Config is day-first ("6 December 2026"), but some sources write
+  // month-first ("December 6, 2026"). Detect which, so the day is never
+  // dropped (this produced the live "2026-12-0" bug).
+  let day, monName, year;
+  if (/^[0-9]{1,2}$/.test(parts[0])) {
+    day = parts[0]; monName = parts[1]; year = parts[2];
+  } else {
+    monName = parts[0]; day = parts[1]; year = parts[2];
+  }
+  day = String(day).replace(/[^0-9]/g, '');
+  const mon = monthMap[monName.replace(/[^A-Za-z]/g, '')] || '12';
+  year = String(year).replace(/[^0-9]/g, '') || '2026';
   return year + '-' + mon + '-' + (day.length < 2 ? '0' + day : day);
 }
 const eventIso = isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05:30';
@@ -81,6 +91,9 @@ const html = `<!DOCTYPE html>
       <meta name="description" content="${esc(seoDesc)}">
       <meta name="author" content="${esc(p1)} &amp; ${esc(p2)}">
       <meta name="theme-color" content="#6d1a2d">
+      <meta name="robots" content="noindex, nofollow">
+      <link rel="canonical" href="https://invite.nirmanpreet.com/">
+      <link rel="apple-touch-icon" href="assets/img/icon-180.png">
       <meta property="og:type" content="website" />
       <meta property="og:title" content="${esc(p1)} &amp; ${esc(p2)} | Wedding Reception | ${esc(att(config, 'date', 'Date'))}" />
       <meta property="og:description" content="${esc(seoDesc)}" />
@@ -95,7 +108,7 @@ const html = `<!DOCTYPE html>
       <meta property="og:image:alt" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026 — Wedding Reception on 6 December 2026 at Park City Resort, Malout" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Nirman & Simran | Wedding Reception | 6 December 2026" />
-      <meta name="twitter:description" content="Nirman & Simran invite you to their Wedding Reception on 6 December 2026 at Park City Resort, Malout. With the blessings of Waheguru, we joyfully invite you to celebrate!" />
+      <meta name="twitter:description" content="${esc(seoDesc)}" />
       <meta name="twitter:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
       <title>${esc(p1)} &amp; ${esc(p2)} | Wedding Reception | ${esc(att(config, 'date', 'Date'))}</title>
 
@@ -116,9 +129,7 @@ const html = `<!DOCTYPE html>
 ${css}
       </style>
 
-      <!-- GSAP + ScrollTrigger (royal animation layer) -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+      <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
 
       <script>
 ${qrLib}
@@ -155,7 +166,7 @@ ${qrLib}
             ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
             ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥
           </div>
-          <h2>${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</h2>
+          <div class="gate-names">${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</div>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
           <div class="lang-pick" id="intro-lang-pick">
             <button type="button" data-lang="en" class="active">English</button>
@@ -177,6 +188,7 @@ ${qrLib}
       </div>
 
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
+      <main id="invite-main">
       <div class="blessing" id="invite-blessing"></div>
 
       <div class="ornament" aria-hidden="true">
@@ -191,7 +203,7 @@ ${qrLib}
       <div class="ceremony-image" aria-hidden="true">
         <picture>
           <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-          <img src="assets/img/anand-karaj-fallback.png" alt="" loading="eager" fetchpriority="high" decoding="async">
+          <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
         </picture>
       </div>
 
@@ -216,6 +228,7 @@ ${qrLib}
       <div id="calendar-section" class="calendar-section"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>
+      </main>
 
       <div class="music" id="music-container" style="display:none;">
         <audio src="" id="my_audio" loop="loop"></audio>
@@ -268,7 +281,6 @@ const iconSrc = path.join(ROOT, 'assets/icon.svg');
 if (fs.existsSync(iconSrc)) {
   fs.copyFileSync(iconSrc, path.join(iconDist, 'icon.svg'));
 }
-
 // Royal ornament + Anand Karaj art
 const svgDist = path.join(iconDist, 'svg');
 fs.mkdirSync(svgDist, { recursive: true });
@@ -290,6 +302,11 @@ fs.mkdirSync(imgDist, { recursive: true });
 ['anand-karaj.webp', 'anand-karaj-fallback.png', 'anand-karaj.png', 'anand-karaj.jpg', 'og.jpg'].forEach(function (f) {
   const src = path.join(ROOT, 'assets/img', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(imgDist, f));
+});
+// Raster app icons (apple-touch + PWA 192/512), if present.
+['icon-180.png', 'icon-192.png', 'icon-512.png'].forEach(function (f) {
+  const s = path.join(ROOT, 'assets/img', f);
+  if (fs.existsSync(s)) fs.copyFileSync(s, path.join(imgDist, f));
 });
 
 console.log('Built dist/index.html (Sikh theme, reception invite).');
