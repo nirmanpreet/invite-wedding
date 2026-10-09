@@ -78,6 +78,15 @@ try {
   console.warn('js/qrcode.min.js not found; QR codes disabled in build.');
 }
 
+// Vendored tsParticles slim engine (MIT, tsParticles 3.1.0) — inlined so dist/ works offline
+let tspLib = '';
+try {
+  tspLib = fs.readFileSync(path.join(ROOT, 'js/tsparticles.slim.min.js'), 'utf8')
+    .replace(/<\/script/gi, '<\\/script');
+} catch (e) {
+  console.warn('js/tsparticles.slim.min.js not found; falling petals disabled in build.');
+}
+
 // Small UI text injected statically (runtime localizes via window.__WEDDING_CONFIG__)
 const summaryEn = esc(extraEn.receptionHeading || 'Reception Party');
 const summaryPa = esc(extraPa.receptionHeading || 'ਰਿਸੈਪਸ਼ਨ ਪਾਰਟੀ');
@@ -133,6 +142,10 @@ ${css}
 
       <script>
 ${qrLib}
+      </script>
+
+      <script>
+${tspLib}
       </script>
 
       <script>
@@ -226,7 +239,6 @@ ${qrLib}
       <div id="photos" class="photos"></div>
       <div id="rsvp-section" class="rsvp-section"></div>
       <div id="venue-map-embed" class="venue-map-embed"></div>
-      <div id="calendar-section" class="calendar-section"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>
       </main>

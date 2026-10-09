@@ -140,7 +140,6 @@
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();
-    renderCalendarSection();
     renderPrintSection();
     renderQrSection();
     updatePdfLang();
@@ -477,18 +476,6 @@
     return p1 + '_' + p2 + '_reception.ics';
   }
 
-  function renderCalendarSection() {
-    var el = document.getElementById('calendar-section');
-    if (!el) return;
-    if (features.calendarIcs === false) { el.innerHTML = ''; return; }
-    var label = tx('calendarLabel', 'Add to calendar');
-    var note = tx('calendarNote', 'Opens your calendar app with the event pre-filled.');
-    var icsData = buildIcsHref();
-    el.innerHTML =
-      '<a href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' + esc(label) + '</a>' +
-      '<div class="cal-note">' + esc(note) + '</div>';
-  }
-
   // ---------- Print ----------
   function renderPrintSection() {
     var el = document.getElementById('print-section');
@@ -819,32 +806,25 @@
   // A gentle shower over the hero: one rose every 1.5s in the royal palette,
   // stopping once the hero scrolls away so the rest of the page stays calm and
   /* ==============================================================
-     FALLING ROSES - canvas
+  /* ==============================================================
+     FALLING ROSES - tsParticles
      --------------------------------------------------------------
-     Replaces the old DOM petals, which were invisible on Android.
+     Swapped from the bespoke canvas loop to the tsParticles slim
+     engine (vendored at js/tsparticles.slim.min.js, MIT). Why:
+       - the old loop redrew ~11 arc+fill calls per petal per frame
+         (2 rings x 5 + centre), so 22 petals ~= 240 path fills/frame.
+         On a mid-range phone that GPU fill cost showed as dropped
+         frames and battery drain.
+       - tsParticles caps its own canvas backing store via
+         detectRetina:false, so a DPR-3 phone renders at CSS pixels
+         (e.g. 485x749) instead of blowing up to 975x2110 (~2M px).
+       - it owns the rAF loop, object pooling, off-screen culling and
+         visibility pause, with far less code to maintain.
 
-     The old chain had four separate things Android could break, any
-     one of which was enough to make nothing appear:
-       1. an SVG data URI in background-image, which the browser had to
-          rasterise - and the petal carried `will-change: transform,
-          opacity`, so it was composited into its own layer first
-       2. a nested custom-property chain: script.js set
-          `--rose: var(--rose-burg)`, then CSS read
-          `background-image: var(--rose, var(--rose-pink))`. Custom
-          properties whose value is itself a var() are substituted
-          lazily, and setProperty() for custom properties was missing
-          or partial in a lot of Android WebView builds
-       3. `will-change` on every petal promoted each one to its own GPU
-          layer - on a mid-range phone that is a memory and CPU problem
-          and layers can render blank
-       4. unprefixed @keyframes/animation/transform, which pre-Chromium
-          Android WebView needs -webkit- forms of
-
-     A canvas removes all four. There is no image to decode (the rose
-     is drawn procedurally, so it is also crisp at any pixel density),
-     no custom properties, no per-element layers, and one draw loop
-     instead of 15+ DOM nodes with animations attached. It behaves
-     identically on every Android version still in circulation.
+     The contract is unchanged: petals are OFF by default (guests opt
+     in via the toggle, remembered in localStorage), the same visible
+     pause/play control satisfies WCAG 2.2.2, and under reduced motion
+     the container still renders a static scatter with zero motion.
      ============================================================== */
   function startPetal() {
     if (features.sakura === false) return;
@@ -856,230 +836,133 @@
        request: the shower should not compete with the couple's names and
        the Gurbani blessing on first paint. Anyone who wants them back taps
        once, which also satisfies WCAG 2.2.2 (a pause/resume mechanism for
-       perpetual motion). Under reduced motion the canvas still renders, but
-       as the static scatter with no rAF loop. */
+       perpetual motion). Under reduced motion we never start the engine;
+       a static scatter is painted instead. */
     var PAUSE_KEY = 'wedding-petals';
     var storedPref = null;
     try { storedPref = localStorage.getItem(PAUSE_KEY); } catch (e) {}
     var enabled = storedPref === 'on';
 
-    var supportsCanvas = !!document.createElement('canvas').getContext;
-    if (!supportsCanvas) return;
+    // No engine -> nothing to do (the rest of the page still works).
+    if (!window.tsParticles || !window.tsParticles.load) return;
 
-    var canvas = document.createElement('canvas');
-    canvas.setAttribute('aria-hidden', 'true');
-    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:block';
-    container.appendChild(canvas);
-    var ctx = canvas.getContext('2d');
-
-    // Royal palette, carried over from the old pre-tinted SVG variants.
-    var PALETTE = [
-      { o: '#a4243b', m: '#c4516a', c: '#dc8296' }, // 0 burgundy
-      { o: '#8c2340', m: '#ad4a66', c: '#c87e93' }, // 1 royal
-      { o: '#d9b865', m: '#e5c46d', c: '#f3e3b6' }, // 2 antique gold
-      { o: '#e5c46d', m: '#f0dda6', c: '#f8eecd' }, // 3 light gold
-      { o: '#e9aec0', m: '#f6d3de', c: '#fbeff3' }, // 4 pink
-      { o: '#f2cdd9', m: '#fbe9ee', c: '#fef6f8' }  // 5 blush
+    /* Royal palette, carried over from the old procedural rose.
+       tsParticles picks uniformly from the array, so the old weighted
+       bias toward soft tones is baked in by repeating the entries. */
+    var COLORS = [
+      '#e9aec0', '#e9aec0', '#e9aec0', '#e9aec0', // pink  x4
+      '#f2cdd9', '#f2cdd9', '#f2cdd9',             // blush x3
+      '#e5c46d', '#e5c46d',                         // light gold  x2
+      '#d9b865', '#d9b865',                         // antique gold x2
+      '#a4243b',                                    // burgundy x1 (punctuation)
+      '#8c2340'                                     // royal    x1 (punctuation)
     ];
 
-    /* Weighted draw order. Indexes into PALETTE above, repeated to bias the
-       mix toward the soft end so the shower stays light over cream. */
-    var PICK = [4, 4, 4, 4, 5, 5, 5, 3, 3, 2, 2, 0, 1];
+    var roomy = window.innerWidth >= 900;
+    var NUMBER = roomy ? 16 : 10;
+    var SIZE_MIN = roomy ? 12 : 10;
+    var SIZE_MAX = roomy ? 26 : 22;
+    var SPEED = roomy ? 8 : 6.5;
 
-    /* Density. The canvas costs one draw loop regardless of how many petals
-       are alive - they are shapes in a loop, not DOM nodes - so this is far
-       cheaper than the old per-element version ever was. These are tuned so
-       the hero reads as a gentle shower rather than a blizzard, and so a
-       mid-range phone is not asked to fill too many pixels per frame. */
-    var MAX_ALIVE_DESKTOP = 34;
-    var MAX_ALIVE_MOBILE = 22;
-    var SPAWN_MS_DESKTOP = 620;
-    var SPAWN_MS_MOBILE = 900;
-    var GRAVITY = 26;        // px per second
+    var reduced = false;
+    try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
 
-    // One decision, reused by both the spawn gate and the frame loop.
-    var maxAlive = MAX_ALIVE_MOBILE;
-    var spawnEvery = SPAWN_MS_MOBILE;
-    function tuneForViewport() {
-      var roomy = window.innerWidth >= 900;
-      maxAlive = roomy ? MAX_ALIVE_DESKTOP : MAX_ALIVE_MOBILE;
-      spawnEvery = roomy ? SPAWN_MS_DESKTOP : SPAWN_MS_MOBILE;
-    }
-    tuneForViewport();
-    var petals = [];
-    var last = 0;
-    var spawnAt = 0;
-    var running = true;
-    var rafId = null;
+    var engine = null; // tsParticles container instance
+    var staticCv = null; // the reduced/off scatter overlay (separate canvas)
 
-    var hero = document.querySelector('.wrap') || document.body;
-
-    // Gate on scroll position, not an IntersectionObserver on .wrap: on a
-    // 360x640 phone .wrap sat entirely below the fold, so a visibility
-    // observer reported "not intersecting" and NO petals ever spawned.
-    function inHero() {
-      var r = hero.getBoundingClientRect();
-      return r.bottom > 0 && r.top < window.innerHeight;
-    }
-
-    function size() {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    // ---- static scatter (reduced motion, or petals off) ----
+    function drawStatic() {
       var w = container.clientWidth || window.innerWidth;
       var h = container.clientHeight || window.innerHeight;
-      canvas.width = Math.max(1, Math.round(w * dpr));
-      canvas.height = Math.max(1, Math.round(h * dpr));
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return { w: w, h: h };
-    }
-    var dims = size();
-
-    function spawn(w, h) {
-      // Weighted, not uniform. A flat pick gave every petal an equal chance of
-      // the deep burgundy, and at 22-38px that reads as a dark blob rather
-      // than a soft shower. Blush and pink now dominate, gold is a warm
-      // accent, and burgundy/royal are rare so they land as punctuation.
-      var pal = PALETTE[PICK[Math.floor(Math.random() * PICK.length)]];
-      var size2 = 26 + Math.random() * 18;
-      petals.push({
-        x: 8 + Math.random() * (w - 16),
-        y: -30,
-        r: size2 / 2,
-        vy: GRAVITY * (0.75 + Math.random() * 0.7),
-        spin: (Math.random() - 0.5) * 1.5,
-        rot: Math.random() * Math.PI * 2,
-        swayAmp: 12 + Math.random() * 22,
-        swayFreq: 0.5 + Math.random() * 0.8,
-        swayPhase: Math.random() * Math.PI * 2,
-        t: 0,
-        pal: pal
-      });
-    }
-
-    // One petal drawn as three concentric rings of five petals, each ring
-    // offset half a step so they nest. Drawn with arc + scale rather than
-    // ctx.ellipse, which older Android WebView lacks.
-    function drawRose(p, alpha) {
-      var r = p.r;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.globalAlpha = alpha;
-
-      var rings = [
-        { n: 5, dist: 0.42, rw: 0.36, rh: 0.58, off: 0, col: p.pal.o },
-        { n: 5, dist: 0.25, rw: 0.28, rh: 0.44, off: Math.PI / 5, col: p.pal.m }
-      ];
-
-      for (var k = 0; k < rings.length; k++) {
-        var ring = rings[k];
-        for (var i = 0; i < ring.n; i++) {
-          var a = (i / ring.n) * Math.PI * 2 + ring.off;
-          ctx.save();
-          ctx.rotate(a);
-          ctx.translate(0, -r * ring.dist);
-          ctx.scale(ring.rw / ring.rh, 1);
-          ctx.beginPath();
-          ctx.arc(0, 0, r * ring.rh, 0, Math.PI * 2);
-          ctx.fillStyle = ring.col;
-          ctx.fill();
-          ctx.restore();
-        }
+      if (!staticCv) {
+        staticCv = document.createElement('canvas');
+        staticCv.setAttribute('aria-hidden', 'true');
+        staticCv.setAttribute('data-static', '1');
+        staticCv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:block';
+        container.appendChild(staticCv);
       }
-
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.30, 0, Math.PI * 2);
-      ctx.fillStyle = p.pal.c;
-      ctx.fill();
-
-      ctx.restore();
-    }
-
-    function frame(now) {
-      if (!last) last = now;
-      var dt = Math.min((now - last) / 1000, 0.05); // clamp after a tab switch
-      last = now;
-
-      ctx.clearRect(0, 0, dims.w, dims.h);
-
-      if (enabled && running && inHero() && petals.length < maxAlive && now >= spawnAt) {
-        spawn(dims.w, dims.h);
-        spawnAt = now + spawnEvery + Math.random() * spawnEvery * 0.5;
-      }
-
-      for (var i = petals.length - 1; i >= 0; i--) {
-        var p = petals[i];
-        p.t += dt;
-        p.y += p.vy * dt;
-        p.rot += p.spin * dt;
-        p.x += Math.sin(p.t * p.swayFreq + p.swayPhase) * p.swayAmp * dt;
-
-        // Fade in over the first 12% of the fall, out over the last 15%.
-        var life = p.y / dims.h;
-        var alpha = life < 0.12 ? life / 0.12 : life > 0.85 ? Math.max(0, (1 - life) / 0.15) : 1;
-        alpha *= 0.78;
-
-        if (p.y > dims.h + 40 || alpha <= 0.01) {
-          petals.splice(i, 1);
-          continue;
-        }
-        drawRose(p, alpha);
-      }
-
-      rafId = window.requestAnimationFrame(frame);
-    }
-
-    // Stop while the tab is hidden: no work, no battery drain.
-    document.addEventListener('visibilitychange', function () {
-      running = !document.hidden;
-      if (running) last = 0; // avoid a huge dt jump on the first frame back
-      if (!running && rafId) {
-        window.cancelAnimationFrame(rafId);
-        rafId = null;
-      } else if (running && enabled && !rafId) {
-        rafId = window.requestAnimationFrame(frame);
-      }
-      if (!enabled) drawStatic();
-    });
-
-    window.addEventListener('resize', function () {
-      dims = size();
-      if (!enabled) drawStatic();
-    });
-    window.addEventListener('orientationchange', function () {
-      setTimeout(function () { dims = size(); if (!enabled) drawStatic(); }, 250);
-    });
-
-    /* Reduced motion: scatter a fixed set of roses across the viewport and
-       draw them once. No falling, no sway, no rAF loop at all - so there is
-       genuinely zero motion, but the page still has its decoration. */
-    function drawStatic() {
-      ctx.clearRect(0, 0, dims.w, dims.h);
-      var count = Math.round((dims.w * dims.h) / 46000);
-      count = Math.max(5, Math.min(count, 18));
+      var dpr = Math.min(window.devicePixelRatio || 1, 2); // capped for perf
+      staticCv.width = Math.max(1, Math.round(w * dpr));
+      staticCv.height = Math.max(1, Math.round(h * dpr));
+      var g = staticCv.getContext('2d');
+      if (!g) return;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, w, h);
+      var count = Math.max(5, Math.min(Math.round((w * h) / 46000), 18));
       for (var i = 0; i < count; i++) {
-        // deterministic scatter, so a resize does not reshuffle the pattern
         var seed = i * 2.399963; // golden angle, for an even spread
-        var x = ((i + 0.5) / count * dims.w + Math.sin(seed) * 34 + dims.w) % dims.w;
-        var y = ((i * 0.6180339887) % 1) * dims.h;
-        petals[i] = {
-          x: x,
-          y: y,
-          r: 13 + ((i * 7) % 12),
-          rot: (seed % (Math.PI * 2)),
-          pal: PALETTE[PICK[i % PICK.length]]
-        };
-        drawRose(petals[i], 0.55);
+        var x = ((i + 0.5) / count * w + Math.sin(seed) * 34 + w) % w;
+        var y = ((i * 0.6180339887) % 1) * h;
+        var r = 6 + ((i * 7) % 6);
+        g.save();
+        g.translate(x, y);
+        g.globalAlpha = 0.55;
+        g.fillStyle = COLORS[(i * 5) % COLORS.length];
+        g.beginPath();
+        g.arc(0, 0, r, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
       }
     }
 
-    if (!enabled) {
-      drawStatic();
-    } else {
-      // Seed a few so the hero is never empty on arrival.
-      for (var k = 0; k < 6; k++) spawn(dims.w, dims.h);
-      petals.forEach(function (p) { p.y = Math.random() * dims.h * 0.5; });
-      rafId = window.requestAnimationFrame(frame);
+    function buildOptions() {
+      return {
+        fpsLimit: 30,          // halve the work vs 60fps; petals are ambient
+        detectRetina: false,   // render at CSS px, not DPR-multiplied (mobile perf)
+        fullScreen: { enable: false, zIndex: 0 }, // stay inside #sakura-falling
+        particles: {
+          number: { value: NUMBER, density: { enable: true, width: 1080, height: 1920 } },
+          color: { value: COLORS },
+          opacity: { value: { min: 0.4, max: 0.8 } },
+          size: { value: { min: SIZE_MIN, max: SIZE_MAX } },
+          rotate: { value: { min: 0, max: 360 }, animation: { enable: true, speed: 3 } },
+          move: {
+            enable: true,
+            speed: SPEED,
+            direction: 'bottom',
+            straight: false,
+            random: true,
+            outModes: { default: 'out' }
+          }
+        },
+        events: { resize: true }
+      };
     }
+
+    // Remove ANY static canvas in the container, not just the one whose
+    // handle we still hold - after a toggle cycle the reference can be
+    // stale, and a leftover static canvas stacks under the engine canvas.
+    function clearStatic() {
+      if (staticCv && staticCv.parentNode) { staticCv.parentNode.removeChild(staticCv); }
+      staticCv = null;
+      var extra = container.querySelectorAll('canvas[data-static]');
+      for (var i = 0; i < extra.length; i++) {
+        if (extra[i].parentNode) extra[i].parentNode.removeChild(extra[i]);
+      }
+    }
+
+    function startEngine() {
+      clearStatic();
+      if (engine) { try { if (engine.play) engine.play(); } catch (e) {} return; }
+      window.tsParticles.load({ id: 'sakura-falling', element: container, options: buildOptions() })
+        .then(function (c) { engine = c; })
+        .catch(function () { /* engine failed; leave decoration off silently */ });
+    }
+    // Pause is not enough: a paused engine keeps its canvas in the DOM and
+    // keeps the instance registered, so the container ends up with a live
+    // engine + a static canvas stacked on top of each other. Destroy fully,
+    // so the next startEngine() rebuilds cleanly.
+    function stopEngine() {
+      if (!engine) return;
+      try {
+        if (typeof engine.destroy === 'function') engine.destroy();
+        else if (typeof engine.pause === 'function') engine.pause();
+      } catch (e) {}
+      engine = null;
+    }
+
+    // ---- initial state ----
+    if (enabled && !reduced) { startEngine(); } else { drawStatic(); }
 
     // The visible pause/play control. Fixed bottom-left, out of the way of
     // the RSVP thumb zone, hidden when printing.
@@ -1099,16 +982,7 @@
       try { localStorage.setItem(PAUSE_KEY, enabled ? 'on' : 'off'); } catch (e) {}
       toggleBtn.textContent = petalBtnText();
       toggleBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-      last = 0;
-      if (!enabled) {
-        petals.length = 0;
-        if (rafId) { window.cancelAnimationFrame(rafId); rafId = null; }
-        drawStatic();
-      } else if (!document.hidden && !rafId) {
-        ctx.clearRect(0, 0, dims.w, dims.h);
-        for (var k2 = 0; k2 < 4; k2++) spawn(dims.w, dims.h);
-        rafId = window.requestAnimationFrame(frame);
-      }
+      if (enabled && !reduced) { startEngine(); } else { stopEngine(); drawStatic(); }
     });
     // Keep the button label in step with the active language.
     window.addEventListener('wedding-langchange', function () {
@@ -1210,7 +1084,6 @@
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();
-    renderCalendarSection();
     renderPrintSection();
     renderQrSection();
     updatePdfLang();
@@ -1225,7 +1098,7 @@
   function revealTargets() {
     var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
       'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
-      'rsvp-section', 'venue-map-embed', 'calendar-section', 'print-section'];
+      'rsvp-section', 'venue-map-embed', 'print-section'];
     var out = [];
     ids.forEach(function (id) {
       var el = document.getElementById(id);
