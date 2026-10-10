@@ -146,6 +146,7 @@
     renderLangToggle();
     updateIntroGate();
     renderSaveTheDate();
+    renderDock();
     // Petal toggle label + any lang-dependent chrome re-render with it.
     try { window.dispatchEvent(new CustomEvent('wedding-langchange')); } catch (e) {}
   }
@@ -179,6 +180,21 @@
         '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
+    /* Phase 2 (hero): the invitation sentence sits under the blessing.
+       Both strings already exist in config (i18n.{en,pa}.pdfSubtext) -
+       nothing new was invented. */
+    var lineEl = document.getElementById('invite-line');
+    if (lineEl) {
+      lineEl.textContent = t('pdfSubtext') || 'With the blessings of Waheguru, you are cordially invited to the Reception of';
+    }
+    /* Phase 2 (hero): the date badge (day number + month/year), built from
+       the localised date string so PA reads "6 ਦਸੰਬਰ 2026". */
+    var badgeEl = document.getElementById('hero-date');
+    if (badgeEl) {
+      var dParts = dateText().split(/\s+/);
+      var monthYear = dParts.length > 1 ? dParts.slice(1).join(' ') : dateText();
+      badgeEl.innerHTML = '<b>' + esc(eventDate.getDate()) + '</b><span>' + esc(monthYear) + '</span>';
+    }
     // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
@@ -187,14 +203,19 @@
       if (blessingText === '' || blessingText === undefined || blessingText === null) {
         blessingText = footerMsg;
       }
+      /* Phase 2: the hero renders its own large ੴ, and the English footerNote
+         carries a trailing "— With the blessings..." sentence that now lives in
+         #invite-line. So the blessing block shows the Gurbani lines only -
+         the same three lines in both languages, spelling untouched. */
+      blessingText = String(blessingText).split('\u2014')[0];
       // Convert newlines to <br> for HTML rendering, then escape
       // We replace \n with a placeholder, escape, then restore <br>
       blessingText = blessingText.replace(/\n/g, '\u0001');
       blessingText = esc(blessingText);
       blessingText = blessingText.replace(/\u0001/g, '<br>');
-      blessingEl.innerHTML =
-        '<span class="ik" aria-hidden="true">ੴ</span>' +
-        '<div class="blessing-text">' + blessingText + '</div>';
+      // No inline <span class="ik">: the static hero ੴ (aria-hidden) is the
+      // only Ik Onkar on screen - sacred text is never duplicated.
+      blessingEl.innerHTML = '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
     var footerEl = document.getElementById('invite-footer');
@@ -215,11 +236,18 @@
     }
     var actionsEl = document.getElementById('invite-actions');
     if (actionsEl) {
+      // Phase 2: the two CTAs use the design system's .btn classes (48px
+      // tap targets). The old .actions .venue rules were removed from
+      // style.css rather than left to fight the new ones.
       actionsEl.innerHTML =
-        '<a href="' + esc(mapUrl) + '" target="_blank" rel="noopener"><div class="venue">' + esc(t('venueBtn') || 'SEE THE VENUE') + '</div></a>' +
-        '<button id="download-pdf" class="venue" type="button">' + esc(t('downloadBtn') || 'DOWNLOAD INVITATION CARD') + '</button>';
+        '<a class="btn" href="' + esc(mapUrl) + '" target="_blank" rel="noopener">' + esc(t('venueBtn') || 'SEE THE VENUE') + '</a>' +
+        '<button id="download-pdf" class="btn ghost" type="button">' + esc(t('downloadBtn') || 'DOWNLOAD INVITATION CARD') + '</button>';
       var btn = document.getElementById('download-pdf');
       if (btn) btn.addEventListener('click', onDownloadPdfClick);
+      // Screen-reader-only heading for the actions card, localised from
+      // existing _extra strings (new key `quickActions`, see config).
+      var actHeading = document.getElementById('h-actions');
+      if (actHeading) actHeading.textContent = txOr('quickActions', 'Quick actions');
     }
     var socialEl = document.getElementById('invite-social');
     if (socialEl) {
@@ -244,7 +272,7 @@
     var heading = tx('receptionHeading', 'Reception');
     var items = '';
     el.innerHTML =
-      '<h2>' + esc(heading) + '</h2>' +
+      '<h2 id="day-info-heading">' + esc(heading) + '</h2>' +
       '<div class="day-grid">' + items +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(dateText()) + '</div></div>' +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(timeText() || '-') + '</div></div>' +
@@ -318,7 +346,7 @@
       ? '<div class="rsvp-by">' + esc(rsvpByName) + '</div>' : '';
 
     el.innerHTML =
-      '<h2>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h2>' + rsvpBy +
+      '<h2 id="rsvp-heading">' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h2>' + rsvpBy +
       (formEnabled
         ? '<label class="sr-only" for="rsvp-name">' + esc(namePh) + '</label>' +
           '<input id="rsvp-name" type="text" placeholder="' + esc(namePh) + '" autocomplete="name">' +
@@ -415,6 +443,9 @@
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" title="' + esc(frameTitle) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
+    // The section is a <section> with no heading (an iframe + label); give
+    // it an accessible name instead of an aria-labelledby pointing nowhere.
+    el.setAttribute('aria-label', (venueName || 'Venue') + ' map');
   }
 
   // ---------- Calendar (.ics) ----------
@@ -591,7 +622,7 @@
 
     // Live page: real <table> QRs, each wrapped in a clickable link.
     el.innerHTML =
-      '<h2>' + title + '</h2>' +
+      '<h2 id="qr-heading">' + title + '</h2>' +
       '<div class="qr-grid">' +
         '<div class="qr-item">' + qrTableHtml(q1, cellPx, targetN, 'map') +
           '<div class="qr-label">' + mapLbl + '</div></div>' +
@@ -795,200 +826,13 @@
     var icsData = buildIcsHref();
     el.innerHTML =
       '<a class="save-date" id="save-date-link" href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' +
-        '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
+        '<div class="sd-title" id="sd-title-heading">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
         '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +
       '</a>';
   }
 
-// ---------- Rose petals ----------
-  // A gentle shower over the hero: one rose every 1.5s in the royal palette,
-  // stopping once the hero scrolls away so the rest of the page stays calm and
-  /* ==============================================================
-  /* ==============================================================
-     FALLING ROSES - tsParticles
-     --------------------------------------------------------------
-     Swapped from the bespoke canvas loop to the tsParticles slim
-     engine (vendored at js/tsparticles.slim.min.js, MIT). Why:
-       - the old loop redrew ~11 arc+fill calls per petal per frame
-         (2 rings x 5 + centre), so 22 petals ~= 240 path fills/frame.
-         On a mid-range phone that GPU fill cost showed as dropped
-         frames and battery drain.
-       - tsParticles caps its own canvas backing store via
-         detectRetina:false, so a DPR-3 phone renders at CSS pixels
-         (e.g. 485x749) instead of blowing up to 975x2110 (~2M px).
-       - it owns the rAF loop, object pooling, off-screen culling and
-         visibility pause, with far less code to maintain.
-
-     The contract is unchanged: petals are OFF by default (guests opt
-     in via the toggle, remembered in localStorage), the same visible
-     pause/play control satisfies WCAG 2.2.2, and under reduced motion
-     the container still renders a static scatter with zero motion.
-     ============================================================== */
-  function startPetal() {
-    if (features.sakura === false) return;
-    var container = document.getElementById('sakura-falling');
-    if (!container) return;
-
-    /* Petals are OFF by default. Guests opt IN via the toggle button
-       (added below), and the choice is remembered. This was a deliberate
-       request: the shower should not compete with the couple's names and
-       the Gurbani blessing on first paint. Anyone who wants them back taps
-       once, which also satisfies WCAG 2.2.2 (a pause/resume mechanism for
-       perpetual motion). Under reduced motion we never start the engine;
-       a static scatter is painted instead. */
-    var PAUSE_KEY = 'wedding-petals';
-    var storedPref = null;
-    try { storedPref = localStorage.getItem(PAUSE_KEY); } catch (e) {}
-    var enabled = storedPref === 'on';
-
-    // No engine -> nothing to do (the rest of the page still works).
-    if (!window.tsParticles || !window.tsParticles.load) return;
-
-    /* Royal palette, carried over from the old procedural rose.
-       tsParticles picks uniformly from the array, so the old weighted
-       bias toward soft tones is baked in by repeating the entries. */
-    var COLORS = [
-      '#e9aec0', '#e9aec0', '#e9aec0', '#e9aec0', // pink  x4
-      '#f2cdd9', '#f2cdd9', '#f2cdd9',             // blush x3
-      '#e5c46d', '#e5c46d',                         // light gold  x2
-      '#d9b865', '#d9b865',                         // antique gold x2
-      '#a4243b',                                    // burgundy x1 (punctuation)
-      '#8c2340'                                     // royal    x1 (punctuation)
-    ];
-
-    var roomy = window.innerWidth >= 900;
-    var NUMBER = roomy ? 16 : 10;
-    var SIZE_MIN = roomy ? 12 : 10;
-    var SIZE_MAX = roomy ? 26 : 22;
-    var SPEED = roomy ? 8 : 6.5;
-
-    var reduced = false;
-    try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
-
-    var engine = null; // tsParticles container instance
-    var staticCv = null; // the reduced/off scatter overlay (separate canvas)
-
-    // ---- static scatter (reduced motion, or petals off) ----
-    function drawStatic() {
-      var w = container.clientWidth || window.innerWidth;
-      var h = container.clientHeight || window.innerHeight;
-      if (!staticCv) {
-        staticCv = document.createElement('canvas');
-        staticCv.setAttribute('aria-hidden', 'true');
-        staticCv.setAttribute('data-static', '1');
-        staticCv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:block';
-        container.appendChild(staticCv);
-      }
-      var dpr = Math.min(window.devicePixelRatio || 1, 2); // capped for perf
-      staticCv.width = Math.max(1, Math.round(w * dpr));
-      staticCv.height = Math.max(1, Math.round(h * dpr));
-      var g = staticCv.getContext('2d');
-      if (!g) return;
-      g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      g.clearRect(0, 0, w, h);
-      var count = Math.max(5, Math.min(Math.round((w * h) / 46000), 18));
-      for (var i = 0; i < count; i++) {
-        var seed = i * 2.399963; // golden angle, for an even spread
-        var x = ((i + 0.5) / count * w + Math.sin(seed) * 34 + w) % w;
-        var y = ((i * 0.6180339887) % 1) * h;
-        var r = 6 + ((i * 7) % 6);
-        g.save();
-        g.translate(x, y);
-        g.globalAlpha = 0.55;
-        g.fillStyle = COLORS[(i * 5) % COLORS.length];
-        g.beginPath();
-        g.arc(0, 0, r, 0, Math.PI * 2);
-        g.fill();
-        g.restore();
-      }
-    }
-
-    function buildOptions() {
-      return {
-        fpsLimit: 30,          // halve the work vs 60fps; petals are ambient
-        detectRetina: false,   // render at CSS px, not DPR-multiplied (mobile perf)
-        fullScreen: { enable: false, zIndex: 0 }, // stay inside #sakura-falling
-        particles: {
-          number: { value: NUMBER, density: { enable: true, width: 1080, height: 1920 } },
-          color: { value: COLORS },
-          opacity: { value: { min: 0.4, max: 0.8 } },
-          size: { value: { min: SIZE_MIN, max: SIZE_MAX } },
-          rotate: { value: { min: 0, max: 360 }, animation: { enable: true, speed: 3 } },
-          move: {
-            enable: true,
-            speed: SPEED,
-            direction: 'bottom',
-            straight: false,
-            random: true,
-            outModes: { default: 'out' }
-          }
-        },
-        events: { resize: true }
-      };
-    }
-
-    // Remove ANY static canvas in the container, not just the one whose
-    // handle we still hold - after a toggle cycle the reference can be
-    // stale, and a leftover static canvas stacks under the engine canvas.
-    function clearStatic() {
-      if (staticCv && staticCv.parentNode) { staticCv.parentNode.removeChild(staticCv); }
-      staticCv = null;
-      var extra = container.querySelectorAll('canvas[data-static]');
-      for (var i = 0; i < extra.length; i++) {
-        if (extra[i].parentNode) extra[i].parentNode.removeChild(extra[i]);
-      }
-    }
-
-    function startEngine() {
-      clearStatic();
-      if (engine) { try { if (engine.play) engine.play(); } catch (e) {} return; }
-      window.tsParticles.load({ id: 'sakura-falling', element: container, options: buildOptions() })
-        .then(function (c) { engine = c; })
-        .catch(function () { /* engine failed; leave decoration off silently */ });
-    }
-    // Pause is not enough: a paused engine keeps its canvas in the DOM and
-    // keeps the instance registered, so the container ends up with a live
-    // engine + a static canvas stacked on top of each other. Destroy fully,
-    // so the next startEngine() rebuilds cleanly.
-    function stopEngine() {
-      if (!engine) return;
-      try {
-        if (typeof engine.destroy === 'function') engine.destroy();
-        else if (typeof engine.pause === 'function') engine.pause();
-      } catch (e) {}
-      engine = null;
-    }
-
-    // ---- initial state ----
-    if (enabled && !reduced) { startEngine(); } else { drawStatic(); }
-
-    // The visible pause/play control. Fixed bottom-left, out of the way of
-    // the RSVP thumb zone, hidden when printing.
-    var toggleBtn = document.createElement('button');
-    toggleBtn.type = 'button';
-    toggleBtn.className = 'petals-toggle';
-    function petalBtnText() {
-      var block = extraBlock[currentLang] || extraBlock[defaultLang] || {};
-      return String(enabled ? (block.petalToggleOn || 'Petals: on')
-                            : (block.petalToggleOff || 'Petals: off'));
-    }
-    toggleBtn.textContent = petalBtnText();
-    toggleBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-    document.body.appendChild(toggleBtn);
-    toggleBtn.addEventListener('click', function () {
-      enabled = !enabled;
-      try { localStorage.setItem(PAUSE_KEY, enabled ? 'on' : 'off'); } catch (e) {}
-      toggleBtn.textContent = petalBtnText();
-      toggleBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-      if (enabled && !reduced) { startEngine(); } else { stopEngine(); drawStatic(); }
-    });
-    // Keep the button label in step with the active language.
-    window.addEventListener('wedding-langchange', function () {
-      toggleBtn.textContent = petalBtnText();
-    });
-  }
 
   // ---------- Language toggle ----------
   function renderLangToggle() {
@@ -1071,9 +915,6 @@
 
   // ---------- Boot ----------
   function boot() {
-    // Reveal styles only apply when JS is running: content is visible by
-    // default so a JS failure can never leave the invite blank.
-    document.documentElement.classList.add('js-reveal');
     // Set <html lang> before anything renders: the Punjabi typography rules are
     // scoped to html[lang="pa"], and setLang() only runs on interaction.
     document.documentElement.lang = isPa() ? 'pa' : 'en';
@@ -1088,89 +929,38 @@
     renderQrSection();
     updatePdfLang();
     renderLangToggle();
-    startPetal();
-    initAnimations();
-  }
-
-  // ---------- Royal animation layer (GSAP, graceful fallback) ----------
-  var royalAnimated = false;
-
-  function revealTargets() {
-    var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
-      'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
-      'rsvp-section', 'venue-map-embed', 'print-section'];
-    var out = [];
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el && el.offsetParent !== null) out.push(el);
-    });
-    var orn = document.querySelectorAll('.ornament');
-    var art = document.querySelector('.ceremony-image img');
-    if (art) out.push(art);
-    return out.concat(Array.prototype.slice.call(orn));
-  }  function playIntroCard() {
-    // The gate card's entrance is a pure CSS animation now (see
-    // .intro-gate .card in style.css) - no library, no JS timing, and it
-    // cannot strand content at opacity 0 the way the GSAP path could.
+    renderDock();
   }
 
   /* ============================================================
-     REVEAL LAYER - CSS transitions + IntersectionObserver
+     REVEAL LAYER
      ------------------------------------------------------------
-     Replaces GSAP/ScrollTrigger (two render-blocking CDN scripts for a
-     fade-up). Rules that keep this safe by construction:
-       - content is visible by default; the hidden state only exists once
-         JS adds .reveal-target to an element (html.js-reveal is set at boot)
-       - no JS is ever REQUIRED for visibility: no-IO browsers get an
-         instant .is-in on everything, and a timed failsafe force-reveals
-         anything still hidden in the viewport
-       - reduced motion gets instant visibility via CSS, not a JS branch
+     Phase 4: the old parallel reveal system (html.js-reveal /
+     .reveal-target / .revealed + a 2.5s failsafe) is gone. Every card
+     now uses the design system's .reveal / .in classes, observed once
+     by js/invite-motion.js. Content is still visible by default: the
+     hidden state only exists once html.js is set, and that class is
+     added by the motion script itself.
      ============================================================ */
-  function playRoyalReveal() {
-    if (royalAnimated) return;
-    royalAnimated = true;
-    var targets = revealTargets();
-    if (!targets.length) return;
 
-    if (!('IntersectionObserver' in window)) {
-      targets.forEach(function (el) { el.classList.add('revealed'); });
-      return;
-    }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) {
-          en.target.classList.add('revealed');
-          io.unobserve(en.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
-
-    targets.forEach(function (el) { el.classList.add('reveal-target'); io.observe(el); });
-
-    // Failsafe: if the observer never fires (odd WebViews, restored bfcache
-    // sessions), anything already inside the viewport is shown anyway.
-    setTimeout(function () {
-      targets.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add('revealed');
-      });
-    }, 2500);
-  }
-
-  function initAnimations() {
-    var gate = document.getElementById('intro-gate');
-    var already = document.body.classList.contains('intro-done');
-    if (already || !gate || gate.classList.contains('hide')) {
-      setTimeout(playRoyalReveal, 120);
-    } else {
-      // Reveal once the intro gate is dismissed by any path.
-      var iv = setInterval(function () {
-        if (document.body.classList.contains('intro-done')) {
-          clearInterval(iv);
-          setTimeout(playRoyalReveal, 260);
-        }
-      }, 120);
-      setTimeout(function () { clearInterval(iv); }, 20000);
+  // ---------- Sticky action dock (phones only) ----------
+  // The <nav class="dock" id="dock"> markup lives in index.html; this only
+  // localises the labels and fills the two hrefs that depend on language /
+  // config (directions and the .ics). Show/hide logic is in invite-motion.js:
+  // it slides in after the hero, hides at the RSVP card and while typing.
+  function renderDock() {
+    var dock = document.getElementById('dock');
+    if (!dock) return;
+    dock.setAttribute('aria-label', txOr('quickActions', 'Quick actions'));
+    var rsvp = document.getElementById('dock-rsvp');
+    if (rsvp) rsvp.textContent = txOr('dockRsvp', 'RSVP');
+    var dir = document.getElementById('dock-dir');
+    if (dir) dir.textContent = txOr('dockDirections', 'Directions');
+    var cal = document.getElementById('dock-cal');
+    if (cal) {
+      cal.textContent = txOr('dockCalendar', 'Calendar');
+      cal.setAttribute('href', buildIcsHref());
+      cal.setAttribute('download', icsDownloadName());
     }
   }
 
