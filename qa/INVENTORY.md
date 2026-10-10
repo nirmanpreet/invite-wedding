@@ -186,7 +186,17 @@ First load (dev): HTML + style.css + script.js + qrcode + fonts ≈ 120–140 KB
 
 ---
 
-## 10. QA tooling available in this workspace
+## 10. User decisions (Phase 0 answers — binding for all later phases)
+
+1. **Blessing:** keep today's blessing untouched — order `ਪ੍ਰਸਾਦਿ` → `ਦਾਸਾਂ ਕਾਰਜ` → `ਸਤਿਗੁਰ ਦਾਤੇ`. No new blessing, no `ਲਖ ਖੁਸੀਆ` line on the page. Restyle only.
+2. **Gate:** keep the language gate exactly as it is, static; all new motion (petals, stagger, reveals) starts only on the hero *after* a language is picked.
+3. **At-a-glance:** one card, keeping the `#day-info` id that script.js renders into. No duplicate Date/Time/Venue card.
+4. **Fonts:** keep the current families (Playfair Display / Cormorant Garamond / Great Vibes / Dancing Script / Noto Sans Gurmukhi). Do NOT switch Latin display to Arvo; do not load unused families.
+5. **README:** fix the forbidden `ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ` spelling to the verified line. *(done in Phase 1)*
+
+---
+
+## 11. QA tooling available in this workspace
 
 - `serve.js` already running on **:3000**
 - Chrome **CDP on 127.0.0.1:9222** responds (`Chrome/155`, reported UA is *HeadlessChrome* — I'll verify whether it is actually headed before Phase 6)

@@ -1,9 +1,6 @@
 
 <p align="center"><img src="./assets/wedding.gif" width="150px" height="150px"/></p>
-<h1 align="center">Nirman &amp; Simran :ring: <br> <br> Wedding Reception <br> 6 December 2026</h1>
-
-<p align="center">
-  ਲੱਖ ਖੁਸ਼ੀਆਂ ਪਾਤਸ਼ਾਹੀਆਂ, ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇ — With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception of Nirman &amp; Simran!
+<h1 align="center">Nirman &amp; Simran :ring: <br> <br> Wedding Reception <br> 6 December 2026</h1>  <p align="center">ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥ — With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception of Nirman &amp; Simran!
 </p>
 
 <p align="center">

@@ -42,22 +42,16 @@ html {
   overflow-x: hidden;
 }
 
+/* Phase 1 (invite-motion.css): the body gradient, the safe-area padding and
+   the centring flex column moved to the design system. Removed here rather
+   than overridden: `background-attachment: fixed` is banned (it kills scroll
+   perf on Android and does nothing on iOS), and the flex column would fight
+   the new .page block layout. text-align stays: legacy blocks rely on it. */
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--dark);
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: var(--ivory);
-  background-image:
-    radial-gradient(1200px 620px at 50% 0%, rgba(200, 162, 75, 0.13), transparent 62%),
-    linear-gradient(178deg, var(--ivory-2) 0%, var(--ivory) 38%, var(--parchment) 100%);
-  background-attachment: scroll, scroll, fixed;
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  overflow-x: hidden;
 }
 
 img { max-width: 100%; height: auto; }

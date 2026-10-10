@@ -69,6 +69,14 @@ const eventIso = isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05
 
 const css = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
+// Design system + motion layer. Loaded after style.css so its :root tokens win.
+let motionCss = '';
+try {
+  motionCss = fs.readFileSync(path.join(ROOT, 'css/invite-motion.css'), 'utf8');
+} catch (e) {
+  console.warn('css/invite-motion.css not found; building without the motion layer.');
+}
+
 // Vendored QR code generator (MIT, qrcode-generator 1.4.4) — inlined so dist/ works offline
 let qrLib = '';
 try {
@@ -100,6 +108,7 @@ const html = `<!DOCTYPE html>
       <meta name="description" content="${esc(seoDesc)}">
       <meta name="author" content="${esc(p1)} &amp; ${esc(p2)}">
       <meta name="theme-color" content="#6d1a2d">
+      <meta name="color-scheme" content="light">
       <meta name="robots" content="noindex, nofollow">
       <link rel="canonical" href="https://invite.nirmanpreet.com/">
       <link rel="apple-touch-icon" href="assets/img/icon-180.png">
@@ -136,6 +145,10 @@ const html = `<!DOCTYPE html>
 
       <style>
 ${css}
+      </style>
+
+      <style>
+${motionCss}
       </style>
 
       <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
