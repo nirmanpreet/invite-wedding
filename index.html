@@ -42,6 +42,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/style.css">
+  <!-- Floating mogra/sunflower/rose shower + the flowers/music toggles.
+       Purely additive: it only styles the existing #sakura-falling
+       overlay and the two buttons it creates. -->
+  <link rel="stylesheet" href="./css/invite-motion.css">
 
   <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
 
@@ -86,8 +90,10 @@
     </div>
   </div>
 
-  <!-- Petals -->
-  <div class="sakura-falling" id="sakura-falling"></div>
+  <!-- Petals / floating flowers. Decoration only: aria-hidden so it is
+       never announced, and the overlay itself already sits behind every
+       content layer (z-index -1) with pointer-events disabled. -->
+  <div class="sakura-falling" id="sakura-falling" aria-hidden="true"></div>
 
   <!-- Royal ornament frame -->
   <div class="royal-frame" aria-hidden="true">
@@ -139,8 +145,11 @@
   <p class="happiness" id="invite-social"></p>
   </main>
 
+  <!-- The one shared audio element for the whole invitation. Its src is
+       set from config.music.src at runtime and it is only ever played
+       after the guest's first language tap. -->
   <div class="music" id="music-container" style="display:none;">
-    <audio src="" id="my_audio" loop="loop"></audio>
+    <audio src="" id="my_audio" loop="loop" preload="none"></audio>
   </div>
 
   <!-- Hidden PDF card -->
@@ -164,5 +173,8 @@
   </div>
 
   <script src="./js/script.js"></script>
+  <!-- Must come after script.js: it listens for the wedding-enter event
+       that script.js dispatches from enterSite(). -->
+  <script src="./js/invite-motion.js"></script>
 </body>
 </html>

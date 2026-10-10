@@ -250,25 +250,36 @@ html[lang="pa"] .intro-gate .gate-blessing {
    ============================================================ */
 
 /* ============================================================
-   PETALS - canvas
+   PETALS - floating flower overlay
    ============================================================
-   The falling roses are drawn on a <canvas> by startPetal() in
-   js/script.js, not by CSS. The previous DOM version was invisible
-   on Android for four independent reasons (an SVG data URI needing
-   rasterise on a will-change-composited layer, a nested var(--rose)
-   custom property set from JS, per-petal GPU layer promotion, and
-   unprefixed keyframes). The canvas removes all four: no image to
-   decode, no custom properties, one layer, one draw loop.
+   The falling flowers are CSS/SVG elements created by
+   js/invite-motion.js inside this container (the former canvas +
+   tsParticles engine has been removed). The container itself is
+   unchanged.
 
-   z-index 0 keeps the roses under the content layer (.wrap is 2).
-   At 1 they painted over the heading and hid letters.
+   z-index is -1, NOT 0. The old comment here claimed "z-index 0 keeps
+   the roses under the content layer (.wrap is 2)", and that is only
+   half true: z-index 0 beats elements that merely declare a positive
+   z-index. It loses to them, but it BEATS every non-positioned
+   element, because a positioned box with z-index 0 paints in a later
+   step than in-flow text. .blessing, .ornament and .dance-med are not
+   positioned, so at z-index 0 the overlay painted straight over the
+   Ik Onkar and the Gurbani blessing - verified with a pixel diff in
+   qa/occlusion-test.mjs.
+
+   At -1 the overlay drops below ALL in-flow content, which is what the
+   decoration has to do: it may never cross the blessing, the artwork
+   or the couple's names. It still shows, because the body background
+   propagates to the root canvas and is painted beneath even negative
+   z-index children. The translucent section cards tint it faintly,
+   which reads as softness rather than obstruction.
    ============================================================ */
 .sakura-falling {
   position: fixed;
   inset: 0;
   width: 100%;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   overflow: hidden;
 }
 /* ============================================================

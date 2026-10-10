@@ -1,0 +1,194 @@
+/* ==============================================================
+   INVITE MOTION — floating flowers + guest controls
+   --------------------------------------------------------------
+   Additive only. Nothing in this file re-declares an existing
+   selector's layout, colour, font or spacing: every rule below is
+   scoped to #sakura-falling (the decoration overlay that already
+   existed), to .im-controls / .im-btn (the two new buttons), or to
+   an entrance keyframe that ends on the element's own resting
+   style.
+
+   THE OVERLAY
+   #sakura-falling was already position:fixed / inset:0 /
+   z-index:0 / pointer-events:none / overflow:hidden, which puts it
+   behind .wrap (z-index 2) and every content section (z-index 2),
+   in front of nothing sacred, and already display:none in print.
+   It is reused as-is rather than adding a second full-screen layer.
+
+   THE PETALS
+   Ported from the "Phool varsha" reference (3 nested elements per
+   flower: fall -> sway -> tumble) with three deliberate changes:
+     1. Three explicit depth layers via [data-layer], instead of the
+        reference's binary far/near coin flip.
+     2. The reference's colours were built for a pink background
+        (#fbe4ec, hot orange marigold #f39a12). They are re-tinted
+        here to the invitation's own palette (antique gold, maroon,
+        blush) so the shower reads as part of this page. The mogra
+        stays true white — it is the flower the layer is named for.
+     3. NO will-change on the petals. style.css documents that
+        per-petal layer promotion made the previous Android petal
+        implementation invisible; transform-only animations are
+        promoted by the compositor without it.
+   ============================================================== */
+
+/* ---- petals ------------------------------------------------- */
+#sakura-falling .p {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  opacity: var(--op, 1);
+  animation: im-fall var(--d) linear var(--dl) infinite;
+}
+#sakura-falling .w {
+  display: block;
+  width: 100%;
+  height: 100%;
+  perspective: 260px;
+  animation: im-sway var(--sd) ease-in-out var(--sdl) infinite alternate;
+}
+#sakura-falling .s {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--img) center / contain no-repeat;
+  animation: im-tumble var(--r) linear var(--rdl) infinite;
+}
+/* Far layer: rotate in-plane only. Dropping the two 3D rotations
+   removes ~9 concurrent animations per screen for a layer that is
+   small, slow and 42% opaque. */
+#sakura-falling .p[data-layer="far"] .s { animation-name: im-spin; }
+
+@keyframes im-fall {
+  from { transform: translate3d(0, -60px, 0); }
+  to   { transform: translate3d(var(--wx, 0px), var(--h, 110vh), 0); }
+}
+@keyframes im-sway {
+  from { transform: translate3d(calc(var(--sw) * -1), 0, 0); }
+  to   { transform: translate3d(var(--sw), 0, 0); }
+}
+@keyframes im-tumble {
+  from { transform: rotateX(0) rotateY(0) rotateZ(0); }
+  to   { transform: rotateX(360deg) rotateY(200deg) rotateZ(var(--rz)); }
+}
+@keyframes im-spin {
+  from { transform: rotateZ(0); }
+  to   { transform: rotateZ(var(--rz)); }
+}
+
+/* Flowers are decoration. They must never be announced, never take a
+   tap, and never reach the printed card or the PDF (which captures
+   #pdf-card only, so this is belt-and-braces). */
+@media print {
+  #sakura-falling { display: none !important; }
+  .im-controls { display: none !important; }
+}
+
+/* ---- entrance ----------------------------------------------- */
+/* No fill-mode on the page fade: if the animation never runs, the
+   body's normal opacity (1) applies and the invitation is visible.
+   A JS failure can therefore never leave a blank page. */
+@keyframes im-page-in { from { opacity: 0; } to { opacity: 1; } }
+body { animation: im-page-in 0.55s var(--ease); }
+
+/* Corner ornaments fade in on a stagger. OPACITY ONLY, deliberately:
+   .rf-corner.tr carries transform:scaleX(-1) and .rf-corner.br
+   carries scale(-1,-1) to mirror the ornament, so animating transform
+   here would overwrite the mirroring and break the design. */
+@keyframes im-orn-in { from { opacity: 0; } to { opacity: 0.5; } }
+.rf-corner { animation: im-orn-in 0.9s var(--ease) both; }
+.rf-corner.tl { animation-delay: 0.15s; }
+.rf-corner.tr { animation-delay: 0.25s; }
+.rf-corner.bl { animation-delay: 0.35s; }
+.rf-corner.br { animation-delay: 0.45s; }
+
+/* ---- guest controls ----------------------------------------- */
+/* Bottom-left, the exact slot the previous "Petals: on/off" pill
+   occupied: clear of the RSVP thumb zone, the language links and
+   every section card. z-index 5 sits above the content layer but
+   far below .intro-gate (9999). */
+.im-controls {
+  position: fixed;
+  left: calc(12px + env(safe-area-inset-left, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s var(--ease);
+}
+/* Only after the guest has chosen a language — the gate card is
+   centred and a bottom-left cluster would crowd it. */
+body.intro-done .im-controls { opacity: 1; visibility: visible; }
+
+.im-btn {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--gold-line);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.88);
+  color: var(--royal);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease),
+              border-color 0.3s var(--ease), transform 0.15s var(--ease);
+}
+.im-btn:active { transform: translateY(1px); }
+.im-btn:focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
+.im-btn svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Off state: the icon reads as inactive without a text label. */
+.im-btn[aria-pressed="false"] { color: #a08a8f; }
+
+/* High Contrast: the theme's gold hairline disappears, so controls
+   take a system border (same treatment as .petals-toggle in
+   style.css). */
+@media (forced-colors: active) {
+  .im-btn { border: 1px solid CanvasText; }
+}
+
+/* ---- reduced motion ----------------------------------------- */
+/* style.css ends with a blanket reduced-motion rule that sets
+   animation-duration to 0.001ms on *. Applied literally it would
+   freeze every flower solid at its start keyframe — but the brief is
+   that the flowers stay VISIBLE and simply calmer. A universal
+   !important can only be undone by another !important, so this is
+   the single one in this file, scoped strictly to the overlay.
+   It restores each element's own inline duration (var(--d) etc.),
+   which js/invite-motion.js has already multiplied by the calm
+   factor when reduced motion is on — so the result is the slow
+   drift, not the fast one. */
+@media (prefers-reduced-motion: reduce) {
+  #sakura-falling .p {
+    animation-duration: var(--d) !important;
+    animation-iteration-count: infinite !important;
+  }
+  #sakura-falling .w {
+    animation-duration: var(--sd) !important;
+    animation-iteration-count: infinite !important;
+  }
+  #sakura-falling .s {
+    animation-duration: var(--r) !important;
+    animation-iteration-count: infinite !important;
+  }
+  /* The entrance is pure decoration on top of already-visible
+     content, so under reduced motion it is simply dropped. */
+  body, .rf-corner { animation: none !important; }
+}
