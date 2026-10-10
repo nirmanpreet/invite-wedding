@@ -46,8 +46,9 @@
     "venueMapShort": "https://maps.app.goo.gl/26iQc7kQhKJ8boDE6"
   },
   "music": {
-    "enabled": false,
-    "src": "./assets/mp3/song.mp3"
+    "_comment": "Played only after the guest's first language tap. Non-sacred instrumental. Copy music.mp3 into dist/ when building (build.js does this).",
+    "enabled": true,
+    "src": "./music.mp3"
   },
   "images": {
     "topRight": "",

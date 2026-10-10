@@ -69,6 +69,15 @@ const eventIso = isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05
 
 const css = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
+/* Floating-flower shower + the two guest toggles. Inlined into the same
+   <style> block as style.css so dist/ stays a single self-contained file. */
+let motionCss = '';
+try {
+  motionCss = fs.readFileSync(path.join(ROOT, 'css/invite-motion.css'), 'utf8');
+} catch (e) {
+  console.warn('css/invite-motion.css not found; flowers disabled in build.');
+}
+
 // Vendored QR code generator (MIT, qrcode-generator 1.4.4) — inlined so dist/ works offline
 let qrLib = '';
 try {
@@ -76,15 +85,6 @@ try {
     .replace(/<\/script/gi, '<\\/script');
 } catch (e) {
   console.warn('js/qrcode.min.js not found; QR codes disabled in build.');
-}
-
-// Vendored tsParticles slim engine (MIT, tsParticles 3.1.0) — inlined so dist/ works offline
-let tspLib = '';
-try {
-  tspLib = fs.readFileSync(path.join(ROOT, 'js/tsparticles.slim.min.js'), 'utf8')
-    .replace(/<\/script/gi, '<\\/script');
-} catch (e) {
-  console.warn('js/tsparticles.slim.min.js not found; falling petals disabled in build.');
 }
 
 // Small UI text injected statically (runtime localizes via window.__WEDDING_CONFIG__)
@@ -136,16 +136,13 @@ const html = `<!DOCTYPE html>
 
       <style>
 ${css}
+${motionCss}
       </style>
 
       <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
 
       <script>
 ${qrLib}
-      </script>
-
-      <script>
-${tspLib}
       </script>
 
       <script>
@@ -190,8 +187,10 @@ ${tspLib}
         </div>
       </div>
 
-      <!-- Petals -->
-      <div class="sakura-falling" id="sakura-falling"></div>
+      <!-- Petals / floating flowers. Decoration only: aria-hidden so it is
+           never announced, and the overlay itself already sits behind every
+           content layer (z-index -1) with pointer-events disabled. -->
+      <div class="sakura-falling" id="sakura-falling" aria-hidden="true"></div>
 
       <!-- Royal ornament frame -->
       <div class="royal-frame" aria-hidden="true">
@@ -243,8 +242,11 @@ ${tspLib}
       <p class="happiness" id="invite-social"></p>
       </main>
 
+      <!-- The one shared audio element for the whole invitation. Its src is
+           set from config.music.src at runtime and it is only ever played
+           after the guest's first language tap. -->
       <div class="music" id="music-container" style="display:none;">
-        <audio src="" id="my_audio" loop="loop"></audio>
+        <audio src="" id="my_audio" loop="loop" preload="none"></audio>
       </div>
 
       <!-- Hidden PDF card -->
@@ -269,6 +271,9 @@ ${tspLib}
       </div>
 
       <script src="./js/script.js"></script>
+      <!-- Must come after script.js: it listens for the wedding-enter event
+           that script.js dispatches from enterSite(). -->
+      <script src="./js/invite-motion.js"></script>
     </body>
 </html>
 `;
@@ -283,6 +288,29 @@ if (fs.existsSync(faviconSrc)) {
 const jsDist = path.join(DIST, 'js');
 fs.mkdirSync(jsDist, { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'js/script.js'), path.join(jsDist, 'script.js'));
+
+// Flower shower + the two toggles. Referenced by <script src> in the page,
+// so it ships as a file rather than being inlined.
+const motionJsSrc = path.join(ROOT, 'js/invite-motion.js');
+if (fs.existsSync(motionJsSrc)) {
+  fs.copyFileSync(motionJsSrc, path.join(jsDist, 'invite-motion.js'));
+} else {
+  console.warn('js/invite-motion.js not found; flowers and music toggles disabled in build.');
+}
+
+/* Background music. config.music.src is "./music.mp3", i.e. relative to the
+   page, so the track has to sit at the root of dist/. Nothing was copied
+   here before, which is why the deployed site had a silent <audio> tag. */
+const musicSrc = att(config, 'music.src', '');
+if (musicSrc && att(config, 'music.enabled', false)) {
+  const from = path.join(ROOT, musicSrc.replace(/^\.\//, ''));
+  if (fs.existsSync(from)) {
+    fs.copyFileSync(from, path.join(DIST, path.basename(musicSrc)));
+    console.log('  Music   : ' + path.basename(musicSrc));
+  } else {
+    console.warn('music.src points at a missing file (' + musicSrc + '); music disabled in build.');
+  }
+}
 
 // PWA manifest + icon assets
 const manifestSrc = path.join(ROOT, 'manifest.webmanifest');
