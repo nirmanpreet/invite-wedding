@@ -104,6 +104,10 @@ if (fs.existsSync(faviconSrc)) {
 const jsDist = path.join(DIST, 'js');
 fs.mkdirSync(jsDist, { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'js/script.js'), path.join(jsDist, 'script.js'));
+// Motion layer (petals + reveal + dock), loaded before script.js.
+if (fs.existsSync(path.join(ROOT, 'js/invite-motion.js'))) {
+  fs.copyFileSync(path.join(ROOT, 'js/invite-motion.js'), path.join(jsDist, 'invite-motion.js'));
+}
 
 // PWA manifest + icon assets
 const manifestSrc = path.join(ROOT, 'manifest.webmanifest');

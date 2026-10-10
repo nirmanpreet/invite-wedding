@@ -72,6 +72,10 @@
 </head>
 <body class="soft-gradient">
 
+  <!-- Petals: 3 depth layers of mogra (white jasmine), behind everything
+       (z-index 0 vs .page's 1). aria-hidden: decorative only. -->
+  <div id="petals" aria-hidden="true"></div>
+
   <!-- Intro gate: simple first-visit language pick. Unchanged by design
        (Phase 0 decision): it is its own full-screen layer and no new motion
        runs on it. -->
@@ -92,9 +96,6 @@
       <div class="gate-hint" id="gate-hint">Tap your language to enter</div>
     </div>
   </div>
-
-  <!-- Petals: old tsParticles host, removed in Phase 3 -->
-  <div class="sakura-falling" id="sakura-falling"></div>
 
   <!-- Royal ornament frame (scaled in by .corner in Phase 4) -->
   <div class="royal-frame" aria-hidden="true">
@@ -201,6 +202,10 @@
     </div>
   </div>
 
+  <!-- Motion layer first: it adds html.js (which arms the CSS reveals),
+       builds the petals and sets up the scroll reveal + action dock.
+       script.js then renders the content into it. -->
+  <script src="./js/invite-motion.js"></script>
   <script src="./js/script.js"></script>
 </body>
 </html>

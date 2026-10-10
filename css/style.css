@@ -244,26 +244,14 @@ html[lang="pa"] .intro-gate .gate-blessing {
    ============================================================ */
 
 /* ============================================================
-   PETALS - canvas
-   ============================================================
-   The falling roses are drawn on a <canvas> by startPetal() in
-   js/script.js, not by CSS. The previous DOM version was invisible
-   on Android for four independent reasons (an SVG data URI needing
-   rasterise on a will-change-composited layer, a nested var(--rose)
-   custom property set from JS, per-petal GPU layer promotion, and
-   unprefixed keyframes). The canvas removes all four: no image to
-   decode, no custom properties, one layer, one draw loop.
-
-   z-index 0 keeps the roses under the content layer (.wrap is 2).
-   At 1 they painted over the heading and hid letters.
+   PETALS
+   Phase 3: the tsParticles / canvas system is gone. Petals are now
+   three depth layers of mogra (white jasmine) built by
+   js/invite-motion.js into #petals and styled in css/invite-motion.css
+   (section 7). Only the print suppression stays here.
    ============================================================ */
-.sakura-falling {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
+@media print {
+  #petals { display: none !important; }
 }
 /* ============================================================
    TITLES
@@ -980,11 +968,8 @@ html[lang="pa"] #print-invite {
 
 /* ============================================================
    ROSE PETALS
-   A gentle shower over the hero only, in the royal palette: theme
-   burgundy and antique gold with a blush for softness. The container
-   (.sakura-falling) is defined once above; this block only styles the
-   petals themselves. The shape is a CSS mask - one data URI cached
-   with the stylesheet - and each petal's colour comes from --petal.
+   Phase 3: removed. The mogra petal layers live in
+   css/invite-motion.css section 7 (#petals .p / .w / .s).
    ============================================================ */
 
 /* A gentle diagonal drift with a slow tumble. translateX is kept small
@@ -1229,7 +1214,7 @@ html[lang="pa"] #print-invite {
     color: #000;
   }
   #lang-toggle, #rsvp-section, #print-section, #calendar-section,
-  .intro-gate, .sakura-falling, #invite-social,
+  .intro-gate, #petals, #invite-social,
   #venue-map-embed, #pdf-card, .actions, #time, .qr-section {
     display: none !important;
   }
@@ -1489,29 +1474,10 @@ html.js-reveal .reveal-target.revealed {
   .intro-gate .card { animation: none; }
 }
 
-/* Petal pause/play control (WCAG 2.2.2: any auto-moving decoration needs a
-   visible way to stop it). Sits bottom-left, clear of the RSVP thumb zone. */
-.petals-toggle {
-  position: fixed;
-  left: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  z-index: 5;
-  min-height: 44px;
-  padding: 8px 14px;
-  border: 1px solid var(--gold-line);
-  border-radius: 999px;
-  background: rgba(255, 253, 248, 0.85);
-  color: var(--royal);
-  font-family: var(--font-body);
-  font-size: 12px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.petals-toggle:focus-visible {
-  outline: 2px solid var(--royal);
-  outline-offset: 2px;
-}
+/* Phase 3: the petal pause/play control (.petals-toggle) is gone -
+   petals are always on now, and they are the only perpetual motion on
+   the page (UI motion is reduced to a quick fade under
+   prefers-reduced-motion, and the petals themselves calm down). */
 
 /* F1 — the aura/frame used to exceed the viewport by 3–5px on phones,
    causing horizontal scroll. Overflow is clipped at the root instead of
@@ -1529,7 +1495,6 @@ html, body {
   .attend-btn,
   #rsvp-send,
   #print-invite,
-  .petals-toggle,
   .lang-toggle a {
     border: 1px solid CanvasText;
   }
