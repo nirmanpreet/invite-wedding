@@ -134,7 +134,7 @@ const html = `<!DOCTYPE html>
        page still picks WebP, so the preload and the element agree. -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" as="image" href="assets/img/anand-karaj.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/img/anand-karaj-crop.webp" type="image/webp" fetchpriority="high">
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
       <style>
@@ -218,8 +218,8 @@ ${qrLib}
            support, since a browser picks one source and ignores the other. -->
       <div class="ceremony-image" aria-hidden="true">
         <picture>
-          <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-          <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
+          <source type="image/webp" srcset="assets/img/anand-karaj-crop.webp">
+          <img src="assets/img/anand-karaj-crop-fallback.png" alt="" width="993" height="1194" loading="eager" fetchpriority="high" decoding="async">
         </picture>
       </div>
 
@@ -265,11 +265,11 @@ ${qrLib}
                No crossorigin attribute: it would cache separately from the
                same file the page loads and download it twice. See index.html. -->
           <div style="margin:2px auto 14px; width:300px;">
-            <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+            <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
           <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">${esc(p1)}</div>
-          <div style="font-size:20px; color:#96702a; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
+          <div style="font-size:20px; color:#8a6624; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">${esc(p2)}</div>
           <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
@@ -379,12 +379,14 @@ if (fs.existsSync(ornamentSrc)) {
 });
 const imgDist = path.join(iconDist, 'img');
 fs.mkdirSync(imgDist, { recursive: true });
-/* The page loads anand-karaj.webp (268 KB) via <picture>, with
-   anand-karaj-fallback.png (900px, 818 KB) only for browsers without WebP.
-   The 1216px transparent PNG and the original JPG are the editable masters:
-   anand-karaj.png is what the WebP was encoded from, so it must stay in the
-   build for the encoder to be reproducible. */
-['anand-karaj.webp', 'anand-karaj-fallback.png', 'anand-karaj.png', 'anand-karaj.jpg', 'og.jpg'].forEach(function (f) {
+/* The page loads anand-karaj-crop.webp (241 KB) via <picture>, with
+   anand-karaj-crop-fallback.png (800px) only for browsers without WebP.
+   Both are cropped from the master: the source is a 1216px SQUARE canvas
+   holding a 993x1194 PORTRAIT illustration, so cropping removes ~64px of
+   dead width on every render and let the phone size go up (see
+   tools/crop-artwork.mjs). anand-karaj.png is the editable master and
+   must stay in the build for the crop to be reproducible. */
+['anand-karaj-crop.webp', 'anand-karaj-crop-fallback.png', 'anand-karaj.png', 'anand-karaj.jpg', 'og.jpg'].forEach(function (f) {
   const src = path.join(ROOT, 'assets/img', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(imgDist, f));
 });

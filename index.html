@@ -48,7 +48,7 @@
        page still picks WebP, so the preload and the element agree. -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" as="image" href="assets/img/anand-karaj.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/img/anand-karaj-crop.webp" type="image/webp" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/style.css">
@@ -126,14 +126,19 @@
   </div>
 
   <!-- Anand Karaj ceremonial art, straight after the blessing.
-       <picture> because this is the page's likely LCP element: at 1216px the
-       PNG is 1.36 MB, while the same resolution as WebP is 268 KB. The 900px
-       PNG is only ever fetched by a browser with no WebP support, since a
-       browser picks one source and ignores the other. -->
+       The source is a 1216x1216 SQUARE canvas holding a 993x1194
+       PORTRAIT illustration - 63% of the file is see-through. Served
+       cropped (tools/crop-artwork.mjs) so the box holds artwork instead
+       of ~64px of dead width per render, which is what let the phone
+       size below go up without pushing the names off screen. The WebP is
+       also smaller than the square original (241 KB vs 268 KB).
+       <picture> because this is the page's likely LCP element: the
+       cropped PNG fallback is only fetched by a browser with no WebP
+       support, since a browser picks one source and ignores the other. -->
   <div class="ceremony-image" aria-hidden="true">
     <picture>
-      <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-      <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
+      <source type="image/webp" srcset="assets/img/anand-karaj-crop.webp">
+      <img src="assets/img/anand-karaj-crop-fallback.png" alt="" width="993" height="1194" loading="eager" fetchpriority="high" decoding="async">
     </picture>
   </div>
 
@@ -183,11 +188,11 @@
            1.84s of LCP on a throttled phone. Same-origin, so html2canvas
            does not need it either. -->
       <div style="margin:2px auto 14px; width:300px;">
-        <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+        <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
       </div>
       <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
       <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
-      <div style="font-size:20px; color:#96702a; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
+      <div style="font-size:20px; color:#8a6624; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
       <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
       <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">Wedding Reception &bull; 6 December 2026</div>
       <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards</div>

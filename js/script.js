@@ -432,9 +432,11 @@
 
   function isIOS() {
     var ua = navigator.userAgent || '';
-    // iPadOS 13+ reports as Macintosh, so the touch-point count is the tell.
-    return /iPad|iPhone|iPod/.test(ua) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (/iPad|iPhone|iPod/.test(ua)) return true;
+    /* iPadOS 13+ reports as desktop Macintosh, so the UA looks like a Mac.
+       The only tell is that it is a touchscreen: navigator.platform is
+       "MacIntel" and maxTouchPoints is 5 (a real trackpad Mac reports 0). */
+    return /Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1;
   }
 
   /* The calendar options used to live in their own #calendar-section card,
@@ -779,26 +781,56 @@
        A real served file, not a data: URI - iOS cannot use data: URLs. */
     var google = (window.WeddingICS && window.WeddingICS.googleUrl)
       ? window.WeddingICS.googleUrl(config) : '';
-    var webcal = isIOS()
+    var ios = isIOS();
+    var webcal = ios
       ? location.href.replace(/^https?:/, 'webcal:').replace(/[^/]*$/, '') + 'wedding.ics'
       : '';
+
+    /* Per-platform, because no single link works everywhere:
+         iOS      webcal:// is handed to the OS, which has a system-wide
+                  handler and opens Apple Calendar directly - the only
+                  reliable "open the calendar app" path anywhere. Note it
+                  means SUBSCRIBE: the app adds the event and keeps
+                  re-fetching the URL.
+         Android  no dependable deep link exists. The Google Calendar app
+                  for Android does not implement webcal:// at all, and
+                  Chrome's intent:// is handled inconsistently by Samsung
+                  Internet and blocked outright by in-app browsers. The
+                  .ics file is the honest path there.
+         Anywhere the Google link is the only option that works INSIDE a
+                  WhatsApp/Instagram in-app browser, which is where most
+                  guests will actually open this.
+
+       The platform's best option goes first and is marked primary, so a
+       guest on an iPhone taps one obvious button and lands in Calendar
+       rather than reading three equal pills and guessing. */
+    var calDl = ' download="' + esc(icsDownloadName()) + '"';
+    var primary = ios
+      ? { href: webcal, label: txOr('calendarApple', 'Open Apple Calendar') }
+      : { href: ICS_FILE, dl: calDl, label: txOr('calendarFile', 'Download .ics') };
+    var rest = [];
+    if (ios) rest.push({ href: ICS_FILE, dl: calDl, label: txOr('calendarFile', 'Download .ics') });
+    if (google) rest.push({ href: google, target: ' target="_blank" rel="noopener"', label: txOr('calendarGoogle', 'Google Calendar') });
+
+    var calBtn = function (o, cls) {
+      return '<a class="' + cls + '" href="' + esc(o.href) + '"' + (o.dl || '') + (o.target || '') + '>' + esc(o.label) + '</a>';
+    };
 
     el.innerHTML =
       '<div class="save-date">' +
         '<a class="sd-stretch" id="save-date-link" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
-          esc(txOr('saveTheDateCta', 'Tap to add it to your calendar')) + '</a>' +
+          esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</a>' +
         '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
         '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +
         '<div class="cal-actions">' +
-          '<a class="cal-btn" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
-            esc(txOr('calendarFile', 'Download .ics')) + '</a>' +
-          (webcal ? '<a class="cal-btn" href="' + esc(webcal) + '">' +
-            esc(txOr('calendarApple', 'Apple Calendar')) + '</a>' : '') +
-          (google ? '<a class="cal-btn" href="' + esc(google) + '" target="_blank" rel="noopener">' +
-            esc(txOr('calendarGoogle', 'Google Calendar')) + '</a>' : '') +
+          calBtn(primary, 'cal-btn cal-primary') +
+          rest.map(function (o) { return calBtn(o, 'cal-btn'); }).join('') +
         '</div>' +
+        '<div class="cal-hint">' + esc(txOr('calendarHint',
+          ios ? 'Opens your calendar app straight away.'
+               : 'Saves the event to your phone. On iPhone this opens Apple Calendar instead.')) + '</div>' +
       '</div>';
   }
 

@@ -10,7 +10,7 @@
   --dark: #3d0d18;
   --highlight: #a4243b;
   --gold: #a88533;
-  --gold-2: #96702a;
+  --gold-2: #8a6624;
   --gold-soft: #e8c877;
   --gold-line: #e0cfa8;
   /* Small labels are MAROON, not gold. Gold was the original problem: at
@@ -1140,21 +1140,30 @@ html[lang="pa"] #print-invite {
 /* Small phones: the blessing and the couple's names must still share the
    first screen, so the art takes whatever vertical room is left over. */
 @media (max-width: 420px) {
-  /* The artwork was capped at 344px wide / 260px tall, which made the
-     Anand Karaj read as a small vignette on a phone.
-     Measured on a 390x844 viewport: at 330px tall "Simran" ended just 6px
-     above the fold, which is too tight to trust across devices and browser
-     chrome. 310px keeps both names comfortably on the first screen with
-     ~26px of headroom while still being a clear ~19% larger. */
+  /* The artwork is served cropped to its alpha bounding box (993x1194,
+     portrait) instead of the original 1216x1216 square canvas, so the box
+     holds artwork rather than ~64px of dead width. */
   .ceremony-image { width: min(430px, 96%); margin: 16px auto 26px; }
-  .ceremony-image img { max-height: 310px; }
-  .ceremony-image::before { width: min(126%, 96vw); height: 132%; }
+  /* Height-aware rather than a fixed cap. This is the fix for the artwork
+     looking tiny: the rule below used to crush it to 150px on short
+     screens, and a 390x664 viewport is exactly what Safari gives an iPhone
+     13 with browser chrome showing - so the illustration was rendering at
+     125x150 on most iPhones, roughly a sixth of the area it should have.
+     vh spends whatever room actually exists, and min() stops it dominating
+     a tall screen. Measured on a 390-wide viewport:
+        664px tall (iPhone 13) -> 226px art
+        740px tall (Android)   -> 252px art
+        844px tall (iPhone 14) -> 287px art  */
+  .ceremony-image img { max-height: min(380px, 34vh); }
+  .ceremony-image::before { width: min(126%, 96vw); height: 122%; }
 }
 
-/* Short screens (landscape phones, very small handsets). The names win. */
+/* Short screens (landscape phones, very small handsets). Only the margins
+   are tightened now - the old max-height:150px here is what made the
+   artwork look like a postage stamp on an iPhone, so the height is
+   governed by the 34vh above instead. */
 @media (max-height: 700px) and (max-width: 480px) {
-  .ceremony-image { margin: 8px auto 16px; }
-  .ceremony-image img { max-height: 150px; }
+  .ceremony-image { margin: 12px auto 20px; }
 }
 
 /* ============================================================
@@ -1578,11 +1587,33 @@ a.save-date { position: relative; }
   transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .cal-btn:hover { background: #fff; border-color: var(--gold); }
+
+/* The platform's best option: filled, so a guest does not have to read
+   three equal pills and work out which one applies to their phone. */
+.cal-btn.cal-primary {
+  background: var(--royal);
+  border-color: var(--royal);
+  color: var(--gold-soft);
+  font-weight: 600;
+}
+.cal-btn.cal-primary:hover { background: var(--maroon); border-color: var(--maroon); }
+
+.cal-hint {
+  margin-top: 10px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--brown);
+  opacity: 0.85;
+}
 html[lang="pa"] .cal-btn {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
   letter-spacing: normal;
   text-transform: none;
   font-size: 14px;
+}
+html[lang="pa"] .cal-hint {
+  font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
+  font-size: 13px;
 }
 @media (forced-colors: active) {
   .cal-btn { border: 1px solid CanvasText; }

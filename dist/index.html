@@ -41,7 +41,7 @@
        page still picks WebP, so the preload and the element agree. -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" as="image" href="assets/img/anand-karaj.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/img/anand-karaj-crop.webp" type="image/webp" fetchpriority="high">
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
       <style>
@@ -57,7 +57,7 @@
   --dark: #3d0d18;
   --highlight: #a4243b;
   --gold: #a88533;
-  --gold-2: #96702a;
+  --gold-2: #8a6624;
   --gold-soft: #e8c877;
   --gold-line: #e0cfa8;
   /* Small labels are MAROON, not gold. Gold was the original problem: at
@@ -1187,21 +1187,30 @@ html[lang="pa"] #print-invite {
 /* Small phones: the blessing and the couple's names must still share the
    first screen, so the art takes whatever vertical room is left over. */
 @media (max-width: 420px) {
-  /* The artwork was capped at 344px wide / 260px tall, which made the
-     Anand Karaj read as a small vignette on a phone.
-     Measured on a 390x844 viewport: at 330px tall "Simran" ended just 6px
-     above the fold, which is too tight to trust across devices and browser
-     chrome. 310px keeps both names comfortably on the first screen with
-     ~26px of headroom while still being a clear ~19% larger. */
+  /* The artwork is served cropped to its alpha bounding box (993x1194,
+     portrait) instead of the original 1216x1216 square canvas, so the box
+     holds artwork rather than ~64px of dead width. */
   .ceremony-image { width: min(430px, 96%); margin: 16px auto 26px; }
-  .ceremony-image img { max-height: 310px; }
-  .ceremony-image::before { width: min(126%, 96vw); height: 132%; }
+  /* Height-aware rather than a fixed cap. This is the fix for the artwork
+     looking tiny: the rule below used to crush it to 150px on short
+     screens, and a 390x664 viewport is exactly what Safari gives an iPhone
+     13 with browser chrome showing - so the illustration was rendering at
+     125x150 on most iPhones, roughly a sixth of the area it should have.
+     vh spends whatever room actually exists, and min() stops it dominating
+     a tall screen. Measured on a 390-wide viewport:
+        664px tall (iPhone 13) -> 226px art
+        740px tall (Android)   -> 252px art
+        844px tall (iPhone 14) -> 287px art  */
+  .ceremony-image img { max-height: min(380px, 34vh); }
+  .ceremony-image::before { width: min(126%, 96vw); height: 122%; }
 }
 
-/* Short screens (landscape phones, very small handsets). The names win. */
+/* Short screens (landscape phones, very small handsets). Only the margins
+   are tightened now - the old max-height:150px here is what made the
+   artwork look like a postage stamp on an iPhone, so the height is
+   governed by the 34vh above instead. */
 @media (max-height: 700px) and (max-width: 480px) {
-  .ceremony-image { margin: 8px auto 16px; }
-  .ceremony-image img { max-height: 150px; }
+  .ceremony-image { margin: 12px auto 20px; }
 }
 
 /* ============================================================
@@ -1625,11 +1634,33 @@ a.save-date { position: relative; }
   transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .cal-btn:hover { background: #fff; border-color: var(--gold); }
+
+/* The platform's best option: filled, so a guest does not have to read
+   three equal pills and work out which one applies to their phone. */
+.cal-btn.cal-primary {
+  background: var(--royal);
+  border-color: var(--royal);
+  color: var(--gold-soft);
+  font-weight: 600;
+}
+.cal-btn.cal-primary:hover { background: var(--maroon); border-color: var(--maroon); }
+
+.cal-hint {
+  margin-top: 10px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--brown);
+  opacity: 0.85;
+}
 html[lang="pa"] .cal-btn {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
   letter-spacing: normal;
   text-transform: none;
   font-size: 14px;
+}
+html[lang="pa"] .cal-hint {
+  font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
+  font-size: 13px;
 }
 @media (forced-colors: active) {
   .cal-btn { border: 1px solid CanvasText; }
@@ -2030,9 +2061,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "calendarLabel": "Add to calendar",
         "calendarTitle": "Add to your calendar",
         "calendarFile": "Download .ics",
-        "calendarApple": "Add to Apple Calendar",
+        "calendarApple": "Open Apple Calendar",
         "calendarGoogle": "Add to Google Calendar",
         "calendarNote": "Opens your calendar app with the reception already filled in.",
+        "calendarHint": "Saves the event to your phone. On iPhone this opens Apple Calendar instead.",
         "introSub": "Wedding Reception Invitation",
         "introMeaning": "One God. With Waheguru's blessings, we invite you to the Wedding Reception of Nirman & Simran.",
         "receptionHeading": "Reception",
@@ -2071,9 +2103,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
         "calendarTitle": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
         "calendarFile": ".ics ਡਾਊਨਲੋਡ ਕਰੋ",
-        "calendarApple": "Apple ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarApple": "Apple ਕੈਲੰਡਰ ਖੋਲ੍ਹੋ",
         "calendarGoogle": "Google ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
         "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
+        "calendarHint": "ਇਵੈਂਟ ਤੁਹਾਡੇ ਫ਼ੋਨ ਵਿੱਚ ਸੇਵ ਹੋ ਜਾਵੇਗਾ। iPhone ਉੱਤੇ ਇਹ Apple Calendar ਖੋਲ੍ਹੇਗਾ।",
         "introSub": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
         "introMeaning": "ਇੱਕ ਪਰਮਾਤਮਾ। ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
         "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
@@ -2223,8 +2256,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
            support, since a browser picks one source and ignores the other. -->
       <div class="ceremony-image" aria-hidden="true">
         <picture>
-          <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-          <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
+          <source type="image/webp" srcset="assets/img/anand-karaj-crop.webp">
+          <img src="assets/img/anand-karaj-crop-fallback.png" alt="" width="993" height="1194" loading="eager" fetchpriority="high" decoding="async">
         </picture>
       </div>
 
@@ -2270,11 +2303,11 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
                No crossorigin attribute: it would cache separately from the
                same file the page loads and download it twice. See index.html. -->
           <div style="margin:2px auto 14px; width:300px;">
-            <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+            <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
           <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
-          <div style="font-size:20px; color:#96702a; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
+          <div style="font-size:20px; color:#8a6624; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
           <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards</div>
