@@ -157,9 +157,9 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
 /* Off state: the icon reads as inactive without a text label. */
 .im-btn[aria-pressed="false"] { color: #a08a8f; }
 
-/* High Contrast: the theme's gold hairline disappears, so controls
-   take a system border (same treatment as .petals-toggle in
-   style.css). */
+/* High Contrast: the theme's gold hairline disappears, so controls take a
+   system border, matching the treatment given to .attend-btn, #rsvp-send,
+   #print-invite and .lang-toggle a in style.css. */
 @media (forced-colors: active) {
   .im-btn { border: 1px solid CanvasText; }
 }

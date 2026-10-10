@@ -1,0 +1,10 @@
+# Link previews (WhatsApp, iMessage, Slack, Facebook) fetch this URL and
+# the og:image. The hosting platform falls back to index.html for any file
+# that does not exist on disk, so without this file a crawler asking for
+# /robots.txt receives a 200 HTML page instead of a policy.
+#
+# The page itself carries <meta name="robots" content="noindex, nofollow">,
+# which is about SEARCH indexing, not fetching. Crawlers must be allowed to
+# fetch the page for the share preview to render at all.
+User-agent: *
+Allow: /

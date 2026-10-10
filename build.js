@@ -285,6 +285,12 @@ const faviconSrc = path.join(ROOT, 'favicon.png');
 if (fs.existsSync(faviconSrc)) {
   fs.copyFileSync(faviconSrc, path.join(DIST, 'favicon.png'));
 }
+/* Without this the host's SPA fallback answers /robots.txt with the whole
+   index.html at 200 text/html, which crawlers cannot parse as a policy. */
+const robotsSrc = path.join(ROOT, 'robots.txt');
+if (fs.existsSync(robotsSrc)) {
+  fs.copyFileSync(robotsSrc, path.join(DIST, 'robots.txt'));
+}
 const jsDist = path.join(DIST, 'js');
 fs.mkdirSync(jsDist, { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'js/script.js'), path.join(jsDist, 'script.js'));

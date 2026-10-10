@@ -1013,17 +1013,11 @@ html[lang="pa"] #print-invite {
   text-transform: none;
 }
 
-/* ============================================================
-   ROSE PETALS
-   A gentle shower over the hero only, in the royal palette: theme
-   burgundy and antique gold with a blush for softness. The container
-   (.sakura-falling) is defined once above; this block only styles the
-   petals themselves. The shape is a CSS mask - one data URI cached
-   with the stylesheet - and each petal's colour comes from --petal.
-   ============================================================ */
-
-/* A gentle diagonal drift with a slow tumble. translateX is kept small
-   so petals stay over the names instead of sweeping off to one side. */
+/* The old "ROSE PETALS" block that stood here described a CSS-mask petal
+   implementation (data-URI mask, --petal colour, diagonal drift). It was
+   removed with the tsParticles engine and is superseded by the flower
+   shower in invite-motion.css, which targets the same #sakura-falling
+   container. */
 
 /* ============================================================
    CEREMONY ARTWORK
@@ -1247,7 +1241,8 @@ html[lang="pa"] #print-invite {
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .sakura { display: none; }
+  /* The floating flowers deliberately keep their slow drift here - see the
+     reduced-motion block in invite-motion.css, which opts them back in. */
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
@@ -1464,7 +1459,7 @@ html[lang="pa"] .save-date .sd-date {
 }
 
 /* ============================================================
-   QA FIX BUNDLE (report: F1, F3, E2, M4, H2, G5, petals/WCAG 2.2.2)
+   QA FIX BUNDLE (report: F1, F3, E2, M4, H2, G5)
    ============================================================ */
 
 /* F3 — tap targets. Language links now have a 44px min box. */
@@ -1524,30 +1519,6 @@ html.js-reveal .reveal-target.revealed {
   .intro-gate .card { animation: none; }
 }
 
-/* Petal pause/play control (WCAG 2.2.2: any auto-moving decoration needs a
-   visible way to stop it). Sits bottom-left, clear of the RSVP thumb zone. */
-.petals-toggle {
-  position: fixed;
-  left: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  z-index: 5;
-  min-height: 44px;
-  padding: 8px 14px;
-  border: 1px solid var(--gold-line);
-  border-radius: 999px;
-  background: rgba(255, 253, 248, 0.85);
-  color: var(--royal);
-  font-family: var(--font-body);
-  font-size: 12px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.petals-toggle:focus-visible {
-  outline: 2px solid var(--royal);
-  outline-offset: 2px;
-}
-
 /* F1 — the aura/frame used to exceed the viewport by 3–5px on phones,
    causing horizontal scroll. Overflow is clipped at the root instead of
    resizing the art (which would shift the layout). */
@@ -1564,7 +1535,6 @@ html, body {
   .attend-btn,
   #rsvp-send,
   #print-invite,
-  .petals-toggle,
   .lang-toggle a {
     border: 1px solid CanvasText;
   }

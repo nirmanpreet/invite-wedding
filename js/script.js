@@ -803,8 +803,8 @@
   }
 
 // ---------- Floating flowers ----------
-  /* The falling-rose engine that used to live here (tsParticles, vendored at
-     js/tsparticles.slim.min.js) has been replaced by css/invite-motion.css +
+  /* The falling-rose engine that used to live here (tsParticles, since
+     deleted) has been replaced by css/invite-motion.css +
      js/invite-motion.js: a dependency-free three-depth shower of mogra,
      roses and marigolds inside the SAME #sakura-falling overlay, driven by
      CSS keyframes rather than a JS rAF loop. It also drops the separate
@@ -938,10 +938,6 @@
     var art = document.querySelector('.ceremony-image img');
     if (art) out.push(art);
     return out.concat(Array.prototype.slice.call(orn));
-  }  function playIntroCard() {
-    // The gate card's entrance is a pure CSS animation now (see
-    // .intro-gate .card in style.css) - no library, no JS timing, and it
-    // cannot strand content at opacity 0 the way the GSAP path could.
   }
 
   /* ============================================================
