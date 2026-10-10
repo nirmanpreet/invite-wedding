@@ -10,10 +10,17 @@
   --dark: #3d0d18;
   --highlight: #a4243b;
   --gold: #a88533;
-  --gold-2: #8c6623;
-  --gold-soft: #e5c46d;
-  --gold-line: #e3d5b3;
-  --gold-text: #85682c;
+  --gold-2: #96702a;
+  --gold-soft: #e8c877;
+  --gold-line: #e0cfa8;
+  /* Small labels are MAROON, not gold. Gold was the original problem: at
+     11-13px it cannot reach 4.5:1 without darkening until it stops looking
+     like gold and starts looking like brown. The earlier fix darkened it to
+     #85682c (4.85:1) and every heading on the page went muddy khaki.
+     Gold now carries only what it is good at - the ampersand, hairlines,
+     borders and artwork - while every small label gets the deep accent
+     colour at 9.35:1, which is both prettier and far more legible. */
+  --gold-text: #7a1f38;
   --ivory: #faf6ec;
   --ivory-2: #fffdf7;
   --parchment: #f4ead4;
@@ -1524,81 +1531,64 @@ html.js-reveal .reveal-target.revealed {
   .intro-gate .card { animation: none; }
 }
 
-/* ---- Calendar section -----------------------------------------
-   Three ways in, because no single one works everywhere: the .ics
-   file (Android, desktop, iOS Safari standalone), a webcal:// link on
-   iOS which opens Calendar with no download step, and Google Calendar,
-   which is the only one that works inside a WhatsApp or Instagram
-   in-app browser. renderCalendarSection() emits only what applies. */
-.calendar-section {
-  position: relative;
-  z-index: 2;
-  width: min(640px, 92%);
-  margin: 22px auto;
-  padding: 26px 22px;
-  box-sizing: border-box;
-  background: rgba(255, 253, 248, 0.78);
-  border: 1px solid var(--gold-line);
+/* ---- Calendar options, inside the Save-the-Date card -------------
+   These used to be a separate #calendar-section card, which duplicated
+   the Save-the-Date link directly above it. They now sit inside that
+   card, on top of a stretched link that keeps the whole date block
+   tappable. The .ics file works on Android, desktop and iOS Safari
+   standalone; webcal:// opens iOS Calendar with no download step; the
+   Google link is the only one that works inside a WhatsApp or Instagram
+   in-app browser, which is where most guests will actually open this. */
+a.save-date { position: relative; }
+
+/* Covers the whole card, so tapping the date does the obvious thing.
+   Its text is not shown: the visible .sd-cta below already says it. */
+.sd-stretch {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   border-radius: 3px;
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  text-align: center;
+  color: transparent;
+  font-size: 0;
 }
-.calendar-section:empty { display: none; }
-.calendar-section h2 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(13px, 3.4vw, 15px);
-  letter-spacing: 3.6px;
-  text-transform: uppercase;
-  color: var(--gold-text);
-  margin: 0 0 18px;
-}
+.sd-stretch:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
 .cal-actions {
+  position: relative;
+  z-index: 1;   /* above the stretched link, so the options stay tappable */
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 14px;
 }
 .cal-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 12px 20px;
-  background: transparent;
-  border: 1px solid var(--gold);
-  border-radius: 6px;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--gold-line);
+  border-radius: 999px;
   color: var(--royal);
-  font-size: 14px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: background 0.3s var(--ease), color 0.3s var(--ease);
-}
-.cal-btn:hover { background: rgba(200, 162, 75, 0.12); }
-.cal-note {
-  margin-top: 14px;
   font-size: 12.5px;
-  line-height: 1.7;
-  color: var(--brown);
-  opacity: 0.9;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
 }
-/* Punjabi must never be tracked or upper-cased (W3C Gurmukhi 5.1 / 6). */
-html[lang="pa"] .calendar-section h2 {
-  font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
-  letter-spacing: normal;
-  text-transform: none;
-  font-size: 16px;
-}
+.cal-btn:hover { background: #fff; border-color: var(--gold); }
 html[lang="pa"] .cal-btn {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
   letter-spacing: normal;
   text-transform: none;
+  font-size: 14px;
 }
 @media (forced-colors: active) {
   .cal-btn { border: 1px solid CanvasText; }
 }
 
-/* F1 — the aura/frame used to exceed the viewport by 3–5px on phones,
+/* F3 — the aura/frame used to exceed the viewport by 3–5px on phones,
    causing horizontal scroll. Overflow is clipped at the root instead of
    resizing the art (which would shift the layout). */
 html, body {

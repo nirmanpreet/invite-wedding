@@ -231,7 +231,6 @@ ${qrLib}
       </div>
 
       <div id="time"></div>
-      <div id="calendar-section" class="calendar-section"></div>
       <p class="dance-med" id="dance-med">${esc(extraEn.receptionHeading || 'Reception')}</p>
 
       <div class="actions" id="invite-actions"></div>
@@ -270,9 +269,9 @@ ${qrLib}
           </div>
           <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">${esc(p1)}</div>
-          <div style="font-size:20px; color:#8c6623; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
+          <div style="font-size:20px; color:#96702a; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
           <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">${esc(p2)}</div>
-          <div style="font-size:14px; letter-spacing:2px; color:#85682c; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
+          <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
           <div id="pdf-qr" class="pdf-qr"></div>

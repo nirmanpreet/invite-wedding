@@ -140,9 +140,7 @@
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();
-    renderPrintSection();
-    renderCalendarSection();
-    renderQrSection();
+    renderPrintSection();    renderQrSection();
     updatePdfLang();
     renderLangToggle();
     updateIntroGate();
@@ -428,7 +426,7 @@
      URL crashes SFSafariViewController, and an in-app browser can neither
      open the Calendar app nor download a file - so "Add to calendar" was
      a dead tap on exactly the phones this invitation is shared on. It now
-     points at a real served .ics file, and renderCalendarSection() adds the
+     points at a real served .ics file, and the Save-the-Date card offers the
      two fallbacks that cover the cases a plain download misses. */
   var ICS_FILE = './wedding.ics';
 
@@ -439,33 +437,9 @@
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
-  function renderCalendarSection() {
-    var el = document.getElementById('calendar-section');
-    if (!el) return;
-    if (features.calendarIcs === false) { el.innerHTML = ''; return; }
-
-    var google = (window.WeddingICS && window.WeddingICS.googleUrl)
-      ? window.WeddingICS.googleUrl(config)
-      : '';
-    // webcal:// hands the file straight to iOS Calendar - no download step,
-    // no Safari interstitial. It is meaningless on Android and desktop, so
-    // it is only offered where it actually does something.
-    var webcal = ICS_FILE.replace(/^https?:\/\//, 'webcal://');
-    if (isIOS()) webcal = location.href.replace(/^https?:/, 'webcal:').replace(/[^/]*$/, '') + 'wedding.ics';
-
-    el.innerHTML =
-      '<h2>' + esc(txOr('calendarTitle', 'Add to your calendar')) + '</h2>' +
-      '<div class="cal-actions">' +
-        '<a class="cal-btn" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
-          esc(txOr('calendarFile', 'Download .ics')) + '</a>' +
-        (isIOS() ? '<a class="cal-btn" href="' + esc(webcal) + '">' +
-          esc(txOr('calendarApple', 'Add to Apple Calendar')) + '</a>' : '') +
-        (google ? '<a class="cal-btn" href="' + esc(google) + '" target="_blank" rel="noopener">' +
-          esc(txOr('calendarGoogle', 'Add to Google Calendar')) + '</a>' : '') +
-      '</div>' +
-      '<div class="cal-note">' + esc(txOr('calendarNote',
-        'Opens your calendar app with the reception already filled in.')) + '</div>';
-  }
+  /* The calendar options used to live in their own #calendar-section card,
+     which duplicated the Save-the-Date link directly above it. They now
+     render inside that card instead - see renderSaveTheDate(). */
 
   function icsDownloadName() {
     return p1 + '_' + p2 + '_reception.ics';
@@ -789,20 +763,43 @@
     var dTxt = dateText();
     // Punjabi: "ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026"  |  English: "Sunday, 6 December 2026"
     var full = wd ? wd + ', ' + dTxt : dTxt;
-    /* The whole card is a link, not just its title. It carries the same .ics as
-       the calendar section, so tapping the date the guest came to read is the
-       same action as tapping "Add to calendar" lower down.
-       The href is a data: URI carrying the correct text/calendar MIME type,
-       which is what makes iOS and Android calendar apps open it rather than
-       showing the raw file; `download` covers desktop browsers. */
-    var icsData = ICS_FILE;
+    /* One card carries everything calendar-related. There used to be a
+       separate "Add to your calendar" section as well, which duplicated the
+       Save-the-Date link and read as a bug - two competing calendar
+       things stacked under each other.
+
+       The date block stays one big tap target via a stretched link that
+       covers the card (.sd-stretch), because tapping the date the guest
+       came to read should do the thing the page is asking for. The three
+       explicit options sit on top of it (z-index) so they stay tappable:
+           .ics file  - Android, desktop, iOS Safari standalone
+           webcal://  - iOS only, opens Calendar with no download step
+           Google     - the only option that works inside a WhatsApp or
+                        Instagram in-app browser
+       A real served file, not a data: URI - iOS cannot use data: URLs. */
+    var google = (window.WeddingICS && window.WeddingICS.googleUrl)
+      ? window.WeddingICS.googleUrl(config) : '';
+    var webcal = isIOS()
+      ? location.href.replace(/^https?:/, 'webcal:').replace(/[^/]*$/, '') + 'wedding.ics'
+      : '';
+
     el.innerHTML =
-      '<a class="save-date" id="save-date-link" href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' +
+      '<div class="save-date">' +
+        '<a class="sd-stretch" id="save-date-link" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
+          esc(txOr('saveTheDateCta', 'Tap to add it to your calendar')) + '</a>' +
         '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
         '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +
-      '</a>';
+        '<div class="cal-actions">' +
+          '<a class="cal-btn" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
+            esc(txOr('calendarFile', 'Download .ics')) + '</a>' +
+          (webcal ? '<a class="cal-btn" href="' + esc(webcal) + '">' +
+            esc(txOr('calendarApple', 'Apple Calendar')) + '</a>' : '') +
+          (google ? '<a class="cal-btn" href="' + esc(google) + '" target="_blank" rel="noopener">' +
+            esc(txOr('calendarGoogle', 'Google Calendar')) + '</a>' : '') +
+        '</div>' +
+      '</div>';
   }
 
 // ---------- Floating flowers ----------
@@ -918,9 +915,7 @@
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();
-    renderPrintSection();
-    renderCalendarSection();
-    renderQrSection();
+    renderPrintSection();    renderQrSection();
     updatePdfLang();
     renderLangToggle();
     initAnimations();
