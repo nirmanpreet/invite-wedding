@@ -146,6 +146,7 @@
     renderLangToggle();
     updateIntroGate();
     renderSaveTheDate();
+    renderDock();
     // Petal toggle label + any lang-dependent chrome re-render with it.
     try { window.dispatchEvent(new CustomEvent('wedding-langchange')); } catch (e) {}
   }
@@ -914,9 +915,6 @@
 
   // ---------- Boot ----------
   function boot() {
-    // Reveal styles only apply when JS is running: content is visible by
-    // default so a JS failure can never leave the invite blank.
-    document.documentElement.classList.add('js-reveal');
     // Set <html lang> before anything renders: the Punjabi typography rules are
     // scoped to html[lang="pa"], and setLang() only runs on interaction.
     document.documentElement.lang = isPa() ? 'pa' : 'en';
@@ -931,88 +929,38 @@
     renderQrSection();
     updatePdfLang();
     renderLangToggle();
-    initAnimations();
-  }
-
-  // ---------- Royal animation layer (GSAP, graceful fallback) ----------
-  var royalAnimated = false;
-
-  function revealTargets() {
-    var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
-      'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
-      'rsvp-section', 'venue-map-embed', 'print-section'];
-    var out = [];
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el && el.offsetParent !== null) out.push(el);
-    });
-    var orn = document.querySelectorAll('.ornament');
-    var art = document.querySelector('.ceremony-image img');
-    if (art) out.push(art);
-    return out.concat(Array.prototype.slice.call(orn));
-  }  function playIntroCard() {
-    // The gate card's entrance is a pure CSS animation now (see
-    // .intro-gate .card in style.css) - no library, no JS timing, and it
-    // cannot strand content at opacity 0 the way the GSAP path could.
+    renderDock();
   }
 
   /* ============================================================
-     REVEAL LAYER - CSS transitions + IntersectionObserver
+     REVEAL LAYER
      ------------------------------------------------------------
-     Replaces GSAP/ScrollTrigger (two render-blocking CDN scripts for a
-     fade-up). Rules that keep this safe by construction:
-       - content is visible by default; the hidden state only exists once
-         JS adds .reveal-target to an element (html.js-reveal is set at boot)
-       - no JS is ever REQUIRED for visibility: no-IO browsers get an
-         instant .is-in on everything, and a timed failsafe force-reveals
-         anything still hidden in the viewport
-       - reduced motion gets instant visibility via CSS, not a JS branch
+     Phase 4: the old parallel reveal system (html.js-reveal /
+     .reveal-target / .revealed + a 2.5s failsafe) is gone. Every card
+     now uses the design system's .reveal / .in classes, observed once
+     by js/invite-motion.js. Content is still visible by default: the
+     hidden state only exists once html.js is set, and that class is
+     added by the motion script itself.
      ============================================================ */
-  function playRoyalReveal() {
-    if (royalAnimated) return;
-    royalAnimated = true;
-    var targets = revealTargets();
-    if (!targets.length) return;
 
-    if (!('IntersectionObserver' in window)) {
-      targets.forEach(function (el) { el.classList.add('revealed'); });
-      return;
-    }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) {
-          en.target.classList.add('revealed');
-          io.unobserve(en.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
-
-    targets.forEach(function (el) { el.classList.add('reveal-target'); io.observe(el); });
-
-    // Failsafe: if the observer never fires (odd WebViews, restored bfcache
-    // sessions), anything already inside the viewport is shown anyway.
-    setTimeout(function () {
-      targets.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add('revealed');
-      });
-    }, 2500);
-  }
-
-  function initAnimations() {
-    var gate = document.getElementById('intro-gate');
-    var already = document.body.classList.contains('intro-done');
-    if (already || !gate || gate.classList.contains('hide')) {
-      setTimeout(playRoyalReveal, 120);
-    } else {
-      // Reveal once the intro gate is dismissed by any path.
-      var iv = setInterval(function () {
-        if (document.body.classList.contains('intro-done')) {
-          clearInterval(iv);
-          setTimeout(playRoyalReveal, 260);
-        }
-      }, 120);
-      setTimeout(function () { clearInterval(iv); }, 20000);
+  // ---------- Sticky action dock (phones only) ----------
+  // The <nav class="dock" id="dock"> markup lives in index.html; this only
+  // localises the labels and fills the two hrefs that depend on language /
+  // config (directions and the .ics). Show/hide logic is in invite-motion.js:
+  // it slides in after the hero, hides at the RSVP card and while typing.
+  function renderDock() {
+    var dock = document.getElementById('dock');
+    if (!dock) return;
+    dock.setAttribute('aria-label', txOr('quickActions', 'Quick actions'));
+    var rsvp = document.getElementById('dock-rsvp');
+    if (rsvp) rsvp.textContent = txOr('dockRsvp', 'RSVP');
+    var dir = document.getElementById('dock-dir');
+    if (dir) dir.textContent = txOr('dockDirections', 'Directions');
+    var cal = document.getElementById('dock-cal');
+    if (cal) {
+      cal.textContent = txOr('dockCalendar', 'Calendar');
+      cal.setAttribute('href', buildIcsHref());
+      cal.setAttribute('download', icsDownloadName());
     }
   }
 

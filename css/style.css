@@ -1440,27 +1440,10 @@ html[lang="pa"] .save-date .sd-date {
   min-height: 44px;
 }
 
-/* H2 — scroll reveal. Hidden state only ever applies once JS confirms it
-   can observe + reveal (html.js-reveal is added by script.js). Without JS
-   these elements stay fully visible, so nothing can get stranded at
-   opacity:0 — the failure mode the GSAP path had on Android. */
-html.js-reveal .reveal-target {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity .7s var(--ease), transform .7s var(--ease);
-}
-html.js-reveal .reveal-target.revealed {
-  opacity: 1;
-  transform: none;
-}
-/* Reduced motion: no slide, no transition — just appear. */
-@media (prefers-reduced-motion: reduce) {
-  html.js-reveal .reveal-target {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
+/* Phase 4: the scroll reveal moved to the design system (.js .reveal →
+   .in, css/invite-motion.css section 9, observed by js/invite-motion.js).
+   The old html.js-reveal / .reveal-target rules are removed rather than
+   left to double-hide the same elements. */
 
 /* The gate card entrance is CSS-only now (GSAP removed). */
 @keyframes gate-in {

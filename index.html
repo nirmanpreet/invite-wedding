@@ -99,10 +99,10 @@
 
   <!-- Royal ornament frame (scaled in by .corner in Phase 4) -->
   <div class="royal-frame" aria-hidden="true">
-    <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+    <img class="rf-corner tl corner" src="assets/svg/corner-ornament.svg" alt="">
+    <img class="rf-corner tr corner" src="assets/svg/corner-ornament.svg" alt="">
+    <img class="rf-corner bl corner" src="assets/svg/corner-ornament.svg" alt="">
+    <img class="rf-corner br corner" src="assets/svg/corner-ornament.svg" alt="">
   </div>
 
   <!-- Print-only header -->
@@ -205,6 +205,16 @@
   <!-- Motion layer first: it adds html.js (which arms the CSS reveals),
        builds the petals and sets up the scroll reveal + action dock.
        script.js then renders the content into it. -->
+  <!-- Sticky action bar: phones only (hidden at >=700px in CSS). Labels are
+       localised by script.js (renderDock); the show/hide logic - slide in
+       after the hero, hide at the RSVP card and while typing - lives in
+       js/invite-motion.js. -->
+  <nav class="dock" id="dock" aria-label="Quick actions">
+    <a class="btn" id="dock-rsvp" href="#rsvp-section">RSVP</a>
+    <a class="btn ghost" id="dock-dir" href="https://www.google.com/maps" target="_blank" rel="noopener">Directions</a>
+    <a class="btn ghost" id="dock-cal" href="#">Calendar</a>
+  </nav>
+
   <script src="./js/invite-motion.js"></script>
   <script src="./js/script.js"></script>
 </body>

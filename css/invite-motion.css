@@ -197,3 +197,17 @@ html[lang="pa"] .hero .meta{line-height:1.8}
    inside the card on a 320px phone. */
 .card .qr-wrap{max-width:100%;overflow:hidden}
 .card .qr-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+
+/* 13. PHASE 4 GLUE: corners, dock, anchor scrolling ------------------
+   The corner ornaments are hidden until the language gate is dismissed
+   (body.intro-done), so their scale-in plays when the guest actually
+   arrives on the page instead of behind the opaque gate overlay.
+   Pausing - not removing - the animation means it still plays, once. */
+.js body:not(.intro-done) .corner{animation-play-state:paused}
+
+/* Anchor targets (dock RSVP link) must not land under the safe area. */
+.card,#rsvp-section,#time{scroll-margin-top:calc(16px + var(--safe-t))}
+
+/* Dock: three equal actions, never wrapping, always thumb-sized. */
+.dock .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[lang="pa"] .dock .btn{font-family:var(--font-gurmukhi);letter-spacing:normal;font-size:13px}

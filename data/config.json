@@ -144,6 +144,9 @@
       "en": {
         "dayInfoTitle": "Wedding Reception at a glance",
         "quickActions": "Quick actions",
+        "dockRsvp": "RSVP",
+        "dockDirections": "Directions",
+        "dockCalendar": "Calendar",
         "dayInfoDate": "Date",
         "dayInfoTime": "Time",
         "dayInfoVenue": "Venue",
@@ -184,6 +187,9 @@
       "pa": {
         "dayInfoTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
         "quickActions": "ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ",
+        "dockRsvp": "RSVP",
+        "dockDirections": "ਸਥਾਨ ਦਾ ਰਸਤਾ",
+        "dockCalendar": "ਕੈਲੰਡਰ",
         "dayInfoDate": "ਤਾਰੀਖ਼",
         "dayInfoTime": "ਸਮਾਂ",
         "dayInfoVenue": "ਸਥਾਨ",
