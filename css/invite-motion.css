@@ -18,6 +18,11 @@
   color-scheme: light;                       /* stops Android/Samsung "auto dark" from inverting the card */
   --pink-50:#fff8fa; --pink-100:#fdf1f4; --pink-200:#fbe4ec; --pink-300:#f8d6e1; --pink-400:#f2b5ca;
   --maroon:#6d1a2d; --maroon-d:#4a1220; --gold:#c8a24b; --gold-d:#b8862e; --gold-l:#e5c46d;
+  /* Text-safe gold. The old --gold-text (#9c7a34) measured 3.9:1 on ivory
+     and --gold-d 3.1:1 on pink: both fail WCAG AA for small text. This one
+     is 4.7:1 on ivory and 5.0:1 on pink-50. Hairlines keep the brighter
+     golds; only text switches to this. */
+  --gold-text:#8a6a26; --gold-ink:#8a6a26;
   --ink:#4a1220; --muted:#8a5a67; --card:rgba(255,250,246,.88);
   --r-card:20px; --r-pill:999px;
   --shadow:0 10px 28px rgba(109,26,45,.12); --shadow-sm:0 6px 16px rgba(184,134,46,.28);
@@ -53,7 +58,7 @@ input,select,textarea{font-size:16px}       /* <16px makes iOS zoom the page whe
 .ik::before{content:"";position:absolute;left:50%;top:50%;width:150%;height:150%;margin:-75% 0 0 -75%;border-radius:50%;
   background:radial-gradient(circle,rgba(229,196,109,.55) 0%,rgba(229,196,109,0) 65%);opacity:.4;z-index:-1;animation:glow 4.5s ease-in-out infinite alternate}
 .names{font-family:var(--font-script);font-size:clamp(44px,14vw,68px);line-height:1.15;color:var(--maroon);margin:.15em 0}
-.names .amp{display:block;font:400 clamp(20px,6vw,28px)/1.4 var(--font-display);color:var(--gold-d)}
+.names .amp{display:block;font:400 clamp(20px,6vw,28px)/1.4 var(--font-display);color:var(--gold-ink)}
 .meta{font-family:var(--font-display);font-size:clamp(15px,4.4vw,18px);color:var(--maroon-d)}
 
 /* 4. CARDS + DIVIDER ------------------------------------------------- */
@@ -74,7 +79,7 @@ input,select,textarea{font-size:16px}       /* <16px makes iOS zoom the page whe
 .info-row svg{flex:0 0 26px;width:26px;height:26px;stroke:var(--gold-d);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .info-row small{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .date-badge{display:inline-flex;flex-direction:column;align-items:center;min-width:104px;padding:12px 18px;border:1px solid var(--gold);border-radius:16px;background:var(--pink-50);font-family:var(--font-display);color:var(--maroon)}
-.date-badge b{font-size:44px;line-height:1}.date-badge span{letter-spacing:.2em;font-size:13px;color:var(--gold-d)}
+.date-badge b{font-size:44px;line-height:1}.date-badge span{letter-spacing:.2em;font-size:13px;color:var(--gold-ink)}
 
 /* 5. BUTTONS + INPUTS ------------------------------------------------ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:var(--r-pill);
@@ -147,6 +152,10 @@ input[type=text],input[type=number],select,textarea{width:100%;min-height:48px;p
   opacity:1;transform:none;animation:none;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .intro-gate .card::before{top:14px}
 .intro-gate .card::after{bottom:14px}
+/* Without JS the gate's buttons do nothing, so a guest would be trapped
+   behind an undismissable overlay. It only exists once html.js is set. */
+.intro-gate{display:none}
+.js .intro-gate{display:flex}
 
 /* 12. PHASE 2 GLUE: hero composition + card rhythm -------------------
    The hero is the whole first screen: arch art, ੴ, blessing, the

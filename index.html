@@ -109,6 +109,25 @@
   <div id="print-header" class="print-header"></div>
 
   <div class="page">
+    <!-- No-JS fallback: the essentials, statically, in both languages.
+         Everything else on the page is filled by script.js, so a guest on a
+         slow network (or a browser with JS blocked) still gets the date,
+         the venue and a tap-to-call number. All strings are existing
+         config values; nothing new was invented. -->
+    <noscript>
+      <section class="card noscript-card">
+        <div class="ik gurmukhi" lang="pa" aria-hidden="true">ੴ</div>
+        <p class="gurmukhi" lang="pa">ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥</p>
+        <h2>Nirman &amp; Simran &mdash; Wedding Reception</h2>
+        <p class="gurmukhi" lang="pa">ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ &mdash; ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ</p>
+        <p>Sunday, 6 December 2026 &middot; 10:00 AM onwards</p>
+        <p class="gurmukhi" lang="pa">ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026 &middot; ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ</p>
+        <p>Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</p>
+        <p class="gurmukhi" lang="pa">ਪਾਰਕ ਸਿਟੀ ਰਿਜ਼ੌਰਟ, ਮਲੋਟ, ਪੰਜਾਬ 152107</p>
+        <p><a class="phone" href="tel:+61423594009">+61 423 594 009</a></p>
+      </section>
+    </noscript>
+
     <!-- ================= FIRST SCREEN ================= -->
     <header class="hero intro">
 
