@@ -20,6 +20,7 @@ new.jpg
 qa/*
 !qa/INVENTORY.md
 !qa/QA-RESULTS.md
+!qa/MANUAL-CHECKLIST.md
 
 # Scratch / debug artefacts left by local investigation
 *.txt
