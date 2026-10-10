@@ -19,6 +19,7 @@ new.jpg
 # Local QA harness (Playwright screenshots, Chrome profiles, scratch scripts)
 qa/*
 !qa/INVENTORY.md
+!qa/QA-RESULTS.md
 
 # Scratch / debug artefacts left by local investigation
 *.txt

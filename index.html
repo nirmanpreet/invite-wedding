@@ -202,7 +202,9 @@
   </div>
 
   <!-- Hidden PDF card -->
-  <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Arvo', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
+  <!-- Rendering template for the downloadable PDF. Off-screen, and hidden
+       from assistive tech: it is captured by html2canvas, never read. -->
+  <div id="pdf-card" class="pdf-card" aria-hidden="true" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Arvo', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
     <div style="text-align:center;">
       <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
       <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
