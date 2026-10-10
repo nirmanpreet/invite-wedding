@@ -212,10 +212,43 @@
       }
       footerEl.innerHTML = contactLine;
     }
-    var actionsEl = document.getElementById('invite-actions');
+    /* Which platform are we on, for choosing a button label. Only three
+       buckets, because only three things actually differ:
+         ios      iPhone / iPad - webcal:// and Apple Maps both work
+         android  any Android, Samsung Internet included
+         other    desktop, in-app browsers, anything unrecognised
+
+       Samsung is deliberately NOT its own bucket. Samsung Internet is a
+       Chromium browser on Android, not a platform with its own calendar or
+       maps app: it does not implement webcal://, it does not implement the
+       intent:// scheme (Samsung's own public tracker request for it is
+       still open), and its maps is still Google Maps. Splitting it out
+       would mean a button that behaves identically to the Android one
+       under a name that implies it does something different. */
+  function platformKind() {
+    var ua = navigator.userAgent || '';
+    if (isIOS()) return 'ios';
+    if (/Android/i.test(ua)) return 'android';
+    return 'other';
+  }
+
+  /* Label the venue button for the map app that will actually open.
+       The URL never changes: the https Google Maps directions link is
+       registered as an Android App Link, so Android and Samsung hand it
+       straight to Google Maps, and iOS opens Apple Maps. The one approach
+       that would NOT work is a geo: URI - Chrome does not register a
+       handler for it and silently renders an error page instead. */
+  function venueBtnLabel() {
+    var kind = platformKind();
+    if (kind === 'android') return t('venueBtnAndroid') || t('venueBtn') || 'OPEN IN GOOGLE MAPS';
+    if (kind === 'ios') return t('venueBtnIos') || t('venueBtn') || 'OPEN IN APPLE MAPS';
+    return t('venueBtn') || 'SEE THE VENUE';
+  }
+
+  var actionsEl = document.getElementById('invite-actions');
     if (actionsEl) {
       actionsEl.innerHTML =
-        '<a href="' + esc(mapUrl) + '" target="_blank" rel="noopener"><div class="venue">' + esc(t('venueBtn') || 'SEE THE VENUE') + '</div></a>' +
+        '<a href="' + esc(mapUrl) + '" target="_blank" rel="noopener"><div class="venue">' + esc(venueBtnLabel()) + '</div></a>' +
         '<button id="download-pdf" class="venue" type="button">' + esc(t('downloadBtn') || 'DOWNLOAD INVITATION CARD') + '</button>';
       var btn = document.getElementById('download-pdf');
       if (btn) btn.addEventListener('click', onDownloadPdfClick);
@@ -300,9 +333,13 @@
     var sendLbl = isPa
       ? (rsvpForm.submitLabelPa || 'Send RSVP via WhatsApp')
       : (rsvpForm.submitLabelEn || 'Send RSVP via WhatsApp');
+    /* Punjabi does NOT fall back to noteEn. config.rsvp.notePa is
+       deliberately empty - see _notePaWhy in data/config.json - so the
+       old `notePa || noteEn` would have printed the English sentence under
+       the Punjabi form, which is exactly the line the guest should not see. */
     var noteTxt = isPa
-      ? (rsvpForm.notePa || rsvpForm.noteEn || '')
-      : (rsvpForm.noteEn || rsvpForm.notePa || '');
+      ? (rsvpForm.notePa || '')
+      : (rsvpForm.noteEn || '');
     var attendLbl = isPa
       ? (rsvpForm.attendLabelPa || '\u0A15\u0A40 \u0A24\u0A41\u0A38\u0A40\u0A02 \u0A06\u0A09\u0A23\u0A17\u0A47?')
       : (rsvpForm.attendLabelEn || 'Will you be there?');

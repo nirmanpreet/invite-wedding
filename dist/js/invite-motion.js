@@ -90,11 +90,18 @@
   // sw = sway px, op = opacity, wx = sideways drift px, k = species pool
   // Mogra-dominant across all three layers, with roses and marigold
   // accents; the larger lotus shape only appears in the near layer.
+  //
+  // Denser and rosier than the first pass (20 on a phone, 26 on desktop).
+  // Phone is now 28 and desktop 36, and the rose share of each pool is
+  // roughly doubled - far 20%->33%, mid 40%->50%, near 50%->60% - so the
+  // shower reads as mogra and rose rather than mogra and gold. Still cheap:
+  // every flower is one element with a CSS transform animation, no
+  // per-frame JS, so the count costs paint, not main-thread time.
   // ==============================================================
   var LAYERS = [
-    { name: 'far',  n: [9, 12], s: [12, 20], d: [26, 34], sw: [10, 24], op: 0.42, wx: 0,       k: ['j', 'j', 'm', 'g', 'r3'] },
-    { name: 'mid',  n: [7, 9],  s: [20, 32], d: [17, 24], sw: [18, 38], op: 0.68, wx: 0,       k: ['j', 'j', 'r2', 'r3', 'm'] },
-    { name: 'near', n: [4, 5],  s: [30, 46], d: [11, 17], sw: [30, 60], op: 0.92, wx: [10, 40], k: ['j', 'r1', 'r2', 'l'] }
+    { name: 'far',  n: [12, 16], s: [12, 20], d: [26, 34], sw: [10, 24], op: 0.42, wx: 0,       k: ['j', 'j', 'm', 'g', 'r3', 'r3'] },
+    { name: 'mid',  n: [10, 13], s: [20, 32], d: [17, 24], sw: [18, 38], op: 0.68, wx: 0,       k: ['j', 'j', 'r2', 'r3', 'm', 'r2'] },
+    { name: 'near', n: [6, 7],   s: [30, 46], d: [11, 17], sw: [30, 60], op: 0.92, wx: [10, 40], k: ['j', 'r1', 'r2', 'r2', 'l'] }
   ];
 
   function R(a, b) { return a + Math.random() * (b - a); }

@@ -326,7 +326,13 @@ html[lang="pa"] .title h1 {
   margin: 20px auto 0;
   letter-spacing: 0.4px;
 }
-.title { margin-bottom: 8px; }
+/* flow-root so the names' own margin-top cannot collapse out of .title.
+   Without it the same CSS produced a 34px gap above the names in English
+   and only 20px in Punjabi, and the artwork's gold frame - which extends
+   14px below the art - landed 6px from "Nirman" on an iPhone in Punjabi.
+   A layout that silently differs by language is a layout that will break
+   again the next time the artwork is resized. */
+.title { margin-bottom: 8px; display: flow-root; }
 .date, .place {
   color: var(--highlight);
   font-weight: 600;
@@ -1357,10 +1363,16 @@ html[lang="pa"] #print-invite {
     content: "";
     position: absolute;
     left: 50%;
-    top: 50%;
+    /* A FIXED bleed rather than a percentage of the box height. At 122-132%
+       the frame grew with the artwork, and once the art grew to 34vh its
+       bottom border ran straight through "Nirman" (measured 390x844: frame
+       bottom 714px, top of Nirman 694px - a 1px gold line across the name).
+       A constant inset cannot outgrow the gap between art and name, so the
+       frame stays a mount instead of becoming a mistake. */
+    top: -14px;
+    bottom: -14px;
     width: min(118%, 97vw);
-    height: 122%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     border: 1px solid rgba(198, 160, 90, 0.34);
     border-radius: 2px;
     pointer-events: none;
@@ -1370,7 +1382,7 @@ html[lang="pa"] #print-invite {
   .ceremony-image picture { position: relative; z-index: 1; }
 
   @media (max-width: 420px) {
-    .ceremony-image::after { width: min(126%, 97vw); height: 132%; }
+    .ceremony-image::after { width: min(126%, 97vw); }
   }
 
   /* ---- 3. Section dividers -------------------------------------
