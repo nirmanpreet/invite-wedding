@@ -143,6 +143,7 @@
       "_comment": "Extra UI strings used by RSVP form, day info, print, and calendar features.",
       "en": {
         "dayInfoTitle": "Wedding Reception at a glance",
+        "quickActions": "Quick actions",
         "dayInfoDate": "Date",
         "dayInfoTime": "Time",
         "dayInfoVenue": "Venue",
@@ -182,6 +183,7 @@
       },
       "pa": {
         "dayInfoTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
+        "quickActions": "ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ",
         "dayInfoDate": "ਤਾਰੀਖ਼",
         "dayInfoTime": "ਸਮਾਂ",
         "dayInfoVenue": "ਸਥਾਨ",

@@ -147,3 +147,53 @@ input[type=text],input[type=number],select,textarea{width:100%;min-height:48px;p
   opacity:1;transform:none;animation:none;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .intro-gate .card::before{top:14px}
 .intro-gate .card::after{bottom:14px}
+
+/* 12. PHASE 2 GLUE: hero composition + card rhythm -------------------
+   The hero is the whole first screen: arch art, ੴ, blessing, the
+   invitation sentence, the names and the date badge. Sizes are capped
+   so 360x640 needs no scrolling to feel complete. */
+.hero{padding:24px 8px 28px}
+.hero .ceremony-image.arch{width:min(300px,74vw);margin:0 auto 10px;padding:10px 10px 0;
+  background:linear-gradient(180deg,rgba(255,253,247,.92),rgba(255,250,246,.7));
+  border:1px solid rgba(200,162,75,.55);border-bottom:0;
+  border-radius:150px 150px 18px 18px;box-shadow:var(--shadow-sm)}
+.hero .ceremony-image.arch::before{display:none}          /* the arch frame replaces the old aura */
+.hero .ceremony-image.arch img{max-height:190px;opacity:1}
+.hero .blessing-block{margin:2px 0 4px;max-width:34em}
+.hero .blessing-text{font-family:var(--font-gurmukhi);font-size:clamp(13px,3.7vw,16px);line-height:1.85;color:var(--maroon-d);letter-spacing:normal}
+.hero .meta{margin:.35em 0;max-width:30em;line-height:1.5}
+.hero .title h1{font-size:clamp(42px,12.5vw,68px);margin:6px 0 0}
+.hero .title .amp-title{font-size:clamp(22px,6.4vw,32px)}
+.hero .title p{font-size:clamp(14px,3.9vw,17px);margin-top:12px;line-height:1.6}
+.hero .date-badge{margin-top:10px}
+.hero .date-badge b{font-size:clamp(34px,10vw,44px)}
+.hero .date-badge span{font-size:12px}
+
+/* Gurmukhi runs anywhere in the hero need the Gurmukhi face + no tracking */
+html[lang="pa"] .hero .meta,
+html[lang="pa"] .hero .date-badge span,
+html[lang="pa"] .hero .date-badge b{font-family:var(--font-gurmukhi);letter-spacing:normal}
+html[lang="pa"] .hero .meta{line-height:1.8}
+
+/* Phones: keep the whole first screen readable without scrolling */
+@media (max-width:380px){
+  .hero .ceremony-image.arch{width:min(230px,62vw);padding:8px 8px 0}
+  .hero .ceremony-image.arch img{max-height:148px}
+  .hero{padding:18px 6px 22px}
+}
+@media (max-height:700px) and (max-width:520px){
+  .hero .ceremony-image.arch{width:min(190px,52vw);margin-bottom:6px}
+  .hero .ceremony-image.arch img{max-height:120px}
+}
+
+/* Cards: an empty container (feature toggled off in config) must never
+   leave a blank ivory panel with a gold border on the page. */
+.card:empty,.stack>.card:empty{display:none}
+.actions:empty,#invite-footer:empty,#photos:empty{display:none}
+.stack{gap:24px}
+#invite-footer,.lang-toggle{margin-top:4px}
+
+/* The QR tables are the one place a dense grid is intentional; keep them
+   inside the card on a 320px phone. */
+.card .qr-wrap{max-width:100%;overflow:hidden}
+.card .qr-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}

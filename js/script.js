@@ -179,6 +179,21 @@
         '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
+    /* Phase 2 (hero): the invitation sentence sits under the blessing.
+       Both strings already exist in config (i18n.{en,pa}.pdfSubtext) -
+       nothing new was invented. */
+    var lineEl = document.getElementById('invite-line');
+    if (lineEl) {
+      lineEl.textContent = t('pdfSubtext') || 'With the blessings of Waheguru, you are cordially invited to the Reception of';
+    }
+    /* Phase 2 (hero): the date badge (day number + month/year), built from
+       the localised date string so PA reads "6 ਦਸੰਬਰ 2026". */
+    var badgeEl = document.getElementById('hero-date');
+    if (badgeEl) {
+      var dParts = dateText().split(/\s+/);
+      var monthYear = dParts.length > 1 ? dParts.slice(1).join(' ') : dateText();
+      badgeEl.innerHTML = '<b>' + esc(eventDate.getDate()) + '</b><span>' + esc(monthYear) + '</span>';
+    }
     // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
@@ -187,14 +202,19 @@
       if (blessingText === '' || blessingText === undefined || blessingText === null) {
         blessingText = footerMsg;
       }
+      /* Phase 2: the hero renders its own large ੴ, and the English footerNote
+         carries a trailing "— With the blessings..." sentence that now lives in
+         #invite-line. So the blessing block shows the Gurbani lines only -
+         the same three lines in both languages, spelling untouched. */
+      blessingText = String(blessingText).split('\u2014')[0];
       // Convert newlines to <br> for HTML rendering, then escape
       // We replace \n with a placeholder, escape, then restore <br>
       blessingText = blessingText.replace(/\n/g, '\u0001');
       blessingText = esc(blessingText);
       blessingText = blessingText.replace(/\u0001/g, '<br>');
-      blessingEl.innerHTML =
-        '<span class="ik" aria-hidden="true">ੴ</span>' +
-        '<div class="blessing-text">' + blessingText + '</div>';
+      // No inline <span class="ik">: the static hero ੴ (aria-hidden) is the
+      // only Ik Onkar on screen - sacred text is never duplicated.
+      blessingEl.innerHTML = '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
     var footerEl = document.getElementById('invite-footer');
@@ -215,11 +235,18 @@
     }
     var actionsEl = document.getElementById('invite-actions');
     if (actionsEl) {
+      // Phase 2: the two CTAs use the design system's .btn classes (48px
+      // tap targets). The old .actions .venue rules were removed from
+      // style.css rather than left to fight the new ones.
       actionsEl.innerHTML =
-        '<a href="' + esc(mapUrl) + '" target="_blank" rel="noopener"><div class="venue">' + esc(t('venueBtn') || 'SEE THE VENUE') + '</div></a>' +
-        '<button id="download-pdf" class="venue" type="button">' + esc(t('downloadBtn') || 'DOWNLOAD INVITATION CARD') + '</button>';
+        '<a class="btn" href="' + esc(mapUrl) + '" target="_blank" rel="noopener">' + esc(t('venueBtn') || 'SEE THE VENUE') + '</a>' +
+        '<button id="download-pdf" class="btn ghost" type="button">' + esc(t('downloadBtn') || 'DOWNLOAD INVITATION CARD') + '</button>';
       var btn = document.getElementById('download-pdf');
       if (btn) btn.addEventListener('click', onDownloadPdfClick);
+      // Screen-reader-only heading for the actions card, localised from
+      // existing _extra strings (new key `quickActions`, see config).
+      var actHeading = document.getElementById('h-actions');
+      if (actHeading) actHeading.textContent = txOr('quickActions', 'Quick actions');
     }
     var socialEl = document.getElementById('invite-social');
     if (socialEl) {
@@ -244,7 +271,7 @@
     var heading = tx('receptionHeading', 'Reception');
     var items = '';
     el.innerHTML =
-      '<h2>' + esc(heading) + '</h2>' +
+      '<h2 id="day-info-heading">' + esc(heading) + '</h2>' +
       '<div class="day-grid">' + items +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(dateText()) + '</div></div>' +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(timeText() || '-') + '</div></div>' +
@@ -318,7 +345,7 @@
       ? '<div class="rsvp-by">' + esc(rsvpByName) + '</div>' : '';
 
     el.innerHTML =
-      '<h2>' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h2>' + rsvpBy +
+      '<h2 id="rsvp-heading">' + esc(isPa ? G.headRsvpPa : (t('rsvpTitle') || 'RSVP')) + '</h2>' + rsvpBy +
       (formEnabled
         ? '<label class="sr-only" for="rsvp-name">' + esc(namePh) + '</label>' +
           '<input id="rsvp-name" type="text" placeholder="' + esc(namePh) + '" autocomplete="name">' +
@@ -415,6 +442,9 @@
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" title="' + esc(frameTitle) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
+    // The section is a <section> with no heading (an iframe + label); give
+    // it an accessible name instead of an aria-labelledby pointing nowhere.
+    el.setAttribute('aria-label', (venueName || 'Venue') + ' map');
   }
 
   // ---------- Calendar (.ics) ----------
@@ -591,7 +621,7 @@
 
     // Live page: real <table> QRs, each wrapped in a clickable link.
     el.innerHTML =
-      '<h2>' + title + '</h2>' +
+      '<h2 id="qr-heading">' + title + '</h2>' +
       '<div class="qr-grid">' +
         '<div class="qr-item">' + qrTableHtml(q1, cellPx, targetN, 'map') +
           '<div class="qr-label">' + mapLbl + '</div></div>' +
@@ -795,7 +825,7 @@
     var icsData = buildIcsHref();
     el.innerHTML =
       '<a class="save-date" id="save-date-link" href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' +
-        '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
+        '<div class="sd-title" id="sd-title-heading">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
         '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +

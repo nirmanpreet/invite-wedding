@@ -43,9 +43,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/style.css">
-  <!-- Design system + motion (pets, cards, dock). Loaded AFTER style.css so its
-       tokens win; conflicting old rules were removed from style.css, not
-       overridden with !important. -->
+  <!-- Design system + motion (cards, dock, petals, reveal). Loaded AFTER
+       style.css so its tokens win; conflicting old rules were removed from
+       style.css, not overridden with !important. -->
   <link rel="stylesheet" href="./css/invite-motion.css">
 
   <!-- GSAP removed: reveals are CSS + IntersectionObserver in script.js -->
@@ -72,7 +72,9 @@
 </head>
 <body class="soft-gradient">
 
-  <!-- Intro gate: simple first-visit language pick -->
+  <!-- Intro gate: simple first-visit language pick. Unchanged by design
+       (Phase 0 decision): it is its own full-screen layer and no new motion
+       runs on it. -->
   <div class="intro-gate" id="intro-gate">
     <div class="card">
       <div class="ik" aria-hidden="true">ੴ</div>
@@ -91,10 +93,10 @@
     </div>
   </div>
 
-  <!-- Petals -->
+  <!-- Petals: old tsParticles host, removed in Phase 3 -->
   <div class="sakura-falling" id="sakura-falling"></div>
 
-  <!-- Royal ornament frame -->
+  <!-- Royal ornament frame (scaled in by .corner in Phase 4) -->
   <div class="royal-frame" aria-hidden="true">
     <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
     <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
@@ -102,47 +104,78 @@
     <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
   </div>
 
-  <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
-  <main id="invite-main">
-  <div class="blessing" id="invite-blessing"></div>
-
-  <div class="ornament" aria-hidden="true">
-    <img src="assets/svg/divider-ornament.svg" alt="">
-  </div>
-
-  <!-- Anand Karaj ceremonial art, straight after the blessing.
-       <picture> because this is the page's likely LCP element: at 1216px the
-       PNG is 1.36 MB, while the same resolution as WebP is 268 KB. The 900px
-       PNG is only ever fetched by a browser with no WebP support, since a
-       browser picks one source and ignores the other. -->
-  <div class="ceremony-image" aria-hidden="true">
-    <picture>
-      <source type="image/webp" srcset="assets/img/anand-karaj.webp">
-      <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
-    </picture>
-  </div>
-
   <!-- Print-only header -->
   <div id="print-header" class="print-header"></div>
 
-  <div class="wrap">
-    <div class="title" id="invite-title"></div>
+  <div class="page">
+    <!-- ================= FIRST SCREEN ================= -->
+    <header class="hero intro">
+
+      <!-- Anand Karaj ceremonial art, framed as an arch. Still a real <img>
+           (never background-attachment) so it is the LCP element and keeps
+           its width/height: no layout shift. -->
+      <div class="ceremony-image arch" aria-hidden="true" style="--i:0">
+        <picture>
+          <source type="image/webp" srcset="assets/img/anand-karaj.webp">
+          <img src="assets/img/anand-karaj-fallback.png" alt="" width="1216" height="1216" loading="eager" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
+
+      <!-- Ik Onkar: never animated, recoloured or stretched (soft glow only) -->
+      <div class="ik gurmukhi" lang="pa" aria-hidden="true" style="--i:1">ੴ</div>
+
+      <!-- Blessing: Gurbani lines only, rendered by script.js from config -->
+      <div class="blessing-block gurmukhi" lang="pa" id="invite-blessing" style="--i:2"></div>
+
+      <!-- Invitation sentence, localised by script.js from existing i18n
+           strings (i18n.{en,pa}.pdfSubtext) - no new copy invented -->
+      <p class="meta" id="invite-line" style="--i:3">With the blessings of Waheguru, you are cordially invited to the Reception of</p>
+
+      <div class="wrap">
+        <div class="title" id="invite-title" style="--i:4"></div>
+      </div>
+
+      <div class="date-badge pop" id="hero-date" style="--i:5" aria-hidden="true"></div>
+    </header>
+
+    <!-- ================= CARDS ================= -->
+    <main id="invite-main" class="stack stagger">
+
+      <!-- Reception at a glance (Date / Time / Venue) — keeps the #day-info
+           id script.js renders into (Phase 0 decision: one card, no dupes) -->
+      <section class="card reveal scale" id="day-info" aria-labelledby="day-info-heading"></section>
+
+      <!-- Save the Date: same .ics as the calendar action -->
+      <section class="card reveal" id="time" aria-labelledby="sd-title-heading"></section>
+
+      <!-- Directions + calendar + download card -->
+      <section class="card reveal right" aria-labelledby="h-actions">
+        <h2 id="h-actions" class="sr-only">Quick actions</h2>
+        <div class="actions btn-row" id="invite-actions"></div>
+      </section>
+
+      <div class="divider reveal" aria-hidden="true"></div>
+
+      <!-- QR codes -->
+      <section class="card reveal left" id="qr-section" aria-labelledby="qr-heading"></section>
+
+      <!-- RSVP -->
+      <section class="card reveal scale" id="rsvp-section" aria-labelledby="rsvp-heading"></section>
+
+      <div class="divider reveal" aria-hidden="true"></div>
+
+      <!-- Venue map -->
+      <section class="card reveal" id="venue-map-embed"></section>
+
+      <!-- Print -->
+      <section class="card reveal" id="print-section"></section>
+
+      <p class="footer" id="invite-footer"></p>
+      <div class="lang-toggle" id="lang-toggle"></div>
+      <div id="photos" class="photos"></div>
+      <p class="happiness" id="invite-social"></p>
+    </main>
   </div>
-
-  <div id="time"></div>
-  <p class="dance-med" id="dance-med">Reception</p>
-
-  <div class="actions" id="invite-actions"></div>
-  <p class="footer" id="invite-footer"></p>
-  <div class="lang-toggle" id="lang-toggle"></div>
-  <div id="day-info" class="day-info"></div>
-  <div id="qr-section" class="qr-section"></div>
-  <div id="photos" class="photos"></div>
-  <div id="rsvp-section" class="rsvp-section"></div>
-  <div id="venue-map-embed" class="venue-map-embed"></div>
-  <div id="print-section" class="print-section"></div>
-  <p class="happiness" id="invite-social"></p>
-  </main>
 
   <div class="music" id="music-container" style="display:none;">
     <audio src="" id="my_audio" loop="loop"></audio>
