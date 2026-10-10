@@ -15,3 +15,14 @@ serve.log
 # assets/img/anand-karaj.jpg; this root-level duplicate is byte-identical
 # (md5 2d0b3f26df5a09aaf365f1842303d4d2) and is not worth 264 KB in history.
 new.jpg
+
+# Local QA harness (Playwright screenshots, Chrome profiles, scratch scripts)
+qa/*
+!qa/INVENTORY.md
+
+# Scratch / debug artefacts left by local investigation
+*.txt
+!PUNJABI_TRANSLATIONS.txt
+curl_output.html
+debug.txt
+tools/fix_json.py
