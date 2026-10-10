@@ -169,6 +169,24 @@
     text-transform: uppercase;
     color: rgba(138,106,74,0.85);
   }
+
+  /* ---- floating flowers (static) --------------------------------
+     The same mogra / rose / marigold shapes and the same antique-gold
+     palette as the live shower in js/invite-motion.js, so the share card
+     and the invitation look like one design. Frozen (this is a
+     screenshot, not the page) and kept out in the margins: every flower
+     sits left of x=120, right of x=1080, or above y=70 / below y=540,
+     well clear of the copy down the middle. Opacity stays low so the
+     card is still legible at thumbnail size. */
+  .flowers { position: absolute; inset: 0; pointer-events: none; }
+  .flowers i {
+    position: absolute;
+    display: block;
+    width: var(--s); height: var(--s);
+    background: center / contain no-repeat;
+    opacity: var(--op);
+    transform: rotate(var(--rot));
+  }
 </style>
 </head>
 <body>
@@ -193,10 +211,67 @@
   </div>
 
   <div class="domain" id="domain"></div>
+  <div class="flowers" id="flowers" aria-hidden="true"></div>
 
 <script>
 /* Copy is injected by tools/make-og.js from data/config.json. */
   window.__OG__ = { gurbani: ['', ''], p1: '', p2: '', connector: '&', date: '', time: '', venue: '', domain: '' };
+
+  /* Flower art, identical to the SVG paths in js/invite-motion.js so the
+     share card and the live shower share one set of shapes. */
+  function svg(vb, body) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '">' + body + '</svg>';
+  }
+  function grad(a, b) {
+    return '<defs><radialGradient id="g" cx=".35" cy=".3" r=".85">' +
+      '<stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/>' +
+      '</radialGradient></defs>';
+  }
+  function ring(n, off, rx, ry, attr) {
+    var o = '';
+    for (var k = 0; k < n; k++) {
+      o += '<ellipse cx="24" cy="' + (24 - off) + '" rx="' + rx + '" ry="' + ry +
+        '" transform="rotate(' + (k * 360 / n) + ' 24 24)" ' + attr + '/>';
+    }
+    return o;
+  }
+  var ROSE = 'M20 5C16 1 8 6 5 16C1 28 7 44 20 46C33 44 39 28 35 16C32 6 24 1 20 5Z';
+  var MARI = 'M20 2C31 10 33 30 20 46C7 30 9 10 20 2Z';
+  var SHAPE = {
+    mogra: svg('0 0 48 48', ring(5, 10, 8, 13, 'fill="#fffdf6" stroke="#e3d5b3" stroke-width=".7"') +
+      '<circle cx="24" cy="24" r="3.5" fill="#dfae3a"/>'),
+    rose: svg('0 0 40 48', grad('#e5a9b8', '#a4243b') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
+    roseDeep: svg('0 0 40 48', grad('#b23a58', '#6d1a2d') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
+    marigold: svg('0 0 48 48', ring(12, 11, 5, 11, 'fill="#c8a24b"') +
+      ring(8, 7, 4, 8, 'fill="#e5c46d"') + '<circle cx="24" cy="24" r="4" fill="#7a5c22"/>'),
+    petal: svg('0 0 40 48', grad('#e5c46d', '#a8812e') + '<path d="' + MARI + '" fill="url(#g)"/>')
+  };
+  /* x, y, size, rotation, opacity - all in the outer margins. */
+  var PLACE = [
+    ['mogra',    62,  54, 46,  -12, 0.34],
+    ['petal',    38, 150, 30,   22, 0.26],
+    ['rose',   1046,  66, 38,   14, 0.30],
+    ['marigold', 58, 470, 34,   -8, 0.26],
+    ['mogra',  1088, 486, 42,   16, 0.32],
+    ['petal',  1148, 300, 26,   34, 0.20],
+    ['roseDeep',300,  28, 26,   -24, 0.22],
+    ['mogra',   856, 566, 28,   28, 0.22]
+  ];
+  (function () {
+    var box = document.getElementById('flowers');
+    PLACE.forEach(function (p) {
+      var el = document.createElement('i');
+      el.style.left = p[1] + 'px';
+      el.style.top = p[2] + 'px';
+      el.style.setProperty('--s', p[3] + 'px');
+      el.style.setProperty('--rot', p[4] + 'deg');
+      el.style.setProperty('--op', p[5]);
+      el.style.backgroundImage = 'url("data:image/svg+xml,' +
+        encodeURIComponent(SHAPE[p[0]]) + '")';
+      box.appendChild(el);
+    });
+  })();
+
   function paint() {
     var o = window.__OG__;
     document.getElementById('gurbani').innerHTML = o.gurbani[0] + '<br>' + o.gurbani[1];

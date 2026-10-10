@@ -325,6 +325,18 @@ if (fs.existsSync(manifestSrc)) {
 }
 const iconDist = path.join(DIST, 'assets');
 fs.mkdirSync(iconDist, { recursive: true });
+
+/* Wipe the two directories this build owns before repopulating them.
+   Without this, an asset deleted from assets/ lingers in dist/ forever
+   and still gets deployed - which is how rose-petal.svg and a long-dead
+   anand-karaj.svg survived several builds. Only these two fully-derived
+   directories are touched; dist/index.html and dist/js are overwritten
+   in place rather than removed. */
+[path.join(iconDist, 'svg'), path.join(iconDist, 'img')].forEach(function (dir) {
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+});
+
 const iconSrc = path.join(ROOT, 'assets/icon.svg');
 if (fs.existsSync(iconSrc)) {
   fs.copyFileSync(iconSrc, path.join(iconDist, 'icon.svg'));
@@ -336,7 +348,7 @@ const ornamentSrc = path.join(ROOT, 'assets/svg/ornament.svg');
 if (fs.existsSync(ornamentSrc)) {
   fs.copyFileSync(ornamentSrc, path.join(svgDist, 'ornament.svg'));
 }
-['corner-ornament.svg', 'divider-ornament.svg', 'rose-petal.svg'].forEach(function (f) {
+['corner-ornament.svg', 'divider-ornament.svg'].forEach(function (f) {
   const s = path.join(ROOT, 'assets/svg', f);
   if (fs.existsSync(s)) fs.copyFileSync(s, path.join(svgDist, f));
 });

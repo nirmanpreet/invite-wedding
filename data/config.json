@@ -46,11 +46,12 @@
     "venueMapShort": "https://maps.app.goo.gl/26iQc7kQhKJ8boDE6"
   },
   "music": {
-    "_comment": "Played only after the guest's first language tap. Non-sacred instrumental. Copy music.mp3 into dist/ when building (build.js does this).",
+    "_comment": "Played only after the guest's first language tap. Non-sacred instrumental. build.js copies the track into dist/; without it the deployed site has no audio.",
     "enabled": true,
     "src": "./music.mp3"
   },
   "images": {
+    "_comment": "Unused. Nothing in the code reads config.images; the floral corner PNGs it referred to have been deleted. The live ornaments are assets/svg/corner-ornament.svg, referenced directly from index.html.",
     "topRight": "",
     "topLeft": ""
   },
@@ -150,8 +151,6 @@
         "dayInfoContact": "Contact",
         "rsvpErrorName": "Please enter your name.",
         "rsvpErrorAttend": "Please tap Yes or No so we know.",
-        "petalToggleOn": "Petals: on",
-        "petalToggleOff": "Petals: off",
         "printLabel": "Print this invitation",
         "calendarLabel": "Add to calendar",
         "calendarNote": "Opens your calendar app with the Wedding Reception event pre-filled.",
@@ -189,8 +188,6 @@
         "dayInfoContact": "ਸੰਪਰਕ",
         "rsvpErrorName": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਨਾਮ ਲਿਖੋ।",
         "rsvpErrorAttend": "ਹਾਂ ਜਾਂ ਨਹੀਂ ਚੁਣੋ ਤਾਂ ਜੋ ਸਾਨੂੰ ਪਤਾ ਲੱਗੇ।",
-        "petalToggleOn": "ਪੰਜੀਆ: ਚਾਲੂ",
-        "petalToggleOff": "ਪੰਜੀਆ: ਬੰਦ",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
         "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
