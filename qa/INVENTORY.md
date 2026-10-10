@@ -168,7 +168,7 @@ First load (dev): HTML + style.css + script.js + qrcode + fonts ≈ 120–140 KB
 
 - Couple: **Nirman ਨਿਰਮਾਣ** & **Simran ਸਿਮਰਨ**
 - Event: Wedding Reception, **Sunday 6 December 2026**, **"10:00 AM onwards"**, **Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India (IST)**, coords 30.220481, 74.472704
-- **⚑ FLAG (do not change):** the printed card says **12:00 pm**; the site says **10:00 AM onwards**. Reported here only, per instructions.
+- **⚑ FLAG RESOLVED (10 Oct 2026, owner confirmed):** **10:00 AM onwards** is correct. The printed card's 12:00 pm is the outlier. Verified: no `12:00` anywhere in `index.html`, `js/script.js`, `data/config.json`, `css/` or `dist/`; every surface reads 10:00 (EN `10:00 AM onwards`, PA `ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ`, JSON-LD `2026-12-06T10:00:00+05:30`, countdown target). The `.ics` is deliberately all-day, so no calendar surface can disagree. If the printed cards are ever reprinted, they should say 10:00 AM.
 - Contact **+61 423 594 009** (WhatsApp RSVP number `61423594009`), second number **+91 78884 79610**
 - RSVP by **22 November 2026**
 - Names in Gurmukhi: **ਨਿਰਮਾਣ** and **ਸਿਮਰਨ**
