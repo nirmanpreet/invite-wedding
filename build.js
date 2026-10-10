@@ -125,6 +125,9 @@ const html = `<!DOCTYPE html>
 
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Font preloads were tried here and removed on the evidence: an A/B over
+       three alternating Lighthouse runs on a throttled phone gave LCP 6.54s
+       WITH them and 5.70s WITHOUT. See index.html for the full note. -->
   <!-- Prefetch/preconnect: the share preview and first paint both depend on
        these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show nothing.
        The artwork is preloaded as the likely LCP element; the <picture> on the
@@ -174,8 +177,8 @@ ${qrLib}
           <div class="ik" aria-hidden="true">ੴ</div>
           <div class="gate-blessing">
             ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
-            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥<br>
-            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
+            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥ਕਰਾਈ ।
           </div>
           <div class="gate-names">${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</div>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
@@ -194,10 +197,10 @@ ${qrLib}
 
       <!-- Royal ornament frame -->
       <div class="royal-frame" aria-hidden="true">
-        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
       </div>
 
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
@@ -205,7 +208,7 @@ ${qrLib}
       <div class="blessing" id="invite-blessing"></div>
 
       <div class="ornament" aria-hidden="true">
-        <img src="assets/svg/divider-ornament.svg" alt="">
+        <img src="assets/svg/divider-ornament.svg" alt="" width="300" height="40" style="aspect-ratio:300/40">
       </div>
 
       <!-- Anand Karaj ceremonial art, straight after the blessing.
@@ -228,6 +231,7 @@ ${qrLib}
       </div>
 
       <div id="time"></div>
+      <div id="calendar-section" class="calendar-section"></div>
       <p class="dance-med" id="dance-med">${esc(extraEn.receptionHeading || 'Reception')}</p>
 
       <div class="actions" id="invite-actions"></div>
@@ -249,27 +253,36 @@ ${qrLib}
         <audio src="" id="my_audio" loop="loop" preload="none"></audio>
       </div>
 
-      <!-- Hidden PDF card -->
-
-      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
+      <!-- Hidden PDF card. Portrait (was 700px landscape) so the Anand Karaj
+           artwork has room without the card becoming a letterboxed strip.
+           Must stay in step with index.html - same ids, same inline styles. -->
+      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
-ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।</div>
-          <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;" id="pdf-name-1">${esc(p1)}</div>
-          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;" id="pdf-connector">${esc(connector)}</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;" id="pdf-name-2">${esc(p2)}</div>
-          <div style="font-size:15px; letter-spacing:2px; color:#a4813a; margin-bottom:12px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-venue-line">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
+          <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
+          <!-- The Anand Karaj artwork, which the old card left out entirely.
+               No crossorigin attribute: it would cache separately from the
+               same file the page loads and download it twice. See index.html. -->
+          <div style="margin:2px auto 14px; width:300px;">
+            <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+          </div>
+          <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
+          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">${esc(p1)}</div>
+          <div style="font-size:20px; color:#8c6623; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
+          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">${esc(p2)}</div>
+          <div style="font-size:14px; letter-spacing:2px; color:#85682c; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
+          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
+          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
           <div id="pdf-qr" class="pdf-qr"></div>
-          <div style="margin-top:26px; border-top:1px solid #e3d5b3; padding-top:14px; font-size:13px; color:#4a1220;" id="pdf-footer-note">${esc(att(config, '_pdf.footerNote', 'With love and joy, together with their families'))}</div>
-          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;" id="pdf-contact">${esc(att(config, 'footer.contact', ''))}</div>
+          <div style="margin-top:20px; border-top:1px solid #e3d5b3; padding-top:12px; font-size:13px; color:#4a1220;" id="pdf-footer-note">${esc(att(config, '_pdf.footerNote', 'With love and joy, together with their families'))}</div>
+          <div style="margin-top:5px; font-size:12px; color:#7a5c2e;" id="pdf-contact">${esc(att(config, 'footer.contact', ''))}</div>
         </div>
       </div>
 
+      <!-- The single .ics generator, shared by the page, build.js and serve.js. -->
+      <script src="./js/ics.js"></script>
       <script src="./js/script.js"></script>
       <!-- Must come after script.js: it listens for the wedding-enter event
            that script.js dispatches from enterSite(). -->
@@ -295,6 +308,9 @@ const jsDist = path.join(DIST, 'js');
 fs.mkdirSync(jsDist, { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'js/script.js'), path.join(jsDist, 'script.js'));
 
+// Shared .ics generator - loaded by the page, required by build.js.
+fs.copyFileSync(path.join(ROOT, 'js/ics.js'), path.join(jsDist, 'ics.js'));
+
 // Flower shower + the two toggles. Referenced by <script src> in the page,
 // so it ships as a file rather than being inlined.
 const motionJsSrc = path.join(ROOT, 'js/invite-motion.js');
@@ -317,6 +333,16 @@ if (musicSrc && att(config, 'music.enabled', false)) {
     console.warn('music.src points at a missing file (' + musicSrc + '); music disabled in build.');
   }
 }
+
+/* The calendar event, as a REAL file.
+   The page used to link a data:text/calendar URI. iOS cannot use those at
+   all - data: URLs crash SFSafariViewController, and in-app browsers can
+   neither open the Calendar app nor download a file - so "Add to calendar"
+   silently did nothing on the phones this invitation is actually opened on.
+   Served over HTTPS with text/calendar, iOS offers it to the Calendar app. */
+const ics = require('./js/ics.js');
+fs.writeFileSync(path.join(DIST, 'wedding.ics'), ics.buildIcs(config), 'utf8');
+console.log('  Calendar: wedding.ics');
 
 // PWA manifest + icon assets
 const manifestSrc = path.join(ROOT, 'manifest.webmanifest');

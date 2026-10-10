@@ -15,6 +15,7 @@ const MIME = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
   '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp',
   '.mp3': 'audio/mpeg', '.webmanifest': 'application/manifest+json',
+  '.ics': 'text/calendar; charset=utf-8',   // iOS needs this to offer it to Calendar
 };
 
 http.createServer((req, res) => {

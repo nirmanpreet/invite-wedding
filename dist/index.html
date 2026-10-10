@@ -32,6 +32,9 @@
 
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Font preloads were tried here and removed on the evidence: an A/B over
+       three alternating Lighthouse runs on a throttled phone gave LCP 6.54s
+       WITH them and 5.70s WITHOUT. See index.html for the full note. -->
   <!-- Prefetch/preconnect: the share preview and first paint both depend on
        these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show nothing.
        The artwork is preloaded as the likely LCP element; the <picture> on the
@@ -53,19 +56,18 @@
   --royal: #4a1220;
   --dark: #3d0d18;
   --highlight: #a4243b;
-  --gold: #c8a24b;
-  --gold-2: #a8812e;
+  --gold: #a88533;
+  --gold-2: #8c6623;
   --gold-soft: #e5c46d;
   --gold-line: #e3d5b3;
-  --gold-text: #9c7a34;
+  --gold-text: #85682c;
   --ivory: #faf6ec;
   --ivory-2: #fffdf7;
   --parchment: #f4ead4;
   --brown: #6b4f26;
   --shadow-soft: 0 10px 34px rgba(61, 13, 24, 0.10);
   --shadow-card: 0 18px 50px rgba(61, 13, 24, 0.14);
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);  --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Cormorant Garamond', 'Arvo', Georgia, serif;
   --font-script: 'Dancing Script', 'Great Vibes', cursive;
   --font-gurmukhi: 'Noto Sans Gurmukhi', 'Cormorant Garamond', serif;
@@ -1178,9 +1180,15 @@ html[lang="pa"] #print-invite {
 /* Small phones: the blessing and the couple's names must still share the
    first screen, so the art takes whatever vertical room is left over. */
 @media (max-width: 420px) {
-  .ceremony-image { width: min(344px, 92%); margin: 14px auto 24px; }
-  .ceremony-image img { max-height: 260px; }
-  .ceremony-image::before { width: min(130%, 96vw); height: 135%; }
+  /* The artwork was capped at 344px wide / 260px tall, which made the
+     Anand Karaj read as a small vignette on a phone.
+     Measured on a 390x844 viewport: at 330px tall "Simran" ended just 6px
+     above the fold, which is too tight to trust across devices and browser
+     chrome. 310px keeps both names comfortably on the first screen with
+     ~26px of headroom while still being a clear ~19% larger. */
+  .ceremony-image { width: min(430px, 96%); margin: 16px auto 26px; }
+  .ceremony-image img { max-height: 310px; }
+  .ceremony-image::before { width: min(126%, 96vw); height: 132%; }
 }
 
 /* Short screens (landscape phones, very small handsets). The names win. */
@@ -1563,6 +1571,80 @@ html.js-reveal .reveal-target.revealed {
   .intro-gate .card { animation: none; }
 }
 
+/* ---- Calendar section -----------------------------------------
+   Three ways in, because no single one works everywhere: the .ics
+   file (Android, desktop, iOS Safari standalone), a webcal:// link on
+   iOS which opens Calendar with no download step, and Google Calendar,
+   which is the only one that works inside a WhatsApp or Instagram
+   in-app browser. renderCalendarSection() emits only what applies. */
+.calendar-section {
+  position: relative;
+  z-index: 2;
+  width: min(640px, 92%);
+  margin: 22px auto;
+  padding: 26px 22px;
+  box-sizing: border-box;
+  background: rgba(255, 253, 248, 0.78);
+  border: 1px solid var(--gold-line);
+  border-radius: 3px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  text-align: center;
+}
+.calendar-section:empty { display: none; }
+.calendar-section h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(13px, 3.4vw, 15px);
+  letter-spacing: 3.6px;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  margin: 0 0 18px;
+}
+.cal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.cal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--royal);
+  font-size: 14px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+}
+.cal-btn:hover { background: rgba(200, 162, 75, 0.12); }
+.cal-note {
+  margin-top: 14px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--brown);
+  opacity: 0.9;
+}
+/* Punjabi must never be tracked or upper-cased (W3C Gurmukhi 5.1 / 6). */
+html[lang="pa"] .calendar-section h2 {
+  font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
+  letter-spacing: normal;
+  text-transform: none;
+  font-size: 16px;
+}
+html[lang="pa"] .cal-btn {
+  font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
+  letter-spacing: normal;
+  text-transform: none;
+}
+@media (forced-colors: active) {
+  .cal-btn { border: 1px solid CanvasText; }
+}
+
 /* F1 — the aura/frame used to exceed the viewport by 3–5px on phones,
    causing horizontal scroll. Overflow is clipped at the root instead of
    resizing the art (which would shift the layout). */
@@ -1829,7 +1911,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
-    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
+    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
@@ -1956,7 +2038,11 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "rsvpErrorAttend": "Please tap Yes or No so we know.",
         "printLabel": "Print this invitation",
         "calendarLabel": "Add to calendar",
-        "calendarNote": "Opens your calendar app with the Wedding Reception event pre-filled.",
+        "calendarTitle": "Add to your calendar",
+        "calendarFile": "Download .ics",
+        "calendarApple": "Add to Apple Calendar",
+        "calendarGoogle": "Add to Google Calendar",
+        "calendarNote": "Opens your calendar app with the reception already filled in.",
         "introSub": "Wedding Reception Invitation",
         "introMeaning": "One God. With Waheguru's blessings, we invite you to the Wedding Reception of Nirman & Simran.",
         "receptionHeading": "Reception",
@@ -1993,7 +2079,11 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "rsvpErrorAttend": "ਹਾਂ ਜਾਂ ਨਹੀਂ ਚੁਣੋ ਤਾਂ ਜੋ ਸਾਨੂੰ ਪਤਾ ਲੱਗੇ।",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
-        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
+        "calendarTitle": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarFile": ".ics ਡਾਊਨਲੋਡ ਕਰੋ",
+        "calendarApple": "Apple ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarGoogle": "Google ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
         "introSub": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
         "introMeaning": "ਇੱਕ ਪਰਮਾਤਮਾ। ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
         "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
@@ -2049,7 +2139,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
@@ -2069,7 +2159,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "rsvpTitle": "RSVP",
       "venueMapLabel": "ਨਕਸ਼ੇ 'ਤੇ ਸਥਾਨ ਵੇਖੋ",
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥"
     }
   },
   "datePa": "6 ਦਸੰਬਰ 2026",
@@ -2102,8 +2192,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
           <div class="ik" aria-hidden="true">ੴ</div>
           <div class="gate-blessing">
             ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
-            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥<br>
-            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
+            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥ਕਰਾਈ ।
           </div>
           <div class="gate-names">Nirman <span class="amp">&amp;</span> Simran</div>
           <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
@@ -2122,10 +2212,10 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 
       <!-- Royal ornament frame -->
       <div class="royal-frame" aria-hidden="true">
-        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
-        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+        <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+        <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
       </div>
 
       <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
@@ -2133,7 +2223,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       <div class="blessing" id="invite-blessing"></div>
 
       <div class="ornament" aria-hidden="true">
-        <img src="assets/svg/divider-ornament.svg" alt="">
+        <img src="assets/svg/divider-ornament.svg" alt="" width="300" height="40" style="aspect-ratio:300/40">
       </div>
 
       <!-- Anand Karaj ceremonial art, straight after the blessing.
@@ -2156,6 +2246,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       </div>
 
       <div id="time"></div>
+      <div id="calendar-section" class="calendar-section"></div>
       <p class="dance-med" id="dance-med">Reception</p>
 
       <div class="actions" id="invite-actions"></div>
@@ -2177,27 +2268,36 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         <audio src="" id="my_audio" loop="loop" preload="none"></audio>
       </div>
 
-      <!-- Hidden PDF card -->
-
-      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
+      <!-- Hidden PDF card. Portrait (was 700px landscape) so the Anand Karaj
+           artwork has room without the card becoming a letterboxed strip.
+           Must stay in step with index.html - same ids, same inline styles. -->
+      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
-ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।</div>
-          <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;" id="pdf-name-1">Nirman</div>
-          <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;" id="pdf-connector">&amp;</div>
-          <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;" id="pdf-name-2">Simran</div>
-          <div style="font-size:15px; letter-spacing:2px; color:#a4813a; margin-bottom:12px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-time-line">10:00 AM onwards</div>
-          <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
+          <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
+          <!-- The Anand Karaj artwork, which the old card left out entirely.
+               No crossorigin attribute: it would cache separately from the
+               same file the page loads and download it twice. See index.html. -->
+          <div style="margin:2px auto 14px; width:300px;">
+            <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+          </div>
+          <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
+          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
+          <div style="font-size:20px; color:#8c6623; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
+          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
+          <div style="font-size:14px; letter-spacing:2px; color:#85682c; margin-bottom:8px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
+          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards</div>
+          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
           <div id="pdf-qr" class="pdf-qr"></div>
-          <div style="margin-top:26px; border-top:1px solid #e3d5b3; padding-top:14px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
-          <div style="margin-top:6px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
+          <div style="margin-top:20px; border-top:1px solid #e3d5b3; padding-top:12px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
+          <div style="margin-top:5px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
         </div>
       </div>
 
+      <!-- The single .ics generator, shared by the page, build.js and serve.js. -->
+      <script src="./js/ics.js"></script>
       <script src="./js/script.js"></script>
       <!-- Must come after script.js: it listens for the wedding-enter event
            that script.js dispatches from enterSite(). -->

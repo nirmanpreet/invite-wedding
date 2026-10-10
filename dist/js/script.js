@@ -141,6 +141,7 @@
     renderRsvp();
     renderVenueMapEmbed();
     renderPrintSection();
+    renderCalendarSection();
     renderQrSection();
     updatePdfLang();
     renderLangToggle();
@@ -418,58 +419,52 @@
   }
 
   // ---------- Calendar (.ics) ----------
-  /* Build the .ics payload once, so the Save the Date card and the calendar
-     section can never disagree about the event details. */
-  function buildIcsHref() {
-    // Derive YYYYMMDD + HHMMSS from the parsed Date, not by splitting the
-    // display string. The old parser assumed "Month Day Year" but the config
-    // is "6 December 2026", so it emitted 2026120; and it read the AM/PM
-    // capture group as the hour, producing DTSTART ...TNaN0000.
-    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
-    // Day/month/year from the Date using LOCAL getters: the wedding is on
-    // 6 December 2026, and UTC getters would shift it to the 5th for
-    // anyone east of Greenwich.
-    var icsDate = eventDate.getFullYear() + pad(eventDate.getMonth() + 1) + pad(eventDate.getDate());
-    // ALL-DAY event (RFC 5545 VALUE=DATE): no time, no TZID, so every
-    // guest's calendar shows the whole of 6 December regardless of their
-    // own zone. DTEND for an all-day event is EXCLUSIVE, i.e. the next day.
-    var endDate = new Date(eventDate.getTime());
-    endDate.setDate(endDate.getDate() + 1);
-    var icsDateEnd = endDate.getFullYear() + pad(endDate.getMonth() + 1) + pad(endDate.getDate());
-    var icsContent =
-      'BEGIN:VCALENDAR\r\n' +
-      'VERSION:2.0\r\n' +
-      'PRODID:-//NirmanSimranWedding//EN\r\n' +
-      'CALSCALE:GREGORIAN\r\n' +
-      'METHOD:PUBLISH\r\n' +
-      'BEGIN:VEVENT\r\n' +
-      'UID:' + icsDate + '-nirman-simran@wedding\r\n' +
-      'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z\r\n' +
-      'SUMMARY:' + p1 + ' & ' + p2 + ' - Wedding Reception\r\n' +
-      'DTSTART;VALUE=DATE:' + icsDate + '\r\n' +
-      'DTEND;VALUE=DATE:' + icsDateEnd + '\r\n' +
-      'DESCRIPTION:Wedding Reception for ' + p1 + ' & ' + p2 + ' on ' + date + ' at ' + venueName + '\r\n' +
-      // LOCATION stays Latin: calendar apps + GPS need the ASCII address.
-      'LOCATION:' + venueName + (venueAddress ? ', ' + venueAddress : '') + '\r\n' +
-      // GEO lets a calendar app drop a pin. Read straight from config rather
-      // than via a variable that may not exist.
-      (function () {
-        var la = config.venue && config.venue.lat;
-        var ln = config.venue && config.venue.lng;
-        return (la && ln) ? 'GEO:' + la + ';' + ln + '\r\n' : '';
-      })() +
-      'STATUS:CONFIRMED\r\n' +
-      // 1-day-before reminder. TRIGGER is a negative DURATION relative to
-      // DTSTART, which is the form that survives all-day events across
-      // Google Calendar, Apple Calendar and Outlook.
-      'BEGIN:VALARM\r\n' +
-      'ACTION:DISPLAY\r\n' +
-      'DESCRIPTION:' + p1 + ' & ' + p2 + ' Wedding Reception tomorrow\r\n' +
-      'TRIGGER:-P1D\r\n' +
-      'END:VALARM\r\n' +
-      'END:VEVENT\r\n' +
-      'END:VCALENDAR';
-    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+  /* The .ics payload itself lives in js/ics.js, shared with build.js and
+     serve.js so the built file, the dev server and the page can never
+     disagree about the date.
+
+     What changed here: the Save-the-Date card used to link a
+     data:text/calendar URI. iOS does nothing useful with those - a data:
+     URL crashes SFSafariViewController, and an in-app browser can neither
+     open the Calendar app nor download a file - so "Add to calendar" was
+     a dead tap on exactly the phones this invitation is shared on. It now
+     points at a real served .ics file, and renderCalendarSection() adds the
+     two fallbacks that cover the cases a plain download misses. */
+  var ICS_FILE = './wedding.ics';
+
+  function isIOS() {
+    var ua = navigator.userAgent || '';
+    // iPadOS 13+ reports as Macintosh, so the touch-point count is the tell.
+    return /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function renderCalendarSection() {
+    var el = document.getElementById('calendar-section');
+    if (!el) return;
+    if (features.calendarIcs === false) { el.innerHTML = ''; return; }
+
+    var google = (window.WeddingICS && window.WeddingICS.googleUrl)
+      ? window.WeddingICS.googleUrl(config)
+      : '';
+    // webcal:// hands the file straight to iOS Calendar - no download step,
+    // no Safari interstitial. It is meaningless on Android and desktop, so
+    // it is only offered where it actually does something.
+    var webcal = ICS_FILE.replace(/^https?:\/\//, 'webcal://');
+    if (isIOS()) webcal = location.href.replace(/^https?:/, 'webcal:').replace(/[^/]*$/, '') + 'wedding.ics';
+
+    el.innerHTML =
+      '<h2>' + esc(txOr('calendarTitle', 'Add to your calendar')) + '</h2>' +
+      '<div class="cal-actions">' +
+        '<a class="cal-btn" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
+          esc(txOr('calendarFile', 'Download .ics')) + '</a>' +
+        (isIOS() ? '<a class="cal-btn" href="' + esc(webcal) + '">' +
+          esc(txOr('calendarApple', 'Add to Apple Calendar')) + '</a>' : '') +
+        (google ? '<a class="cal-btn" href="' + esc(google) + '" target="_blank" rel="noopener">' +
+          esc(txOr('calendarGoogle', 'Add to Google Calendar')) + '</a>' : '') +
+      '</div>' +
+      '<div class="cal-note">' + esc(txOr('calendarNote',
+        'Opens your calendar app with the reception already filled in.')) + '</div>';
   }
 
   function icsDownloadName() {
@@ -643,16 +638,18 @@
     qrPaintList.forEach(function (entry) {
       var br = entry.box.getBoundingClientRect();
       if (!br.width) return;
-      var side = entry.target * entry.cell;
-      // The QR area sits inside the box; centre it the same way the table
-      // version does (blank rows/cols around a smaller QR).
+      /* Each QR is drawn to fill its box exactly, using ITS OWN module
+         count. Previously both were drawn on a shared pitch derived from
+         targetN, which meant the map QR (fewer modules than the vCard)
+         came out visibly smaller than the contact QR beside it. Filling the
+         box makes the two identical on the card, and a QR decoder handles
+         a coarser module pitch without trouble. */
       var n = entry.qr.getModuleCount();
-      var off = Math.floor((entry.target - n) / 2);
-      var x0 = (br.left - cardRect.left) * scale + (br.width - side) * scale / 2;
-      var y0 = (br.top - cardRect.top) * scale + (br.height - side) * scale / 2;
-      var px = side * scale / entry.target;
+      var x0 = (br.left - cardRect.left) * scale;
+      var y0 = (br.top - cardRect.top) * scale;
+      var px = (br.width * scale) / n;
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(x0, y0, side * scale, side * scale);
+      ctx.fillRect(x0, y0, br.width * scale, br.height * scale);
       ctx.fillStyle = '#4a1220';
       for (var r = 0; r < n; r++) {
         var runStart = -1;
@@ -661,7 +658,7 @@
           if (dark && runStart < 0) runStart = c;
           if (!dark && runStart >= 0) {
             var w = (c - runStart) * px;
-            ctx.fillRect(x0 + (off + runStart) * px, y0 + (off + r) * px, w, px);
+            ctx.fillRect(x0 + runStart * px, y0 + r * px, w, px);
             runStart = -1;
           }
         }
@@ -747,11 +744,17 @@
         }
         return;
       }
-      html2canvas(card, { scale: 2, useCORS: true, logging: false })
+      /* scale 2 on a 560px card rasterised 1120px of mostly-flat parchment
+         and embedded it as PNG, which is why every download was 8.78 MB.
+         scale 1.5 is still comfortably above print resolution for a
+         560px card, and JPEG at 0.92 is the right format for this: it is a
+         photographic-style image with no transparency. Typical output is
+         now ~300 KB. */
+      html2canvas(card, { scale: 1.5, useCORS: true, logging: false, backgroundColor: '#faf6ec' })
         .then(function (canvas) {
           // html2canvas cannot draw the QR modules, so paint them on here.
           paintQrCodesOnto(canvas, card);
-          var imgData = canvas.toDataURL('image/png');
+          var imgData = canvas.toDataURL('image/jpeg', 0.92);
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
           var pw = pdf.internal.pageSize.getWidth();
@@ -759,7 +762,7 @@
           // Centre the card on the page; otherwise a tall A4 page leaves a
           // wide empty band under a wide, short card.
           var offY = Math.max(0, (pdf.internal.pageSize.getHeight() - ph) / 2);
-          pdf.addImage(imgData, 'PNG', 0, offY, pw, ph);
+          pdf.addImage(imgData, 'JPEG', 0, offY, pw, ph, undefined, 'FAST');
           pdf.save('Invitation - ' + p1 + ' ' + connector + ' ' + p2 + '.pdf');
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
@@ -792,7 +795,7 @@
        The href is a data: URI carrying the correct text/calendar MIME type,
        which is what makes iOS and Android calendar apps open it rather than
        showing the raw file; `download` covers desktop browsers. */
-    var icsData = buildIcsHref();
+    var icsData = ICS_FILE;
     el.innerHTML =
       '<a class="save-date" id="save-date-link" href="' + esc(icsData) + '" download="' + esc(icsDownloadName()) + '">' +
         '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
@@ -916,6 +919,7 @@
     renderRsvp();
     renderVenueMapEmbed();
     renderPrintSection();
+    renderCalendarSection();
     renderQrSection();
     updatePdfLang();
     renderLangToggle();

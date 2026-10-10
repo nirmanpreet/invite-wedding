@@ -66,6 +66,19 @@ const server = http.createServer((req, res) => {
     res.end(body);
     return;
   }
+  if (url === '/wedding.ics') {
+    // Generated live so the dev server matches the built site. Served as a
+    // real file with the calendar MIME type - this is the whole point of the
+    // change, since iOS refuses to do anything useful with a data: URI.
+    const ics = require('./js/ics.js');
+    res.writeHead(200, {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="wedding.ics"',
+      'Cache-Control': 'no-store',
+    });
+    res.end(ics.buildIcs(readConfig()));
+    return;
+  }
 
   // Security: only serve inside ROOT
   let filePath = path.normalize(path.join(ROOT, url.replace(/^\//, '')));

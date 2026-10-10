@@ -32,6 +32,16 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Font preloads were tried here and REMOVED on the evidence. Preloading
+       the four faces the gate card needs looked like the obvious fix for the
+       render-blocking Google Fonts stylesheet, but an A/B over three
+       alternating Lighthouse runs on a throttled phone said the opposite:
+       FCP 4.29s -> 3.99s and LCP 6.54s -> 5.70s WITHOUT them. Preloads are
+       high priority and compete with the critical CSS and the LCP artwork.
+       They did help CLS (0.016 vs 0.032), but both are far inside the 0.1
+       "good" threshold, so ~0.85s of LCP is not worth it.
+       The real fix for that render block is self-hosting the fonts, which
+       removes the third-party round trip instead of racing it. Not done. -->
   <!-- Prefetch/preconnect: the share preview and first paint both depend on
        these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show nothing.
        The artwork is preloaded as the likely LCP element; the <picture> on the
@@ -77,8 +87,8 @@
       <div class="ik" aria-hidden="true">ੴ</div>
       <div class="gate-blessing">
                 ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
-        ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥<br>
-        ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+        ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
+        ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
       </div>
       <div class="gate-names">Nirman <span class="amp">&amp;</span> Simran</div>
       <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
@@ -97,18 +107,22 @@
 
   <!-- Royal ornament frame -->
   <div class="royal-frame" aria-hidden="true">
-    <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="">
-    <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="">
+    <img class="rf-corner tl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+    <img class="rf-corner tr" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+    <img class="rf-corner bl" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
+    <img class="rf-corner br" src="assets/svg/corner-ornament.svg" alt="" width="104" height="104">
   </div>
 
   <!-- Blessing: Ik Onkar + Satgur Prasad + Lakh khushiaan pathshahiaan -->
   <main id="invite-main">
   <div class="blessing" id="invite-blessing"></div>
 
+  <!-- Width/height are declared so the browser reserves the box before the
+       SVG decodes; without them the ornament nudged the page down on load,
+       which Lighthouse reported as a layout shift. aspect-ratio then keeps
+       the correct shape if the CSS ever changes width. -->
   <div class="ornament" aria-hidden="true">
-    <img src="assets/svg/divider-ornament.svg" alt="">
+    <img src="assets/svg/divider-ornament.svg" alt="" width="300" height="40" style="aspect-ratio:300/40">
   </div>
 
   <!-- Anand Karaj ceremonial art, straight after the blessing.
@@ -131,6 +145,7 @@
   </div>
 
   <div id="time"></div>
+  <div id="calendar-section" class="calendar-section"></div>
   <p class="dance-med" id="dance-med">Reception</p>
 
   <div class="actions" id="invite-actions"></div>
@@ -152,26 +167,40 @@
     <audio src="" id="my_audio" loop="loop" preload="none"></audio>
   </div>
 
-  <!-- Hidden PDF card -->
-  <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:700px; background:#faf6ec; color:#4a1220; font-family:'Arvo', Georgia, serif; border:1px solid #e3d5b3; padding:40px; box-sizing:border-box;">
+  <!-- Hidden PDF card.
+       Portrait (was 700px landscape) so the Anand Karaj artwork has room to
+       breathe without the card becoming a wide, letterboxed strip on A4.
+       Every id is kept: updatePdfLang() in script.js writes all of them. -->
+  <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
     <div style="text-align:center;">
-      <div style="font-size:34px; color:#a4243b; margin-bottom:12px;" id="pdf-ik">ੴ</div>
-      <div style="font-size:15px; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
-ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।</div>
-      <div style="font-size:15px; color:#4a1220; font-style:italic; margin-bottom:10px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
-      <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0;" id="pdf-name-1">Nirman</div>
-      <div style="font-size:22px; color:#b8862e; font-family:'Great Vibes', cursive;" id="pdf-connector">&amp;</div>
-      <div style="font-size:46px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:4px 0 14px;" id="pdf-name-2">Simran</div>
-      <div style="font-size:15px; letter-spacing:2px; color:#a4813a; margin-bottom:12px;" id="pdf-event-line">Wedding Reception &bull; 6 December 2026</div>
-      <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-time-line">10:00 AM onwards</div>
-      <div style="font-size:16px; color:#4a1220; margin:4px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
+      <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
+      <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
+      <!-- The Anand Karaj artwork, which the old card left out entirely.
+           NO crossorigin attribute: images are cached per CORS mode, so
+           adding it here made this a second, separate fetch of the same
+           268 KB webp that the page above already downloads - which cost
+           1.84s of LCP on a throttled phone. Same-origin, so html2canvas
+           does not need it either. -->
+      <div style="margin:2px auto 14px; width:300px;">
+        <img src="assets/img/anand-karaj.webp" alt="" style="display:block; width:100%; height:auto;">
+      </div>
+      <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
+      <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
+      <div style="font-size:20px; color:#8c6623; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
+      <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
+      <div style="font-size:14px; letter-spacing:2px; color:#85682c; margin-bottom:8px;" id="pdf-event-line">Wedding Reception &bull; 6 December 2026</div>
+      <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards</div>
+      <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
       <div id="pdf-qr" class="pdf-qr"></div>
-      <div style="margin-top:26px; border-top:1px solid #e3d5b3; padding-top:14px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
-      <div style="margin-top:6px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
+      <div style="margin-top:20px; border-top:1px solid #e3d5b3; padding-top:12px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
+      <div style="margin-top:5px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
     </div>
   </div>
 
+  <!-- The single .ics generator, shared by the page, build.js and serve.js. -->
+  <script src="./js/ics.js"></script>
   <script src="./js/script.js"></script>
   <!-- Must come after script.js: it listens for the wedding-enter event
        that script.js dispatches from enterSite(). -->

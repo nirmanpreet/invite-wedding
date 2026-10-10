@@ -26,7 +26,7 @@
     "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
-    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
+    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
@@ -153,7 +153,11 @@
         "rsvpErrorAttend": "Please tap Yes or No so we know.",
         "printLabel": "Print this invitation",
         "calendarLabel": "Add to calendar",
-        "calendarNote": "Opens your calendar app with the Wedding Reception event pre-filled.",
+        "calendarTitle": "Add to your calendar",
+        "calendarFile": "Download .ics",
+        "calendarApple": "Add to Apple Calendar",
+        "calendarGoogle": "Add to Google Calendar",
+        "calendarNote": "Opens your calendar app with the reception already filled in.",
         "introSub": "Wedding Reception Invitation",
         "introMeaning": "One God. With Waheguru's blessings, we invite you to the Wedding Reception of Nirman & Simran.",
         "receptionHeading": "Reception",
@@ -190,7 +194,11 @@
         "rsvpErrorAttend": "ਹਾਂ ਜਾਂ ਨਹੀਂ ਚੁਣੋ ਤਾਂ ਜੋ ਸਾਨੂੰ ਪਤਾ ਲੱਗੇ।",
         "printLabel": "ਇਹ ਸੱਦਾ-ਪੱਤਰ ਪ੍ਰਿੰਟ ਕਰੋ",
         "calendarLabel": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
-        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
+        "calendarTitle": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarFile": ".ics ਡਾਊਨਲੋਡ ਕਰੋ",
+        "calendarApple": "Apple ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarGoogle": "Google ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "calendarNote": "ਤੁਹਾਡੇ ਕੈਲੰਡਰ ਵਿੱਚ ਰਿਸੈਪਸ਼ਨ ਦਾ ਇਵੈਂਟ ਪਹਿਲਾਂ ਤੋਂ ਭਰਿਆ ਹੋਇਆ ਖੁੱਲ੍ਹੇਗਾ।",
         "introSub": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਦਾ ਸੱਦਾ-ਪੱਤਰ",
         "introMeaning": "ਇੱਕ ਪਰਮਾਤਮਾ। ਵਾਹਿਗੁਰੂ ਜੀ ਦੀ ਕਿਰਪਾ ਨਾਲ, ਅਸੀਂ ਤੁਹਾਨੂੰ ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ ਦੇ ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੰਦੇ ਹਾਂ।",
         "socialLabel": "ਸਾਡੀ ਖੁਸ਼ੀ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ!",
@@ -246,7 +254,7 @@
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
@@ -266,7 +274,7 @@
       "rsvpTitle": "RSVP",
       "venueMapLabel": "ਨਕਸ਼ੇ 'ਤੇ ਸਥਾਨ ਵੇਖੋ",
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥"
     }
   },
   "datePa": "6 ਦਸੰਬਰ 2026",
