@@ -305,15 +305,16 @@ ${qrLib}
       <div class="actions" id="invite-actions"></div>
       <p class="footer" id="invite-footer"></p>
       <div id="day-info" class="day-info"></div>
-      <!-- RSVP and the map now come BEFORE the QR codes. A phone cannot scan
-           its own screen, so a QR block in the main flow is a dead end for
-           most guests and it was pushing the two things they CAN act on - a
-           reply and directions - a full screen further down. -->
       <div id="rsvp-section" class="rsvp-section"></div>
-      <div id="venue-map-embed" class="venue-map-embed"></div>
-      <!-- Last on screen: hidden entirely on touch phones, where it cannot be
-           used. Still rendered on desktop, in print, and on the PDF card. -->
+      <!-- QR codes first, then the map. The owner asked for this order.
+           On a touch phone the QR block is hidden entirely (a phone cannot
+           scan its own screen), so on a phone this pair simply reads
+           "RSVP -> map", which is the order that was wanted anyway.
+           On desktop, print and the PDF card the QR codes are the thing a
+           guest holds up to someone else, so they now come before the
+           directions. -->
       <div id="qr-section" class="qr-section"></div>
+      <div id="venue-map-embed" class="venue-map-embed"></div>
       <div id="photos" class="photos"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>

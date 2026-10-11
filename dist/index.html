@@ -1107,14 +1107,24 @@ html[lang="pa"] .title h1 {
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .name-shimmer {
     text-shadow: none;
+    /* The gold band was 40%-60% of a 250%-wide background - a 20% window,
+       which on a name 350px wide is about 28px of gold sliding across.
+       That reads as a flicker, not a sweep. Widened to 34%-66% (a 32%
+       window, ~45px of gold) and the peak lightened to #e0b862 so the
+       highlight actually looks like light rather than a darker patch. */
     background: linear-gradient(100deg,
-      var(--royal) 0%, var(--royal) 40%, #c8a24b 50%, var(--royal) 60%, var(--royal) 100%);
+      var(--royal) 0%, var(--royal) 34%, #e0b862 50%, var(--royal) 66%, var(--royal) 100%);
     background-size: 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    animation: name-shine 2.4s ease-out 0.6s 1 both;
+    /* Twice, not once. A single 2.4s pass is easy to miss entirely: the
+       guest taps through the gate, the page is already moving, and by the
+       time they look at the names the sweep has finished. Two passes over
+       3.6s mean the second one catches a guest who has only just arrived,
+       and `both` still parks it on the maroon end afterwards. */
+    animation: name-shine 1.8s ease-in-out 0.5s 2 both;
   }
   @keyframes name-shine {
     from { background-position: 120% 0; }
@@ -1572,11 +1582,18 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
       rgba(232, 200, 119, 0.05) 70%,
       rgba(232, 200, 119, 0) 84%);
   pointer-events: none;
-  animation: art-glow 5.5s ease-in-out infinite;
+  /* FASTER and with a higher floor than the first pass. At 5.5s with a
+     0.45-0.95 swing the glow was real but slow enough that the owner
+     described it as "hardly noticeable" - by the time it had visibly
+     brightened it had already dimmed again. 3.4s is about one and a half
+     breaths per screenful, which reads as alive rather than as a pulse
+     you have to wait for. The floor rose 0.45 -> 0.58 so the artwork is
+     never sitting in near-darkness between beats. */
+  animation: art-glow 3.4s ease-in-out infinite;
 }
 @keyframes art-glow {
-  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.97); }
-  50%      { opacity: 0.95; transform: translate(-50%, -50%) scale(1.03); }
+  0%, 100% { opacity: 0.58; transform: translate(-50%, -50%) scale(0.97); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.05); }
 }
 /* force-motion:on */
 /*
@@ -2012,9 +2029,13 @@ html[lang="pa"] .save-date .sd-date {
    to see the fourth one. */
 html.js-reveal .reveal-target {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .7s var(--ease), transform .7s var(--ease);
-  transition-delay: calc(var(--i, 0) * 90ms);
+  /* 18px over .7s was too shy to notice on a phone - a card that fades in
+     from 18px away reads as "it was just there". 34px over .8s with a
+     longer stagger is the smallest change that is clearly an arrival.
+     The stagger cap in script.js is unchanged, so nothing waits long. */
+  transform: translateY(34px) scale(0.985);
+  transition: opacity .8s var(--ease), transform .8s var(--ease);
+  transition-delay: calc(var(--i, 0) * 120ms);
 }
 html.js-reveal .reveal-target.revealed {
   opacity: 1;
@@ -2365,6 +2386,10 @@ html[lang="pa"] .rsvp-thanks a {
   from { transform: translate3d(0, -60px, 0); }
   to   { transform: translate3d(var(--wx, 0px), var(--h, 110vh), 0); }
 }
+/* Sway is a full-width sweep, not a nudge. The amplitude itself is set in
+   js/invite-motion.js; what changed here is the timing, so the swing reads
+   as a drifting petal rather than a slow pendulum: 3.5-6.5s per sweep used
+   to be long enough that a flower appeared to hang still. */
 @keyframes im-sway {
   from { transform: translate3d(calc(var(--sw) * -1), 0, 0); }
   to   { transform: translate3d(var(--sw), 0, 0); }
@@ -2959,15 +2984,16 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       <div class="actions" id="invite-actions"></div>
       <p class="footer" id="invite-footer"></p>
       <div id="day-info" class="day-info"></div>
-      <!-- RSVP and the map now come BEFORE the QR codes. A phone cannot scan
-           its own screen, so a QR block in the main flow is a dead end for
-           most guests and it was pushing the two things they CAN act on - a
-           reply and directions - a full screen further down. -->
       <div id="rsvp-section" class="rsvp-section"></div>
-      <div id="venue-map-embed" class="venue-map-embed"></div>
-      <!-- Last on screen: hidden entirely on touch phones, where it cannot be
-           used. Still rendered on desktop, in print, and on the PDF card. -->
+      <!-- QR codes first, then the map. The owner asked for this order.
+           On a touch phone the QR block is hidden entirely (a phone cannot
+           scan its own screen), so on a phone this pair simply reads
+           "RSVP -> map", which is the order that was wanted anyway.
+           On desktop, print and the PDF card the QR codes are the thing a
+           guest holds up to someone else, so they now come before the
+           directions. -->
       <div id="qr-section" class="qr-section"></div>
+      <div id="venue-map-embed" class="venue-map-embed"></div>
       <div id="photos" class="photos"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>

@@ -72,6 +72,10 @@
   from { transform: translate3d(0, -60px, 0); }
   to   { transform: translate3d(var(--wx, 0px), var(--h, 110vh), 0); }
 }
+/* Sway is a full-width sweep, not a nudge. The amplitude itself is set in
+   js/invite-motion.js; what changed here is the timing, so the swing reads
+   as a drifting petal rather than a slow pendulum: 3.5-6.5s per sweep used
+   to be long enough that a flower appeared to hang still. */
 @keyframes im-sway {
   from { transform: translate3d(calc(var(--sw) * -1), 0, 0); }
   to   { transform: translate3d(var(--sw), 0, 0); }

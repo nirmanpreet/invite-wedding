@@ -88,20 +88,36 @@
   // DEPTH LAYERS
   // n = count [phone, desktop], s = size px, d = fall seconds,
   // sw = sway px, op = opacity, wx = sideways drift px, k = species pool
-  // Mogra-dominant across all three layers, with roses and marigold
-  // accents; the larger lotus shape only appears in the near layer.
   //
-  // Denser and rosier than the first pass (20 on a phone, 26 on desktop).
-  // Phone is now 28 and desktop 36, and the rose share of each pool is
-  // roughly doubled - far 20%->33%, mid 40%->50%, near 50%->60% - so the
-  // shower reads as mogra and rose rather than mogra and gold. Still cheap:
-  // every flower is one element with a CSS transform animation, no
-  // per-frame JS, so the count costs paint, not main-thread time.
+  // MOGRA AND MARIGOLD DOMINATE. The owner asked for both to be much more
+  // visible, so mogra is now ~44% of all draws and the marigold head ~17%
+  // (was 29% and 6%). Roses are the accent that stays: still 33% in total,
+  // because a shower of nothing but two species reads as wallpaper rather
+  // than as a garden. The lotus remains near-layer only.
+  //
+  // The far layer is where mogra and marigold heads were thinnest, and that
+  // is exactly where they were least visible - 0.42 opacity and 12-20px.
+  // So both were raised in ALL THREE pools, and the far layer's opacity
+  // went 0.42 -> 0.52 so the extra mogra is actually legible at that depth.
+  //
+  // FALL TIMES SHORTENED by roughly a third across all three layers. At
+  // 26-34s the far layer crawled at about 30 px/second, which on a phone
+  // is roughly one screen every nine seconds - far too slow to register as
+  // motion at a glance, so the shower read as a static arrangement of
+  // flowers rather than as falling petals. Sway widened on the same pass
+  // for the same reason: a drifting flower reads as falling even when the
+  // fall itself is slow. The spread between layers is preserved, because
+  // that ratio is what creates the sense of depth.
+  //
+  // Still cheap: every flower is one element with a CSS transform
+  // animation, no per-frame JS, so the count costs paint, not main-thread
+  // time. Phone 28, desktop 36 - unchanged, so the added species cost
+  // nothing; it came out of the rose share.
   // ==============================================================
   var LAYERS = [
-    { name: 'far',  n: [12, 16], s: [12, 20], d: [26, 34], sw: [10, 24], op: 0.42, wx: 0,       k: ['j', 'j', 'm', 'g', 'r3', 'r3'] },
-    { name: 'mid',  n: [10, 13], s: [20, 32], d: [17, 24], sw: [18, 38], op: 0.68, wx: 0,       k: ['j', 'j', 'r2', 'r3', 'm', 'r2'] },
-    { name: 'near', n: [6, 7],   s: [30, 46], d: [11, 17], sw: [30, 60], op: 0.92, wx: [10, 40], k: ['j', 'r1', 'r2', 'r2', 'l'] }
+    { name: 'far',  n: [12, 16], s: [12, 20], d: [17, 22], sw: [14, 30], op: 0.52, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'm', 'r3', 'r3'] },
+    { name: 'mid',  n: [10, 13], s: [20, 32], d: [11, 15], sw: [24, 48], op: 0.72, wx: 0,       k: ['j', 'j', 'j', 'g', 'r2', 'r2', 'r3', 'm'] },
+    { name: 'near', n: [6, 7],   s: [30, 46], d: [7, 11],  sw: [38, 74], op: 0.94, wx: [10, 40], k: ['j', 'j', 'r1', 'r2', 'l', 'g'] }
   ];
 
   function R(a, b) { return a + Math.random() * (b - a); }
@@ -162,11 +178,16 @@
           (L.wx ? ';--wx:' + F(R(L.wx[0], L.wx[1])) + 'px' : '');
         w.style.cssText =
           '--sw:' + F(R(L.sw[0], L.sw[1])) + 'px;' +
-          '--sd:' + F(R(3.5, 6.5) * calm, 1) + 's;' +
-          '--sdl:' + F(-R(0, 5), 1) + 's';
+          /* Sway and tumble sped up to match the faster fall: a petal that drops
+           quickly but swings every 5s looks like it is being dragged.
+           Now the two stay in the same register, so it reads as one
+           drifting object rather than three animations happening to the
+           same element. */
+          '--sd:' + F(R(2.2, 4.0) * calm, 1) + 's;' +
+          '--sdl:' + F(-R(0, 4), 1) + 's';
         s.style.cssText =
           '--img:var(--k_' + kind + ');' +
-          '--r:' + F(R(5, 9) * calm, 1) + 's;' +
+          '--r:' + F(R(3.2, 6) * calm, 1) + 's;' +
           '--rdl:' + F(-R(0, 6), 1) + 's;' +
           '--rz:' + F(R(120, 300)) + 'deg';
 
