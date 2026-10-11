@@ -73,8 +73,8 @@
     g: W('0 0 48 48', ring(12, 11, 5, 11, 'fill="#c8a24b"') + ring(8, 7, 4, 8, 'fill="#e5c46d"') +
       '<circle cx="24" cy="24" r="4" fill="#7a5c22"/>'),
     // mogra — five white petals, gold centre
-    j: W('0 0 48 48', ring(5, 10, 8, 13, 'fill="#fffdf6" stroke="#e3d5b3" stroke-width=".7"') +
-      '<circle cx="24" cy="24" r="3.5" fill="#dfae3a"/>'),
+    j: W('0 0 48 48', ring(5, 10, 8, 13, 'fill="#fff8ec" stroke="#d4b87a" stroke-width="1.2"') +
+      '<circle cx="24" cy="24" r="3.5" fill="#e8c547"/>'),
     // gold shimmer + lotus
     s: W('0 0 40 40', G('#f2e2b4', '#c8a24b') +
       '<path d="M20 1Q22.5 17.5 39 20Q22.5 22.5 20 39Q17.5 22.5 1 20Q17.5 17.5 20 1Z" fill="url(#g)"/>'),

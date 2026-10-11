@@ -1592,14 +1592,14 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
      still one element and one gradient paint, so the cost is unchanged. */
   background:
     radial-gradient(closest-side,
-      rgba(255, 236, 186, 0.60) 0%,
-      rgba(245, 214, 140, 0.30) 28%,
-      rgba(232, 200, 119, 0.10) 52%,
+      rgba(255, 236, 186, 0.85) 0%,
+      rgba(245, 214, 140, 0.50) 28%,
+      rgba(232, 200, 119, 0.22) 52%,
       rgba(232, 200, 119, 0) 72%),
     radial-gradient(closest-side,
-      rgba(232, 200, 119, 0.46) 0%,
-      rgba(232, 200, 119, 0.22) 42%,
-      rgba(232, 200, 119, 0.07) 68%,
+      rgba(232, 200, 119, 0.65) 0%,
+      rgba(232, 200, 119, 0.35) 42%,
+      rgba(232, 200, 119, 0.14) 68%,
       rgba(232, 200, 119, 0) 86%);
   pointer-events: none;
   /* SLOWER, and with a much wider swing, because the owner's second
@@ -1619,13 +1619,13 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   animation: art-glow 5.2s ease-in-out infinite;
 }
 @keyframes art-glow {
-  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.97); }
+  0%, 100% { opacity: 0.65; transform: translate(-50%, -50%) scale(0.97); }
   50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.12); }
 }
 /* force-motion:on */
 /*
 @media (prefers-reduced-motion: reduce) {
-  .ceremony-image::before { animation: none; opacity: 0.7; }
+  .ceremony-image::before { animation: none; opacity: 0.8; }
 }
 */
 /* force-motion:off */
