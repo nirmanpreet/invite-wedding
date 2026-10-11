@@ -107,10 +107,12 @@
   function R(a, b) { return a + Math.random() * (b - a); }
   function F(n, d) { return n.toFixed(d === undefined ? 0 : d); }
 
+  /* Motion is NOT reduced on this site. See the "force-motion" markers in
+     css/style.css for why, and for how to turn it back on.
+     Kept as a variable because build() below reads it twice - to slow the
+     fall and to thin the count - and those are the two behaviours worth
+     being able to undo in one place. */
   var reduced = false;
-  try {
-    reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  } catch (e) {}
 
   function lowPower() {
     return (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 4) <= 2;
@@ -451,7 +453,12 @@
     setTimeout(function () { lastW = window.innerWidth; refresh(); }, 300);
   });
 
-  // Honour a live change of the OS motion setting.
+  /* Honour a live change of the OS motion setting.
+     Disabled on purpose: `reduced` is a constant false now, so this listener
+     could only ever flip the shower ON if a guest turned the setting on and
+     then off again. It is left here (commented) so the switch is easy to
+     put back if reduced motion is ever honoured again. */
+  /*
   try {
     if (window.matchMedia) {
       var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -460,4 +467,5 @@
       else if (mq.addListener) mq.addListener(onMq);
     }
   } catch (e) {}
+  */
 })();

@@ -320,11 +320,14 @@ button, input {
 .intro-gate.opening .card { opacity: 0; transform: scale(0.96); }
 .intro-gate.opening .gate-door.l { transform: translateX(-101%); transition-delay: 0.25s; }
 .intro-gate.opening .gate-door.r { transform: translateX(101%); transition-delay: 0.25s; }
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   .gate-door, .intro-gate .card { transition: none; }
-  /* No sliding at all: the panels simply stop being painted. */
   .intro-gate.opening .gate-door { display: none; }
 }
+*/
+/* force-motion:off */
 
 .intro-gate .card {
   position: relative;
@@ -1087,39 +1090,65 @@ html[lang="pa"] .title h1 {
 
    Applies to .name-a and .name-b only - never to the connector, which must
    stay a flat gold mark. In Punjabi the same class lands on the Gurmukhi
-   name, which is what we want: the greeting is in both languages. */
-.name-shimmer {
-  text-shadow: none;
-  background: linear-gradient(100deg,
-    var(--royal) 0%, var(--royal) 40%, #c8a24b 50%, var(--royal) 60%, var(--royal) 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: name-shine 2.4s ease-out 0.6s 1 both;
-}
-@keyframes name-shine {
-  from { background-position: 120% 0; }
-  to   { background-position: -20% 0; }
-}
-/* The Latin subtitle in Punjabi sits INSIDE .name-a. It must opt out:
-   without this it inherits the transparent fill and disappears entirely,
-   taking the only Latin spelling of the name with it. It also keeps the
-   script face and its own size - it is a caption, not part of the sweep. */
-.name-shimmer .name-latin {
-  background: none;
-  -webkit-text-fill-color: currentColor;
-  color: var(--royal);
-}
-@media (prefers-reduced-motion: reduce) {
+   name, which is what we want: the greeting is in both languages.
+
+   THE NAMES MUST NEVER BE INVISIBLE.
+   `color: transparent` + `-webkit-text-fill-color: transparent` means the
+   text is painted ONLY by the gradient showing through background-clip:text.
+   Two real cases were measured where that leaves the names unreadable:
+     - Windows High Contrast (forced-colors: active): the browser drops the
+       background-image and keeps the transparent fill -> nothing on screen.
+     - a browser that ignores -webkit-background-clip (older Android
+       WebViews, which is exactly the audience this site is opened on):
+       transparent text, unclipped gradient -> nothing on screen.
+   So the transparent fill is scoped to @supports, and forced-colors opts
+   back in below. The names are always readable even when the effect cannot
+   run. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .name-shimmer {
-    animation: none;
+    text-shadow: none;
+    background: linear-gradient(100deg,
+      var(--royal) 0%, var(--royal) 40%, #c8a24b 50%, var(--royal) 60%, var(--royal) 100%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: name-shine 2.4s ease-out 0.6s 1 both;
+  }
+  @keyframes name-shine {
+    from { background-position: 120% 0; }
+    to   { background-position: -20% 0; }
+  }
+  /* The Latin subtitle in Punjabi sits INSIDE .name-a. It must opt out:
+     without this it inherits the transparent fill and disappears entirely,
+     taking the only Latin spelling of the name with it. It also keeps the
+     script face and its own size - it is a caption, not part of the sweep. */
+  .name-shimmer .name-latin {
     background: none;
-    color: var(--royal);
     -webkit-text-fill-color: currentColor;
+    color: var(--royal);
   }
 }
+/* High Contrast strips background-image but NOT the transparent fill, which
+   would leave the names invisible. Restore a real colour and opt out of the
+   forced palette for this one element only. */
+@media (forced-colors: active) {
+  .name-shimmer,
+  .name-shimmer .name-latin {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+    forced-color-adjust: none;
+  }
+}
+/* force-motion:on */
+/*
+@media (prefers-reduced-motion: reduce) {
+  .name-shimmer { animation: none; }
+}
+*/
+/* force-motion:off */
 
 .intro-gate h2,
 .intro-gate .gate-names {
@@ -1549,11 +1578,13 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.97); }
   50%      { opacity: 0.95; transform: translate(-50%, -50%) scale(1.03); }
 }
-/* Reduced motion: the glow holds still at a readable strength. It is
-   atmosphere, not information, so it is simply not animated. */
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   .ceremony-image::before { animation: none; opacity: 0.6; }
 }
+*/
+/* force-motion:off */
 
 /* <picture> is inline by default, which would leave the img's box inline and
    break the centring and the aura alignment. */
@@ -1704,18 +1735,35 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   #calendar-section, #print-section, #venue-map-embed { margin-top: 22px; }
 }
 /* ============================================================
-   REDUCED MOTION
+   REDUCED MOTION — DISABLED ON PURPOSE
+   ============================================================
+   This block used to reduce every animation to an instant change when the
+   guest's device asked for reduced motion. It is deliberately inert now.
+
+   WHY IT WAS TURNED OFF: on the devices this invitation is actually opened
+   on - Android phones, and Windows laptops with "show animations" off, which
+   is very common - reduced motion is on by default. Honouring it turned the
+   whole invitation static: no gate doors, no shimmer, no glow, no petal
+   burst. The owner saw a dead page and reported it as "no animation".
+
+   TO RESTORE ACCESSIBILITY SUPPORT (recommended if any guest ever asks):
+   delete the "/* force-motion:on * /" and "/* force-motion:off * /" marker
+   lines below and uncomment the marked declarations. That is the whole
+   change, and it is why they are marked.
    ============================================================ */
+
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  /* The floating flowers deliberately keep their slow drift here - see the
-     reduced-motion block in invite-motion.css, which opts them back in. */
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
 }
+*/
+/* force-motion:off */
 
 /* ============================================================
    PRINT
@@ -1972,7 +2020,8 @@ html.js-reveal .reveal-target.revealed {
   opacity: 1;
   transform: none;
 }
-/* Reduced motion: no slide, no transition, no wait — just appear. */
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   html.js-reveal .reveal-target {
     opacity: 1;
@@ -1980,7 +2029,10 @@ html.js-reveal .reveal-target.revealed {
     transition: none;
     transition-delay: 0s;
   }
+  .intro-gate .card { animation: none; }
 }
+*/
+/* force-motion:off */
 
 /* The gate card entrance is CSS-only now (GSAP removed). */
 @keyframes gate-in {
@@ -1990,9 +2042,13 @@ html.js-reveal .reveal-target.revealed {
 .intro-gate .card {
   animation: gate-in .8s var(--ease) both;
 }
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   .intro-gate .card { animation: none; }
 }
+*/
+/* force-motion:off */
 
 /* ---- Calendar options, inside the Save-the-Date card -------------
    These used to be a separate #calendar-section card, which duplicated the
@@ -2184,9 +2240,13 @@ html[lang="pa"] .rsvp-thanks a {
   from { opacity: 0; transform: scale(0.96); }
   to   { opacity: 1; transform: none; }
 }
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   .rsvp-thanks { animation: none; }
 }
+*/
+/* force-motion:off */
 
 /* ---- Press feedback ------------------------------------------
    transform only. These selectors target the VISIBLE control, not a
@@ -2215,6 +2275,8 @@ html[lang="pa"] .rsvp-thanks a {
 .intro-gate .lang-pick button:active,
 .cal-toggle:active { transform: scale(0.97); }
 
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   .actions .venue, .actions button, .rsvp-section button, #print-invite,
   .attend-btn, .cal-btn, .intro-gate .lang-pick button, .cal-toggle {
@@ -2226,6 +2288,8 @@ html[lang="pa"] .rsvp-thanks a {
     transform: none;
   }
 }
+*/
+/* force-motion:off */
 
 ﻿/* ==============================================================
    INVITE MOTION â€” floating flowers + guest controls
@@ -2443,16 +2507,13 @@ main#invite-main { padding-bottom: 76px; }
 }
 
 /* ---- reduced motion ----------------------------------------- */
-/* style.css ends with a blanket reduced-motion rule that sets
-   animation-duration to 0.001ms on *. Applied literally it would
-   freeze every flower solid at its start keyframe â€” but the brief is
-   that the flowers stay VISIBLE and simply calmer. A universal
-   !important can only be undone by another !important, so this is
-   the single one in this file, scoped strictly to the overlay.
-   It restores each element's own inline duration (var(--d) etc.),
-   which js/invite-motion.js has already multiplied by the calm
-   factor when reduced motion is on â€” so the result is the slow
-   drift, not the fast one. */
+/* DISABLED ON PURPOSE - see the block in style.css for why, and for how to
+   turn it back on. The blanket `*, *::before, *::after { animation-duration:
+   0.001ms !important }` rule it used to fight is now commented out, so
+   nothing here needs to be. The flowers fall at their normal speed for
+   everyone. */
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   #sakura-falling .p {
     animation-duration: var(--d) !important;
@@ -2466,14 +2527,12 @@ main#invite-main { padding-bottom: 76px; }
     animation-duration: var(--r) !important;
     animation-iteration-count: infinite !important;
   }
-  /* The entrance is pure decoration on top of already-visible
-     content, so under reduced motion it is simply dropped. */
   body, .rf-corner { animation: none !important; }
-  /* The scroll dim and the one-time caption are both information, not
-     decoration, so they must not animate either - they just appear. */
   .im-btn, .im-tip { transition: none !important; }
   .im-tip.on { transform: none; }
 }
+*/
+/* force-motion:off */
 
       </style>
 

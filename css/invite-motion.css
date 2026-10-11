@@ -214,16 +214,13 @@ main#invite-main { padding-bottom: 76px; }
 }
 
 /* ---- reduced motion ----------------------------------------- */
-/* style.css ends with a blanket reduced-motion rule that sets
-   animation-duration to 0.001ms on *. Applied literally it would
-   freeze every flower solid at its start keyframe â€” but the brief is
-   that the flowers stay VISIBLE and simply calmer. A universal
-   !important can only be undone by another !important, so this is
-   the single one in this file, scoped strictly to the overlay.
-   It restores each element's own inline duration (var(--d) etc.),
-   which js/invite-motion.js has already multiplied by the calm
-   factor when reduced motion is on â€” so the result is the slow
-   drift, not the fast one. */
+/* DISABLED ON PURPOSE - see the block in style.css for why, and for how to
+   turn it back on. The blanket `*, *::before, *::after { animation-duration:
+   0.001ms !important }` rule it used to fight is now commented out, so
+   nothing here needs to be. The flowers fall at their normal speed for
+   everyone. */
+/* force-motion:on */
+/*
 @media (prefers-reduced-motion: reduce) {
   #sakura-falling .p {
     animation-duration: var(--d) !important;
@@ -237,11 +234,9 @@ main#invite-main { padding-bottom: 76px; }
     animation-duration: var(--r) !important;
     animation-iteration-count: infinite !important;
   }
-  /* The entrance is pure decoration on top of already-visible
-     content, so under reduced motion it is simply dropped. */
   body, .rf-corner { animation: none !important; }
-  /* The scroll dim and the one-time caption are both information, not
-     decoration, so they must not animate either - they just appear. */
   .im-btn, .im-tip { transition: none !important; }
   .im-tip.on { transform: none; }
 }
+*/
+/* force-motion:off */

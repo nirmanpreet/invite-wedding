@@ -4,13 +4,19 @@
  */
 'use strict';
 (function () {
-  /* One flag, read once, for every animation on the page. Defined before
-     anything else so no feature can accidentally branch on its own copy.
-     Everything that animates must check this (in JS) or be covered by the
-     matching @media (prefers-reduced-motion: reduce) block in CSS - the
-     instruction is that motion becomes an instant change, never a missing
-     or broken one. */
-  var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  /* Motion is NOT reduced on this site, deliberately.
+     `REDUCED` is kept as a named flag rather than deleted, because the two
+     behaviours it gates (the gate doors and the RSVP petal burst) are worth
+     being able to switch off in ONE place - see the "force-motion" markers
+     in css/style.css for the CSS half of the same switch.
+
+     Why it was turned off: on the devices this invitation is actually opened
+     on - Android phones, and Windows laptops with "show animations" turned
+     off, which is the default on a lot of machines - the browser reports
+     prefers-reduced-motion: reduce. Honouring it made the whole invitation
+     static: no doors, no shimmer, no glow, no burst. The owner saw a dead
+     page and reported it as "no animation". */
+  var REDUCED = false;
   var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? window.__WEDDING_CONFIG__ : {};
   var couple = config.couple || {};
   var p1 = couple.partner1 || 'Nirman';
@@ -1174,16 +1180,14 @@
      a WebView that skips transitions, or one where the tab was backgrounded
      mid-open, would otherwise leave a guest staring at a gate whose panels
      have slid away but which still swallows every tap on the invitation. */
-  /* Read the setting again at the moment it is used. REDUCED is captured once
-     at load as specified, but the guest can turn the OS setting on while the
-     gate is open; in that case the flag is stale, the panels get
-     transition:none from the media query, transitionend never fires, and the
-     safety net would leave a faded-out gate over a dead page for 1.3s. */
+  /* Single source of truth, shared with the CSS "force-motion" markers.
+     It does NOT re-read prefers-reduced-motion: the site animates for
+     everyone, so the OS setting must not be able to switch the doors back
+     off half way through. It used to, which meant the panels got
+     transition:none, transitionend never fired, and the safety net left a
+     faded-out gate over a dead page for 1.3 seconds. */
   function motionReduced() {
-    if (REDUCED) return true;
-    try {
-      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (e) { return false; }
+    return REDUCED;
   }
 
   function openGate(gate, done) {
