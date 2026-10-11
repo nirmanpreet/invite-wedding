@@ -1,5 +1,5 @@
-/* ==============================================================
-   INVITE MOTION — floating flowers + guest controls
+﻿/* ==============================================================
+   INVITE MOTION â€” floating flowers + guest controls
    --------------------------------------------------------------
    Additive only. Nothing in this file re-declares an existing
    selector's layout, colour, font or spacing: every rule below is
@@ -24,7 +24,7 @@
         (#fbe4ec, hot orange marigold #f39a12). They are re-tinted
         here to the invitation's own palette (antique gold, maroon,
         blush) so the shower reads as part of this page. The mogra
-        stays true white — it is the flower the layer is named for.
+        stays true white â€” it is the flower the layer is named for.
      3. NO will-change on the petals. style.css documents that
         per-petal layer promotion made the previous Android petal
         implementation invisible; transform-only animations are
@@ -32,6 +32,14 @@
    ============================================================== */
 
 /* ---- petals ------------------------------------------------- */
+/* The guest switched away from this tab. animation-play-state is the only
+   thing that stops them, and unlike display:none it costs nothing to
+   resume - no relayout, no re-measuring. */
+#sakura-falling.paused .p,
+#sakura-falling.paused .w,
+#sakura-falling.paused .s {
+  animation-play-state: paused !important;
+}
 #sakura-falling .p {
   position: absolute;
   top: 0;
@@ -104,31 +112,44 @@ body { animation: im-page-in 0.55s var(--ease); }
 .rf-corner.br { animation-delay: 0.45s; }
 
 /* ---- guest controls ----------------------------------------- */
-/* Bottom-left, the exact slot the previous "Petals: on/off" pill
-   occupied: clear of the RSVP thumb zone, the language links and
-   every section card. z-index 5 sits above the content layer but
+/* Bottom-RIGHT. They used to sit bottom-left, directly over the left edge
+   of a section card (at 390px a card is 359px wide and starts at x=16, so a
+   48px cluster at x=12 covered 44px of it) - i.e. they sat on top of the
+   text the guest was reading. z-index 5 stays above the content layer but
    far below .intro-gate (9999). */
 .im-controls {
   position: fixed;
-  left: calc(12px + env(safe-area-inset-left, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
   bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 5;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s var(--ease);
 }
-/* Only after the guest has chosen a language — the gate card is
-   centred and a bottom-left cluster would crowd it. */
+/* Only after the guest has chosen a language â€” the gate card is
+   centred and a corner cluster would crowd it. */
 body.intro-done .im-controls { opacity: 1; visibility: visible; }
 
+/* While the guest is actively scrolling the buttons dim right down. They are
+   never removed and never stop working, so a tap during the fade still
+   registers - the point is only to stop them competing with the text going
+   past underneath. */
+html.is-scrolling .im-btn { opacity: 0.25; }
+
 .im-btn {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
+  /* 44px, not the 40px first proposed: 40px is below the 44px minimum tap
+     target, and this file already carries a deliberate decision (see the F3
+     fixes in style.css) that every control on the page keeps a 44px box for
+     older relatives on a phone. Going to 44 also shrinks them for the first
+     time, from 48. */
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -140,7 +161,8 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.3s var(--ease), color 0.3s var(--ease),
-              border-color 0.3s var(--ease), transform 0.15s var(--ease);
+              border-color 0.3s var(--ease), transform 0.15s var(--ease),
+              opacity 0.3s var(--ease);
 }
 .im-btn:active { transform: translateY(1px); }
 .im-btn:focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
@@ -157,6 +179,33 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
 /* Off state: the icon reads as inactive without a text label. */
 .im-btn[aria-pressed="false"] { color: #a08a8f; }
 
+/* One-time caption beside the controls, so a guest who has never met a
+   round icon-only button knows they are buttons and what one does. The text
+   is the music button's own aria-label, already translated into the active
+   language - so this introduces no new copy that would need proofreading.
+   aria-hidden because the button's own label already says it. */
+.im-tip {
+  position: absolute;
+  right: 54px;
+  bottom: 2px;
+  padding: 6px 11px;
+  border-radius: 14px;
+  background: var(--royal);
+  color: var(--ivory);
+  font-family: var(--font-gurmukhi);
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  pointer-events: none;
+}
+.im-tip.on { opacity: 0.95; transform: none; }
+
+/* The last thing on the page must not end up underneath the cluster. */
+main#invite-main { padding-bottom: 76px; }
+
 /* High Contrast: the theme's gold hairline disappears, so controls take a
    system border, matching the treatment given to .attend-btn, #rsvp-send,
    #print-invite and .lang-toggle a in style.css. */
@@ -167,13 +216,13 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
 /* ---- reduced motion ----------------------------------------- */
 /* style.css ends with a blanket reduced-motion rule that sets
    animation-duration to 0.001ms on *. Applied literally it would
-   freeze every flower solid at its start keyframe — but the brief is
+   freeze every flower solid at its start keyframe â€” but the brief is
    that the flowers stay VISIBLE and simply calmer. A universal
    !important can only be undone by another !important, so this is
    the single one in this file, scoped strictly to the overlay.
    It restores each element's own inline duration (var(--d) etc.),
    which js/invite-motion.js has already multiplied by the calm
-   factor when reduced motion is on — so the result is the slow
+   factor when reduced motion is on â€” so the result is the slow
    drift, not the fast one. */
 @media (prefers-reduced-motion: reduce) {
   #sakura-falling .p {
@@ -191,4 +240,8 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
   /* The entrance is pure decoration on top of already-visible
      content, so under reduced motion it is simply dropped. */
   body, .rf-corner { animation: none !important; }
+  /* The scroll dim and the one-time caption are both information, not
+     decoration, so they must not animate either - they just appear. */
+  .im-btn, .im-tip { transition: none !important; }
+  .im-tip.on { transform: none; }
 }

@@ -38,10 +38,50 @@
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
+  /* A timed event, emitted in UTC.
+     An all-day event (VALUE=DATE) is the safer kind of thing in general - it
+     cannot be shown at the wrong hour - but it is wrong here: the reception
+     starts at 10:00 and a guest who saves it as all-day sees no time at
+     all, so it looks like a day they might have other plans for.
+
+     UTC (a trailing Z) rather than a TZID block, because a TZID needs the
+     receiving calendar to know about Asia/Kolkata and to have a definition
+     for it. A Z timestamp is unambiguous everywhere, including in the
+     in-app browsers most guests will actually open this from.
+
+       "2026-12-06T10:00:00+05:30"  ->  "20261206T043000Z" */
+  function toIcsUtc(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+
+  /* Exact start and end in India time, straight from config.
+     Returns null when either is missing or unparseable, so the caller can
+     fall back rather than emit a DTSTART: with nothing after it. */
+  function timedRange(config) {
+    var s = String(att(config, 'startISO', '') || '');
+    var e = String(att(config, 'endISO', '') || '');
+    if (!s || !e) return null;
+    var start = new Date(s);
+    var end = new Date(e);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
+    if (end.getTime() <= start.getTime()) return null;
+    return { start: toIcsUtc(s), end: toIcsUtc(e) };
+  }
+
   /* Config dates are written day-first ("6 December 2026"), but accept
      month-first too so a hand edit cannot silently emit 2026-12-0 - which
-     is exactly the bug this function previously had. */
+     is exactly the bug this function previously had.
+     Now only a FALLBACK: startISO carries an explicit +05:30 and is used
+     whenever it is present, because this parses in the machine's own
+     timezone and the build machine is not necessarily in India. */
   function parseEventDate(config) {
+    var iso = String(att(config, 'startISO', '') || '');
+    if (iso) {
+      var t0 = new Date(iso);
+      if (!isNaN(t0.getTime())) return t0;
+    }
     var raw = String(att(config, 'countdownTarget', '') || '').trim();
     if (raw) {
       var t = new Date(raw);
@@ -83,17 +123,24 @@
 
     var d = parseEventDate(config);
 
-    /* ALL-DAY event (VALUE=DATE): no time, no TZID, so every guest's
-       calendar shows the whole of the day regardless of their zone.
+    /* Exact start and end in UTC, driven by config.startISO / endISO.
+       Both are required: a VEVENT with no DTEND, or with one that is not
+       after DTSTART, is rejected outright by several calendars, so if
+       either is missing the all-day form below is used instead of emitting
+       something broken. */
+    var timed = timedRange(config);
+
+    /* All-day form (VALUE=DATE), kept as the fallback. No time, no TZID, so
+       every guest's calendar shows the whole of the day regardless of zone.
        DTEND for an all-day event is EXCLUSIVE, i.e. the next day. */
     var icsDate = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
-    var end = new Date(d.getTime());
-    end.setDate(end.getDate() + 1);
-    var icsEnd = end.getFullYear() + pad(end.getMonth() + 1) + pad(end.getDate());
+    var nextDay = new Date(d.getTime());
+    nextDay.setDate(nextDay.getDate() + 1);
+    var icsEnd = nextDay.getFullYear() + pad(nextDay.getMonth() + 1) + pad(nextDay.getDate());
 
-    /* Stamp must not change on every build or the file is re-downloaded
-       for nothing; derive it from the event date instead. */
-    var stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T000000Z';
+    /* DTSTAMP is the moment the file was produced, per RFC 5545 - NOT the
+       day of the event. */
+    var stamp = toIcsUtc(new Date().toISOString());
 
     var lines = [
       'BEGIN:VCALENDAR',
@@ -105,8 +152,12 @@
       'UID:' + icsDate + '-nirman-simran@wedding',
       'DTSTAMP:' + stamp,
       'SUMMARY:' + esc(p1 + ' ' + conn + ' ' + p2 + ' - Wedding Reception'),
-      'DTSTART;VALUE=DATE:' + icsDate,
-      'DTEND;VALUE=DATE:' + icsEnd,
+      timed
+        ? 'DTSTART:' + timed.start
+        : 'DTSTART;VALUE=DATE:' + icsDate,
+      timed
+        ? 'DTEND:' + timed.end
+        : 'DTEND;VALUE=DATE:' + icsEnd,
       'DESCRIPTION:' + esc('Wedding Reception for ' + p1 + ' ' + conn + ' ' + p2 +
         ' on ' + dateText + ' at ' + venueName + (timeText ? ', ' + timeText : '')),
       /* LOCATION stays Latin: calendar apps and GPS need the ASCII address. */
@@ -143,18 +194,30 @@
     var p2 = att(config, 'couple.partner2', 'Partner 2');
     var conn = att(config, 'couple.connector', '&');
     var d = parseEventDate(config);
-    var end = new Date(d.getTime());
-    end.setDate(end.getDate() + 1);
-    /* LOCAL getters, and no time component: this is an all-day event. Using
-       getUTC* here shifted the whole event a day whenever the machine sat
-       more than 10 hours ahead of UTC (Dec 6 10:00 local became Dec 5 UTC). */
-    var fmt = function (t) {
-      return t.getFullYear() + pad(t.getMonth() + 1) + pad(t.getDate());
-    };
+
+    /* The same instants the .ics carries, so the two can never disagree:
+       a guest who picks Google Calendar and a guest who download the file
+       must end up with the same start and the same end. */
+    var timed = timedRange(config);
+    var dates;
+    if (timed) {
+      dates = timed.start + '/' + timed.end;
+    } else {
+      var nextDay = new Date(d.getTime());
+      nextDay.setDate(nextDay.getDate() + 1);
+      /* LOCAL getters, and no time component: this is the all-day fallback.
+         Using getUTC* here shifted the whole event a day whenever the
+         machine sat more than 10 hours ahead of UTC. */
+      var fmt = function (t) {
+        return t.getFullYear() + pad(t.getMonth() + 1) + pad(t.getDate());
+      };
+      dates = fmt(d) + '/' + fmt(nextDay);
+    }
+
     var q = new URLSearchParams({
       action: 'TEMPLATE',
       text: p1 + ' ' + conn + ' ' + p2 + ' - Wedding Reception',
-      dates: fmt(d) + '/' + fmt(end),
+      dates: dates,
       details: 'Wedding Reception for ' + p1 + ' ' + conn + ' ' + p2 + ' on ' +
         att(config, 'date', '') + ' at ' + att(config, 'venue.name', ''),
       location: att(config, 'venue.name', '') + ', ' + att(config, 'venue.address', ''),
@@ -162,5 +225,10 @@
     return 'https://calendar.google.com/calendar/render?' + q.toString();
   }
 
-  return { buildIcs: buildIcs, googleUrl: googleUrl, parseEventDate: parseEventDate };
+  return {
+    buildIcs: buildIcs,
+    googleUrl: googleUrl,
+    parseEventDate: parseEventDate,
+    toIcsUtc: toIcsUtc
+  };
 });

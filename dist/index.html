@@ -11,11 +11,15 @@
       <link rel="canonical" href="https://invite.nirmanpreet.com/">
       <link rel="apple-touch-icon" href="assets/img/icon-180.png">
       <meta property="og:type" content="website" />
-      <meta property="og:title" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026" />
+      <meta property="og:title" content="Nirman &amp; Simran | ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ | 6 Dec 2026" />
       <meta property="og:description" content="Wedding reception of Nirman &amp; Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited." />
       <meta property="og:url" content="https://invite.nirmanpreet.com/" />
       <meta property="og:site_name" content="Nirman &amp; Simran" />
       <meta property="og:locale" content="en_US" />
+      <!-- One URL serves both languages (the page switches in place, there is
+           no /pa/ path), so this only tells a scraper the Punjabi wording
+           exists. Harmless if a platform ignores it; useful if it does not. -->
+      <meta property="og:locale:alternate" content="pa_IN" />
       <meta property="og:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
       <meta property="og:image:secure_url" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
       <meta property="og:image:type" content="image/jpeg" />
@@ -23,32 +27,167 @@
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026 — Wedding Reception on 6 December 2026 at Park City Resort, Malout" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Nirman & Simran | Wedding Reception | 6 December 2026" />
+      <meta name="twitter:title" content="Nirman &amp; Simran | ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ | 6 Dec 2026" />
       <meta name="twitter:description" content="Wedding reception of Nirman &amp; Simran - 6 Dec 2026, Park City Resort, Malout. With Waheguru blessings, you are warmly invited." />
       <meta name="twitter:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
-      <title>Nirman &amp; Simran | Wedding Reception | 6 December 2026</title>
+      <title>Nirman &amp; Simran | ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ | 6 Dec 2026</title>
 
       <link rel="manifest" href="manifest.webmanifest">
 
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Font preloads were tried here and removed on the evidence: an A/B over
-       three alternating Lighthouse runs on a throttled phone gave LCP 6.54s
-       WITH them and 5.70s WITHOUT. See index.html for the full note. -->
-  <!-- Prefetch/preconnect: the share preview and first paint both depend on
-       these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show nothing.
-       The artwork is preloaded as the likely LCP element; the <picture> on the
-       page still picks WebP, so the preload and the element agree. -->
+      <!--
+       FONTS ARE SELF-HOSTED NOW. The Google Fonts <link> and its two
+       preconnects are gone: every guest on mobile data was paying a DNS
+       lookup, a TLS handshake and two round trips to a third party before a
+       single letter could be painted, and that <link rel=stylesheet> was
+       render-blocking. The @font-face rules are at the top of css/style.css
+       and the files come from tools/build-fonts.js.
+
+       Font PRELOADS were tried here and are still not here, on the evidence:
+       an A/B over three alternating Lighthouse runs on a throttled phone gave
+       LCP 6.54s WITH them and 5.70s WITHOUT. Preloads are high priority and
+       compete with the critical CSS and the LCP artwork. font-display:swap
+       already means nothing waits on a font. Do not add them back without
+       re-running that A/B.
+
+       Prefetch/preconnect: the share preview and first paint both depend on
+       these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show
+       nothing. The artwork is preloaded as the likely LCP element; the
+       <picture> on the page still picks WebP, so the preload and the element
+       agree. -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="preload" as="image" href="assets/img/anand-karaj-crop.webp" type="image/webp" fetchpriority="high">
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
       <style>
 /* ============================================================
    Nirman & Simran — Wedding Reception
    Classical Royal theme: royal maroon, antique gold, aged ivory
    ============================================================ */
+
+/* ============================================================
+   SELF-HOSTED FONTS
+   ------------------------------------------------------------
+   Generated by `node tools/build-fonts.js` — edit that, not this.
+
+   These used to come from fonts.googleapis.com. That cost every guest a DNS
+   lookup, a TLS handshake and two round trips to a third party before a
+   single letter could be painted, on a render-blocking <link>. Same-origin
+   woff2 removes all of it and lets the fonts share the connection with
+   everything else.
+
+   Three things that are deliberate and must not be "tidied":
+     - font-display: swap. Never `block`: a guest on slow mobile data must
+       see the invitation in the fallback face immediately, not a blank
+       screen while a font is fetched.
+     - each weight is a STATIC file, pinned out of Google's variable font
+       with fontTools.varLib.instancer. Shipping the variable file verbatim
+       would make an Android WebView older than Chrome 62 render every
+       heading at the default 400 instance, i.e. quietly lose all bold.
+     - the Gurmukhi files were subset with --layout-features='*'. Without
+       it, conjuncts and vowel marks in the verse render broken. The
+       weights and families are what the page actually requests, measured
+       on a real load in both languages; two families in the old <link>
+       (Crimson Text, and Arvo, which was never even requested) were dead
+       and are gone.
+   ============================================================ */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('assets/fonts/cormorant-garamond-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('assets/fonts/cormorant-garamond-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('assets/fonts/cormorant-garamond-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('assets/fonts/cormorant-garamond-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('assets/fonts/cormorant-garamond-400i.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('assets/fonts/playfair-display-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('assets/fonts/playfair-display-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('assets/fonts/playfair-display-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('assets/fonts/playfair-display-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Dancing Script';
+  src: url('assets/fonts/dancing-script-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Dancing Script';
+  src: url('assets/fonts/dancing-script-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Great Vibes';
+  src: url('assets/fonts/great-vibes-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans Gurmukhi';
+  src: url('assets/fonts/noto-sans-gurmukhi-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans Gurmukhi';
+  src: url('assets/fonts/noto-sans-gurmukhi-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --maroon: #6d1a2d;
@@ -138,14 +277,53 @@ button, input {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  /* The two panels now provide the surface; see .gate-door. The radial
+     highlight stays behind them so nothing changes colour as they part. */
   background:
     radial-gradient(700px 420px at 50% 12%, rgba(200, 162, 75, 0.16), transparent 65%),
     linear-gradient(168deg, var(--ivory-2), var(--parchment));
+  overflow: hidden;
 }
 .intro-gate.hide {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+/* ---- the gate opens like two doors ----------------------------
+   Two panels that slide apart instead of the whole screen fading.
+   They carry the parchment gradient themselves, so they can be seen
+   sliding; the gate's own radial highlight stays behind them, which is
+   what stops the join showing as a seam while they are closed.
+
+   .gate-door is 50.5% wide rather than 50% so the two overlap by 1% at
+   the centre - at exactly 50% a sub-pixel gap opened down the middle on
+   some Android WebViews and the page showed through it. */
+.gate-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(168deg, var(--ivory-2), var(--parchment));
+  transition: transform 0.85s var(--ease);
+  will-change: transform;
+}
+.gate-door.l { left: 0; }
+.gate-door.r { right: 0; }
+.intro-gate .card {
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.intro-gate.opening .card { opacity: 0; transform: scale(0.96); }
+.intro-gate.opening .gate-door.l { transform: translateX(-101%); transition-delay: 0.25s; }
+.intro-gate.opening .gate-door.r { transform: translateX(101%); transition-delay: 0.25s; }
+@media (prefers-reduced-motion: reduce) {
+  .gate-door, .intro-gate .card { transition: none; }
+  /* No sliding at all: the panels simply stop being painted. */
+  .intro-gate.opening .gate-door { display: none; }
 }
 
 .intro-gate .card {
@@ -194,11 +372,18 @@ html[lang="pa"] .intro-gate .gate-names {
   text-shadow: none;
 }
 /* Gurbani blessing on the intro gate. Never letter-spaced: Gurmukhi glyphs
-   join at the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6). */
+   join at the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6).
+   The size is fluid rather than stepped: the old version dropped to 10.5px
+   under 340px to stop the verse wrapping, which made the sacred text
+   unreadable on exactly the small phones most likely to be in a guest's hand.
+   A mark can no longer be orphaned because the space before it is a
+   no-break space (build.js / config.json), so the text can simply be given
+   room. */
 .intro-gate .gate-blessing {
   font-family: var(--font-gurmukhi);
-  font-size: clamp(13px, 3.6vw, 15px);
-  line-height: 1.95;
+  font-size: 15px;
+  font-size: clamp(13px, 3.7vw, 16px);
+  line-height: 1.9;
   color: var(--maroon);
   letter-spacing: normal;
   text-transform: none;
@@ -226,13 +411,18 @@ html[lang="pa"] .intro-gate .gate-blessing {
   display: flex;
   gap: 14px;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 .intro-gate .lang-pick button {
   appearance: none;
-  min-width: 150px;
-  min-height: 50px;
-  padding: 13px 26px;
+  /* Share the row instead of wrapping. At 150px each the two buttons needed
+     314px and the card only offers ~270px at 390, so they stacked and the
+     guest had to read the gate as a two-step form. */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 180px;
+  min-height: 48px;
+  padding: 13px 14px;
   background: transparent;
   border: 1px solid var(--gold);
   border-radius: 2px;
@@ -241,9 +431,9 @@ html[lang="pa"] .intro-gate .gate-blessing {
      "ਪੰਜਾਬੀ" must use the Gurmukhi face with no tracking (W3C §5.1/§6).
      One rule for both would give the Punjabi label the wrong typeface. */
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 2.4px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.35s var(--ease), color 0.35s var(--ease), border-color 0.35s var(--ease);
@@ -258,19 +448,50 @@ html[lang="pa"] .intro-gate .gate-blessing {
 .intro-gate .lang-pick button:hover {
   background: rgba(200, 162, 75, 0.12);
 }
+/* Neither language is pre-selected. Filling one button by default read as
+   "this is the right one", and a large share of the guest list reads Punjabi.
+   The filled state is .active (a real tap) and .pre (a suggestion); focus is
+   left to the global :focus-visible ring, because pairing :focus with the
+   filled style is what made the focused button look selected. */
 .intro-gate .lang-pick button.active,
-.intro-gate .lang-pick button:focus {
+.intro-gate .lang-pick button.pre {
   background: var(--royal);
   border-color: var(--royal);
   color: var(--gold-soft);
+  box-shadow: 0 0 0 3px rgba(168, 133, 51, 0.35);
 }
 .intro-gate .gate-hint {
   margin-top: 26px;
   font-size: 11px;
-  letter-spacing: 2.6px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--gold-text);
-  opacity: 0.72;
+  opacity: 0.8;
+  /* Each half is a unit: if the two do not fit side by side the line breaks
+     BETWEEN them, never inside "TAP YOUR LANGUAGE TO ENTER" or inside a
+     Gurmukhi word. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+}
+/* The Gurmukhi half of the bilingual hint must not inherit the Latin
+   tracking or the upper-casing: tracking severs the conjunct (W3C 5.1 / 6)
+   and Gurmukhi has no case to transform. This rule therefore has to beat
+   the html[lang=...] lists below, which is why .gate-hint was removed from
+   them. */
+.intro-gate .gate-hint span { white-space: nowrap; }
+.intro-gate .gate-hint .hint-mid {
+  letter-spacing: normal;
+  text-transform: none;
+  margin: 0 0.6em;
+}
+.intro-gate .gate-hint .hint-pa {
+  font-family: var(--font-gurmukhi);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 /* ============================================================
@@ -822,13 +1043,12 @@ html[lang="pa"] .title h1 {
 
 /* Never let the ornament dominate on small screens */
 @media (max-width: 380px) {
-  /* Reclaim width so the longer Gurbani line still fits on one line. */
+  /* Reclaim width for the stacked names and the two language buttons. */
   .intro-gate .card { padding: 34px 18px 30px; }
-  .intro-gate .gate-blessing { font-size: 11.5px; line-height: 2; }
 }
 @media (max-width: 340px) {
   .intro-gate .card { padding: 28px 12px 26px; }
-  .intro-gate .gate-blessing { font-size: 10.5px; }
+  .intro-gate .gate-names { font-size: 32px; }
 }
 
 @media (max-width: 380px) {
@@ -857,17 +1077,57 @@ html[lang="pa"] .title h1 {
   margin: 10px 0 0;
   color: var(--royal);
   text-transform: none;
-  text-shadow:
-    0 1px 0 rgba(255, 253, 247, 0.8),
-    0 2px 14px rgba(140, 35, 64, 0.14);
+}
+
+/* A single gold pass across each name, once, on arrival.
+   background-clip:text paints the gradient through the glyphs, so the
+   text-shadow that used to soften the script strokes is removed: a shadow
+   is painted BEHIND the glyph, and with the fill transparent it would show
+   through the letters as a muddy halo instead of a glow.
+
+   Applies to .name-a and .name-b only - never to the connector, which must
+   stay a flat gold mark. In Punjabi the same class lands on the Gurmukhi
+   name, which is what we want: the greeting is in both languages. */
+.name-shimmer {
+  text-shadow: none;
+  background: linear-gradient(100deg,
+    var(--royal) 0%, var(--royal) 40%, #c8a24b 50%, var(--royal) 60%, var(--royal) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: name-shine 2.4s ease-out 0.6s 1 both;
+}
+@keyframes name-shine {
+  from { background-position: 120% 0; }
+  to   { background-position: -20% 0; }
+}
+/* The Latin subtitle in Punjabi sits INSIDE .name-a. It must opt out:
+   without this it inherits the transparent fill and disappears entirely,
+   taking the only Latin spelling of the name with it. It also keeps the
+   script face and its own size - it is a caption, not part of the sweep. */
+.name-shimmer .name-latin {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--royal);
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-shimmer {
+    animation: none;
+    background: none;
+    color: var(--royal);
+    -webkit-text-fill-color: currentColor;
+  }
 }
 
 .intro-gate h2,
 .intro-gate .gate-names {
   font-family: var(--font-script);
   font-weight: 700;
-  font-size: clamp(44px, 11.5vw, 70px);
-  line-height: 1.22;
+  font-size: 40px;
+  font-size: clamp(34px, 10.5vw, 48px);
+  line-height: 1.05;
   letter-spacing: 0;
   color: var(--royal);
   margin: 2px 0 6px;
@@ -875,6 +1135,63 @@ html[lang="pa"] .title h1 {
   text-shadow:
     0 1px 0 rgba(255, 253, 247, 0.75),
     0 2px 12px rgba(140, 35, 64, 0.12);
+}
+/* One name per line, "&" on a line of its own.
+   As inline text "Nirman & Simran" had no break opportunity between the
+   names that the browser could use, so at every width from 320 to 1280 it
+   wrapped as "Nirman &" / "Simran" - leaving the connector stranded at the
+   end of a line. Three flex children give an explicit break instead, which
+   works at any width and any language (in Punjabi the names are shorter, so
+   they would otherwise have shared one line and looked unbalanced). */
+.intro-gate .gate-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.intro-gate .gate-names .gate-name { display: block; }
+
+/* ============================================================
+   THE `*` TRAP — read this before adding a wrapper element
+   ------------------------------------------------------------
+   Line 40 of this file is:
+
+       * { font-family: var(--font-body); ... }
+
+   which is shorthand for EVERY element and beats inheritance. A <span>
+   inside an element that set font-family therefore does NOT inherit it:
+   the universal rule re-assigns it to the body face.
+
+   That is why the couple's names have been rendering in Cormorant Garamond
+   rather than the Dancing Script the whole design calls for. The parent
+   (.title h1, .gate-names) computes "Dancing Script"; the <span> holding
+   the actual text computed "Cormorant Garamond". It was invisible because
+   both are elegant serifs and the page still looked finished.
+
+   It also means the font for these spans cannot simply be left alone:
+   declaring it here at (0,3,0) would outrank the html[lang="pa"] rules at
+   (0,1,2) and put Gurmukhi names into Dancing Script, which has no
+   Gurmukhi glyphs. Both languages are therefore stated explicitly. */
+.title .title-names > .name-a,
+.title .title-names > .name-b {
+  font-family: var(--font-script);
+}
+html[lang="pa"] .title .title-names > .name-a,
+html[lang="pa"] .title .title-names > .name-b {
+  font-family: var(--font-gurmukhi);
+  font-weight: 600;
+}
+.intro-gate .gate-names .gate-name {
+  font-family: var(--font-script);
+}
+/* NOT the Gurmukhi face, even when <html lang="pa">: the gate's names are
+   static Latin, written into the markup by build.js and never re-rendered,
+   because the gate is where you CHOOSE a language and must not be in one
+   already. Without this, a returning Punjabi guest - who arrives with
+   html[lang="pa"] already set from their remembered choice - saw "Nirman"
+   and "Simran" set in Noto Sans Gurmukhi, a completely different face from
+   the English gate. */
+html[lang="pa"] .intro-gate .gate-names .gate-name {
+  font-family: var(--font-script);
 }
 
 /* The couple is one <h1> (axe: heading order); its inner spans keep the
@@ -899,6 +1216,13 @@ html[lang="pa"] .title h1 {
   margin: 0 0.08em;
   color: var(--gold);
   letter-spacing: 0;
+}
+/* The connector on the gate is a full line between the two names, so it is
+   scaled down to sit as a mark rather than as a third name. */
+.intro-gate .gate-names .amp {
+  font-size: 0.5em;
+  line-height: 1.2;
+  margin: 0.04em 0;
 }
 
 /* The Latin name under the Gurmukhi name, in the same family so the
@@ -931,7 +1255,6 @@ html[lang="pa"] .title h1 {
    swash capitals, which turned "Nirman" into an unreadable "NJRMaN". Script
    faces are drawn as connected shapes, so they must never be tracked either. */
 html[lang="en"] .intro-gate .sub,
-html[lang="en"] .intro-gate .gate-hint,
 html[lang="en"] .intro-gate .lang-pick button,
 html[lang="en"] .title h3,
 html[lang="en"] .dance-med,
@@ -959,7 +1282,6 @@ html[lang="en"] .save-date .sd-title {
 
 /* Punjabi: never track, never upper-case, lighter weight */
 html[lang="pa"] .intro-gate .sub,
-html[lang="pa"] .intro-gate .gate-hint,
 html[lang="pa"] .intro-gate .lang-pick button,
 html[lang="pa"] .title h3,
 html[lang="pa"] .dance-med,
@@ -1195,7 +1517,15 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   text-align: center;
 }
 
-/* Soft gold aura behind the illustration */
+/* Soft gold aura behind the illustration, breathing slowly like a diya.
+   OPACITY AND SCALE ONLY. An earlier version of this idea used
+   filter: blur(16px) on the gradient, which repaints a 500x400 layer every
+   single frame of the loop - on exactly the cheap Android phones this site
+   is opened on. A radial-gradient is already soft, so the blur bought
+   nothing that was not paid for per frame.
+
+   The artwork is a transparent PNG, so the aura genuinely shows through
+   around it; no blend mode is needed and none is used. */
 .ceremony-image::before {
   content: "";
   position: absolute;
@@ -1208,11 +1538,21 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   transform: translate(-50%, -50%);
   background:
     radial-gradient(closest-side,
-      rgba(198, 160, 90, 0.20) 0%,
-      rgba(198, 160, 90, 0.10) 48%,
-      rgba(198, 160, 90, 0.03) 70%,
-      rgba(198, 160, 90, 0) 84%);
+      rgba(232, 200, 119, 0.42) 0%,
+      rgba(232, 200, 119, 0.18) 46%,
+      rgba(232, 200, 119, 0.05) 70%,
+      rgba(232, 200, 119, 0) 84%);
   pointer-events: none;
+  animation: art-glow 5.5s ease-in-out infinite;
+}
+@keyframes art-glow {
+  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.97); }
+  50%      { opacity: 0.95; transform: translate(-50%, -50%) scale(1.03); }
+}
+/* Reduced motion: the glow holds still at a readable strength. It is
+   atmosphere, not information, so it is simply not animated. */
+@media (prefers-reduced-motion: reduce) {
+  .ceremony-image::before { animation: none; opacity: 0.6; }
 }
 
 /* <picture> is inline by default, which would leave the img's box inline and
@@ -1322,9 +1662,6 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   background: linear-gradient(180deg, rgba(229, 196, 109, 0.22), rgba(200, 162, 75, 0.10));
   box-shadow: 0 6px 18px rgba(109, 26, 45, 0.10);
 }
-.actions .venue:active,
-#print-invite:active,
-.attend-btn:active { transform: translateY(1px); }
 .attend-btn.selected {
   background: linear-gradient(180deg, rgba(140, 35, 64, 0.14), rgba(109, 26, 45, 0.08));
 }
@@ -1393,11 +1730,28 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   #venue-map-embed, #pdf-card, .actions, #time, .qr-section {
     display: none !important;
   }
+  /* The QR codes were in the hide list above, which is how they ended up
+     absent from every printed copy even though the brief has always said
+     they should print. Reinstated here on purpose: a relative holding a
+     printed card can scan the map off someone else's phone or the fridge
+     door, and a printed invitation is exactly where that is useful.
+     Order matters - this block comes after the rule above, so it wins. */
+  #qr-section { display: block !important; }
   .print-header { display: block; margin-bottom: 16px; }
   .wrap, .title h1, .title p { color: #000; }
   .blessing .blessing-text { color: #000; }
-  
+
   .footer .phone { color: #000; }
+}
+
+/* A phone cannot scan its own screen. On a touch phone the QR block was two
+   screens of scrolling that could not be used by anyone standing in front of
+   that phone - the guest would have had to find a second device. Hidden
+   there, kept on desktop, restored in print above, and never removed from
+   the DOM, so the PDF card (whose codes live in #pdf-qr, outside this
+   element) is unaffected either way. */
+@media screen and (hover: none) and (pointer: coarse) {
+  #qr-section { display: none; }
 }
 
 /* ============================================================
@@ -1408,40 +1762,18 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
    ============================================================ */
 @media screen {
 
-  /* ---- 1. Save the Date is now a link --------------------------
-     The card was a plain <div> with an "Add to calendar" link sitting
-     much further down the page. It is now the <a> itself, carrying the
-     same .ics, so tapping the date the guest actually came to read does
-     the thing the page was already asking them to do. */
-  a.save-date {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition:
-      border-color 0.25s ease,
-      box-shadow 0.25s ease,
-      transform 0.15s ease;
-  }
-  a.save-date:hover,
-  a.save-date:focus-visible {
-    border-color: var(--gold);
-    box-shadow: 0 6px 22px rgba(140, 35, 64, 0.14);
-  }
-  a.save-date:active {
-    transform: translateY(1px);
-  }
-  /* Keyboard users get a ring; pointer users do not see one. */
-  a.save-date:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 3px;
-  }
-
+  /* ---- 1. Save the Date is now one button ----------------------
+     The card used to be an <a> in its own right, carrying the .ics, so
+     tapping the date the guest came to read did the thing the page was
+     asking them to do. It is now a plain <div> holding one explicit
+     button: an invisible full-card link on top of three visible pills was
+     four competing affordances, and a guest who tapped the date by mistake
+     got a download with no way to tell what had happened. */
   .save-date .sd-cta {
     display: inline-block;
     margin-top: 12px;
-    padding: 7px 16px;
+    padding: 9px 18px;
+    min-height: 44px;
     font-family: var(--font-display);
     font-size: 11.5px;
     font-weight: 600;
@@ -1452,8 +1784,8 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
     border: 1px solid var(--gold-line);
     border-radius: 3px;
   }
-  a.save-date:hover .sd-cta,
-  a.save-date:focus-visible .sd-cta {
+  .cal-toggle:hover,
+  .cal-toggle:focus-visible {
     background: rgba(198, 160, 90, 0.24);
   }
 
@@ -1624,22 +1956,29 @@ html[lang="pa"] .save-date .sd-date {
 /* H2 — scroll reveal. Hidden state only ever applies once JS confirms it
    can observe + reveal (html.js-reveal is added by script.js). Without JS
    these elements stay fully visible, so nothing can get stranded at
-   opacity:0 — the failure mode the GSAP path had on Android. */
+   opacity:0 — the failure mode the GSAP path had on Android.
+
+   --i is a stagger index set by script.js, so a screen's worth of cards
+   arrives as a sequence rather than as one block. It is capped low on
+   purpose: a guest scrolling quickly past four cards should not wait 500ms
+   to see the fourth one. */
 html.js-reveal .reveal-target {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(18px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
+  transition-delay: calc(var(--i, 0) * 90ms);
 }
 html.js-reveal .reveal-target.revealed {
   opacity: 1;
   transform: none;
 }
-/* Reduced motion: no slide, no transition — just appear. */
+/* Reduced motion: no slide, no transition, no wait — just appear. */
 @media (prefers-reduced-motion: reduce) {
   html.js-reveal .reveal-target {
     opacity: 1;
     transform: none;
     transition: none;
+    transition-delay: 0s;
   }
 }
 
@@ -1656,26 +1995,65 @@ html.js-reveal .reveal-target.revealed {
 }
 
 /* ---- Calendar options, inside the Save-the-Date card -------------
-   These used to be a separate #calendar-section card, which duplicated
-   the Save-the-Date link directly above it. They now sit inside that
-   card, on top of a stretched link that keeps the whole date block
-   tappable. The .ics file works on Android, desktop and iOS Safari
-   standalone; webcal:// opens iOS Calendar with no download step; the
-   Google link is the only one that works inside a WhatsApp or Instagram
-   in-app browser, which is where most guests will actually open this. */
-a.save-date { position: relative; }
+   These used to be a separate #calendar-section card, which duplicated the
+   Save-the-Date link directly above it - and the card itself was also one
+   big stretched download link sitting on top of the three option pills, so
+   there were four ways to do the same thing on one card. Now: one button,
+   and the options open underneath it. All three still work. The .ics file
+   works on Android, desktop and iOS Safari standalone; webcal:// opens iOS
+   Calendar with no download step; the Google link is the only one that
+   works inside a WhatsApp or Instagram in-app browser, which is where most
+   guests will actually open this. */
 
-/* Covers the whole card, so tapping the date does the obvious thing.
-   Its text is not shown: the visible .sd-cta below already says it. */
-.sd-stretch {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 3px;
-  color: transparent;
-  font-size: 0;
+/* The single opener. A <button>, so the UA's button chrome comes back off. */
+.cal-toggle {
+  appearance: none;
+  cursor: pointer;
 }
-.sd-stretch:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.cal-toggle:focus-visible { outline: 2px solid var(--royal); outline-offset: 3px; }
+
+.cal-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+.cal-panel[hidden] { display: none; }
+.cal-panel.open { animation: cal-open 0.35s var(--ease) both; }
+@keyframes cal-open {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* "N days to go" and the timezone note. Both inside the Save-the-Date card:
+   they describe the same event, and as loose siblings between the card and
+   "RECEPTION" they read as orphaned debris. */
+.days-to-go {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--highlight);
+}
+.tz-note {
+  margin: 8px auto 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+  color: var(--gold-text);
+  opacity: 0.9;
+}
+html[lang="pa"] .days-to-go,
+html[lang="pa"] .tz-note {
+  font-family: var(--font-gurmukhi);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html[lang="pa"] .days-to-go { font-size: 16px; }
+html[lang="pa"] .tz-note { font-size: 14.5px; }
 
 .cal-actions {
   position: relative;
@@ -1768,8 +2146,89 @@ html, body {
   min-height: 1.2em;
 }
 
-/* ==============================================================
-   INVITE MOTION — floating flowers + guest controls
+/* ---- RSVP confirmation ------------------------------------------------
+   role="status" on the box, so it is announced when it replaces the form.
+   The "Open WhatsApp again" link is the important part: window.open() is
+   silently blocked by several in-app browsers, and without this a guest
+   whose reply appears to have vanished has no way back to the chat. */
+.rsvp-thanks {
+  animation: thanks-in 0.5s var(--ease) both;
+  text-align: center;
+}
+.rsvp-thanks-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--maroon);
+  margin-bottom: 10px;
+}
+html[lang="pa"] .rsvp-thanks-title {
+  font-family: var(--font-gurmukhi);
+  letter-spacing: normal;
+  font-size: 30px;
+}
+.rsvp-thanks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  color: var(--highlight);
+  text-decoration: underline;
+}
+html[lang="pa"] .rsvp-thanks a {
+  font-family: var(--font-gurmukhi);
+  font-size: 15px;
+}
+@keyframes thanks-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rsvp-thanks { animation: none; }
+}
+
+/* ---- Press feedback ------------------------------------------
+   transform only. These selectors target the VISIBLE control, not a
+   wrapper: .actions renders <a><div class="venue">, and a transform on an
+   inline <a> is ignored by the CSS spec, so scaling the wrapper would
+   silently do nothing. .cal-btn and .lang-pick button already carry a
+   transform in their own transition; the rest get one here. */
+.actions .venue,
+.actions button,
+.rsvp-section button,
+#print-invite,
+.attend-btn,
+.cal-btn,
+.intro-gate .lang-pick button,
+.cal-toggle {
+  transition: transform 0.15s var(--ease), box-shadow 0.25s var(--ease),
+              background 0.3s var(--ease), color 0.3s var(--ease),
+              border-color 0.3s var(--ease);
+}
+.actions .venue:active,
+.actions button:active,
+.rsvp-section button:active,
+#print-invite:active,
+.attend-btn:active,
+.cal-btn:active,
+.intro-gate .lang-pick button:active,
+.cal-toggle:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  .actions .venue, .actions button, .rsvp-section button, #print-invite,
+  .attend-btn, .cal-btn, .intro-gate .lang-pick button, .cal-toggle {
+    transition: none;
+  }
+  .actions .venue:active, .actions button:active, .rsvp-section button:active,
+  #print-invite:active, .attend-btn:active, .cal-btn:active,
+  .intro-gate .lang-pick button:active, .cal-toggle:active {
+    transform: none;
+  }
+}
+
+﻿/* ==============================================================
+   INVITE MOTION â€” floating flowers + guest controls
    --------------------------------------------------------------
    Additive only. Nothing in this file re-declares an existing
    selector's layout, colour, font or spacing: every rule below is
@@ -1794,7 +2253,7 @@ html, body {
         (#fbe4ec, hot orange marigold #f39a12). They are re-tinted
         here to the invitation's own palette (antique gold, maroon,
         blush) so the shower reads as part of this page. The mogra
-        stays true white — it is the flower the layer is named for.
+        stays true white â€” it is the flower the layer is named for.
      3. NO will-change on the petals. style.css documents that
         per-petal layer promotion made the previous Android petal
         implementation invisible; transform-only animations are
@@ -1802,6 +2261,14 @@ html, body {
    ============================================================== */
 
 /* ---- petals ------------------------------------------------- */
+/* The guest switched away from this tab. animation-play-state is the only
+   thing that stops them, and unlike display:none it costs nothing to
+   resume - no relayout, no re-measuring. */
+#sakura-falling.paused .p,
+#sakura-falling.paused .w,
+#sakura-falling.paused .s {
+  animation-play-state: paused !important;
+}
 #sakura-falling .p {
   position: absolute;
   top: 0;
@@ -1874,31 +2341,44 @@ body { animation: im-page-in 0.55s var(--ease); }
 .rf-corner.br { animation-delay: 0.45s; }
 
 /* ---- guest controls ----------------------------------------- */
-/* Bottom-left, the exact slot the previous "Petals: on/off" pill
-   occupied: clear of the RSVP thumb zone, the language links and
-   every section card. z-index 5 sits above the content layer but
+/* Bottom-RIGHT. They used to sit bottom-left, directly over the left edge
+   of a section card (at 390px a card is 359px wide and starts at x=16, so a
+   48px cluster at x=12 covered 44px of it) - i.e. they sat on top of the
+   text the guest was reading. z-index 5 stays above the content layer but
    far below .intro-gate (9999). */
 .im-controls {
   position: fixed;
-  left: calc(12px + env(safe-area-inset-left, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
   bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 5;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s var(--ease);
 }
-/* Only after the guest has chosen a language — the gate card is
-   centred and a bottom-left cluster would crowd it. */
+/* Only after the guest has chosen a language â€” the gate card is
+   centred and a corner cluster would crowd it. */
 body.intro-done .im-controls { opacity: 1; visibility: visible; }
 
+/* While the guest is actively scrolling the buttons dim right down. They are
+   never removed and never stop working, so a tap during the fade still
+   registers - the point is only to stop them competing with the text going
+   past underneath. */
+html.is-scrolling .im-btn { opacity: 0.25; }
+
 .im-btn {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
+  /* 44px, not the 40px first proposed: 40px is below the 44px minimum tap
+     target, and this file already carries a deliberate decision (see the F3
+     fixes in style.css) that every control on the page keeps a 44px box for
+     older relatives on a phone. Going to 44 also shrinks them for the first
+     time, from 48. */
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1910,7 +2390,8 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.3s var(--ease), color 0.3s var(--ease),
-              border-color 0.3s var(--ease), transform 0.15s var(--ease);
+              border-color 0.3s var(--ease), transform 0.15s var(--ease),
+              opacity 0.3s var(--ease);
 }
 .im-btn:active { transform: translateY(1px); }
 .im-btn:focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
@@ -1927,6 +2408,33 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
 /* Off state: the icon reads as inactive without a text label. */
 .im-btn[aria-pressed="false"] { color: #a08a8f; }
 
+/* One-time caption beside the controls, so a guest who has never met a
+   round icon-only button knows they are buttons and what one does. The text
+   is the music button's own aria-label, already translated into the active
+   language - so this introduces no new copy that would need proofreading.
+   aria-hidden because the button's own label already says it. */
+.im-tip {
+  position: absolute;
+  right: 54px;
+  bottom: 2px;
+  padding: 6px 11px;
+  border-radius: 14px;
+  background: var(--royal);
+  color: var(--ivory);
+  font-family: var(--font-gurmukhi);
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  pointer-events: none;
+}
+.im-tip.on { opacity: 0.95; transform: none; }
+
+/* The last thing on the page must not end up underneath the cluster. */
+main#invite-main { padding-bottom: 76px; }
+
 /* High Contrast: the theme's gold hairline disappears, so controls take a
    system border, matching the treatment given to .attend-btn, #rsvp-send,
    #print-invite and .lang-toggle a in style.css. */
@@ -1937,13 +2445,13 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
 /* ---- reduced motion ----------------------------------------- */
 /* style.css ends with a blanket reduced-motion rule that sets
    animation-duration to 0.001ms on *. Applied literally it would
-   freeze every flower solid at its start keyframe — but the brief is
+   freeze every flower solid at its start keyframe â€” but the brief is
    that the flowers stay VISIBLE and simply calmer. A universal
    !important can only be undone by another !important, so this is
    the single one in this file, scoped strictly to the overlay.
    It restores each element's own inline duration (var(--d) etc.),
    which js/invite-motion.js has already multiplied by the calm
-   factor when reduced motion is on — so the result is the slow
+   factor when reduced motion is on â€” so the result is the slow
    drift, not the fast one. */
 @media (prefers-reduced-motion: reduce) {
   #sakura-falling .p {
@@ -1961,6 +2469,10 @@ body.intro-done .im-controls { opacity: 1; visibility: visible; }
   /* The entrance is pure decoration on top of already-visible
      content, so under reduced motion it is simply dropped. */
   body, .rf-corner { animation: none !important; }
+  /* The scroll dim and the one-time caption are both information, not
+     decoration, so they must not animate either - they just appear. */
+  .im-btn, .im-tip { transition: none !important; }
+  .im-tip.on { transform: none; }
 }
 
       </style>
@@ -1985,6 +2497,9 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   },
   "date": "6 December 2026",
   "time": "10:00 AM onwards",
+  "startISO": "2026-12-06T10:00:00+05:30",
+  "endISO": "2026-12-06T15:00:00+05:30",
+  "_endISO_note": "EDIT (Nirman): placeholder. Confirm the real end time. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
   "countdownTarget": "Dec 6, 2026 10:00:00",
   "venue": {
     "name": "Park City Resort",
@@ -2000,7 +2515,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "notePa": "ਕਿਰਪਾ ਕਰਕੇ 22 ਨਵੰਬਰ 2026 ਤੱਕ RSVP ਕਰੋ।"
   },
   "footer": {
-    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
+    "message": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding!",
     "contact": "For any queries: +61 423 594 009",
     "contactLabel": "For any queries:",
     "phone": "+61 423 594 009",
@@ -2147,6 +2662,14 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrContact": "Contact Details",
         "qrNote": "Scan with your phone camera, or tap a code to open it",
         "gateHint": "Tap your language to enter",
+        "gateHintBoth": "Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ",
+        "tzIst": "IST (India time)",
+        "tzYours": "In your time",
+        "daysToGo": "{n} days to go",
+        "daysOne": "Tomorrow",
+        "daysZero": "Today",
+        "rsvpThanks": "Thank you!",
+        "rsvpReopen": "Open WhatsApp again",
         "saveTheDateTitle": "Save the Date",
         "saveTheDateNote": "Add the reception to your calendar so you do not miss it.",
         "saveTheDateCta": "Tap to add it to your calendar",
@@ -2199,6 +2722,14 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrContact": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
         "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ, ਜਾਂ ਖੋਲ੍ਹਣ ਲਈ ਟੈਪ ਕਰੋ",
         "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
+        "gateHintBoth": "Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ",
+        "tzIst": "ਭਾਰਤੀ ਸਮਾਂ (IST)",
+        "tzYours": "ਤੁਹਾਡੇ ਸਮੇਂ ਅਨੁਸਾਰ",
+        "daysToGo": "{n} ਦਿਨ ਬਾਕੀ",
+        "daysOne": "ਕੱਲ੍ਹ",
+        "daysZero": "ਅੱਜ",
+        "rsvpThanks": "ਧੰਨਵਾਦ!",
+        "rsvpReopen": "ਵਟਸਐਪ ਦੁਬਾਰਾ ਖੋਲ੍ਹੋ",
         "saveTheDateTitle": "ਇਹ ਤਾਰੀਖ਼ ਯਾਦ ਰੱਖੋ",
         "saveTheDateNote": "ਆਪਣੇ ਕੈਲੰਡਰ ਵਿੱਚ ਤਾਰੀਖ਼ ਨੂੰ ਸੇਵ ਕਰੋ ਤਾਂ ਜੋ ਤੁਸੀਂ ਇਸ ਤਾਰੀਖ਼ ਨੂੰ ਨਾ ਭੁੱਲੋ।",
         "saveTheDateCta": "ਕੈਲੰਡਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਇੱਥੇ ਟੈਪ ਕਰੋ",
@@ -2233,7 +2764,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "rsvpTitle": "RSVP",
       "venueMapLabel": "View venue on map",
       "photoCaption": "Nirman & Simran",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥\n— With the blessings of Waheguru, we joyfully invite you to celebrate the Wedding Reception!"
     },
     "pa": {
       "langLabel": "ਪੰਜਾਬੀ",
@@ -2255,7 +2786,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       "rsvpTitle": "RSVP",
       "venueMapLabel": "ਨਕਸ਼ੇ 'ਤੇ ਸਥਾਨ ਵੇਖੋ",
       "photoCaption": "ਨਿਰਮਾਣ ਅਤੇ ਸਿਮਰਨ",
-      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥"
+      "footerNote": "ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥\nਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।\nਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥"
     }
   },
   "datePa": "6 ਦਸੰਬਰ 2026",
@@ -2287,17 +2818,31 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
           <div class="gate-blessing">
-            ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
-            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
-            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
+            ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
+            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
+            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
           </div>
-          <div class="gate-names">Nirman <span class="amp">&amp;</span> Simran</div>
+          <div class="gate-names"><span class="gate-name">Nirman</span><span class="amp">&amp;</span><span class="gate-name">Simran</span></div>
           <div class="sub" id="intro-sub">Wedding Reception Invitation</div>
           <div class="lang-pick" id="intro-lang-pick">
-            <button type="button" data-lang="en" class="active">English</button>
+            <!-- No .active on either button: highlighting one language by
+                 default reads as "this is the right one", and a large part of
+                 the guest list reads Punjabi. Both are equal until one is
+                 tapped; script.js may add .pre to Punjabi on a phone whose
+                 own language is Punjabi. -->
+            <button type="button" data-lang="en">English</button>
             <button type="button" data-lang="pa">ਪੰਜਾਬੀ</button>
           </div>
-          <div class="gate-hint" id="gate-hint">Tap your language to enter</div>
+          <!-- Bilingual on purpose: the guest should not have to recognise
+               their own language before being able to read the instruction.
+               The two halves are separate elements because the Latin half is
+               tracked and upper-cased and the Gurmukhi half must be NEITHER:
+               letter-spacing severs Gurmukhi conjuncts and breaks the join at
+               the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6). One run
+               of mixed text could not be styled both ways.
+               Static so it reads correctly before script.js runs;
+               updateIntroGate() keeps it in sync with config afterwards. -->
+          <div class="gate-hint" id="gate-hint"><span class="hint-latin">Tap your language to enter</span><span class="hint-mid" aria-hidden="true">·</span><span class="hint-pa">ਭਾਸ਼ਾ ਚੁਣੋ</span></div>
         </div>
       </div>
 
@@ -2355,10 +2900,16 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       <div class="actions" id="invite-actions"></div>
       <p class="footer" id="invite-footer"></p>
       <div id="day-info" class="day-info"></div>
-      <div id="qr-section" class="qr-section"></div>
-      <div id="photos" class="photos"></div>
+      <!-- RSVP and the map now come BEFORE the QR codes. A phone cannot scan
+           its own screen, so a QR block in the main flow is a dead end for
+           most guests and it was pushing the two things they CAN act on - a
+           reply and directions - a full screen further down. -->
       <div id="rsvp-section" class="rsvp-section"></div>
       <div id="venue-map-embed" class="venue-map-embed"></div>
+      <!-- Last on screen: hidden entirely on touch phones, where it cannot be
+           used. Still rendered on desktop, in print, and on the PDF card. -->
+      <div id="qr-section" class="qr-section"></div>
+      <div id="photos" class="photos"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>
       </main>
@@ -2372,16 +2923,24 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 
       <!-- Hidden PDF card. Portrait (was 700px landscape) so the Anand Karaj
            artwork has room without the card becoming a letterboxed strip.
-           Must stay in step with index.html - same ids, same inline styles. -->
-      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
+           Must stay in step with updatePdfLang() in js/script.js - same ids.
+
+           display:none, not just parked off-screen at left:-9999px.
+           Parked off-screen it is still LAID OUT, so the browser sees text
+           set in its faces and downloads them for every guest who will
+           never tap "download". That was Great Vibes (30 KB) plus two
+           more faces pulled onto the critical path of every single visit
+           for a card most guests do not open. onDownloadPdfClick() turns
+           it back on before html2canvas reads it. -->
+      <div id="pdf-card" class="pdf-card" style="display:none; position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
           <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
-ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
+          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
+ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
           <!-- The Anand Karaj artwork, which the old card left out entirely.
                No crossorigin attribute: it would cache separately from the
-               same file the page loads and download it twice. See index.html. -->
+               same file the page loads and download it twice. -->
           <div style="margin:2px auto 14px; width:300px;">
             <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
@@ -2398,7 +2957,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         </div>
       </div>
 
-      <!-- The single .ics generator, shared by the page, build.js and serve.js. -->
+      <!-- The single .ics generator, shared by the page and this build. -->
       <script src="./js/ics.js"></script>
       <script src="./js/script.js"></script>
       <!-- Must come after script.js: it listens for the wedding-enter event

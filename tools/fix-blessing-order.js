@@ -18,7 +18,7 @@ const B = 'ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣ�
 // and CRLF from git checkout.
 const SEPS = ['\r\n', '\n', '\\n'];
 
-const files = ['index.html', 'build.js', 'data/config.json'];
+const files = ['build.js', 'data/config.json'];
 let grandTotal = 0;
 
 for (const f of files) {

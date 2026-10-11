@@ -4,6 +4,13 @@
  */
 'use strict';
 (function () {
+  /* One flag, read once, for every animation on the page. Defined before
+     anything else so no feature can accidentally branch on its own copy.
+     Everything that animates must check this (in JS) or be covered by the
+     matching @media (prefers-reduced-motion: reduce) block in CSS - the
+     instruction is that motion becomes an instant change, never a missing
+     or broken one. */
+  var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? window.__WEDDING_CONFIG__ : {};
   var couple = config.couple || {};
   var p1 = couple.partner1 || 'Nirman';
@@ -19,7 +26,14 @@
   var footerPhone = (config.footer && config.footer.phone) || '';
   var footerPhoneHref = (config.footer && config.footer.phoneHref) || '';
   var mapUrl = (config.links && config.links.venueMap) || 'https://maps.google.com';
-  var eventDate = new Date(config.countdownTarget || 'Dec 6, 2026 10:00:00');
+  /* The weekday shown on the Save-the-Date card.
+     startISO is preferred because it is unambiguous: it carries +05:30.
+     countdownTarget is "Dec 6, 2026 10:00:00", which JavaScript parses in
+     the VIEWER's timezone, so on a phone set to Australia/Melbourne the
+     guest was being told the weekday of their own 10am. */
+  var eventDate = config.startISO
+    ? new Date(config.startISO)
+    : new Date(config.countdownTarget || 'Dec 6, 2026 10:00:00');
   if (isNaN(eventDate.getTime())) eventDate = new Date('Dec 6, 2026 10:00:00');
   var social = config.social || {};
   var socialEnabled = !!(social.enabled && social.url);
@@ -145,6 +159,7 @@
     renderLangToggle();
     updateIntroGate();
     renderSaveTheDate();
+    renderTimeLines();
     // Petal toggle label + any lang-dependent chrome re-render with it.
     try { window.dispatchEvent(new CustomEvent('wedding-langchange')); } catch (e) {}
   }
@@ -171,10 +186,14 @@
          failed axe's heading-order rule). The connector is a styled span
          inside the h1; the occasion becomes a real <h2>, so the outline is
          h1 > h2 everywhere on the page. */
+      /* name-shimmer rides on the two NAME spans, never on the connector - the
+         "&" is a flat gold mark and a sweep across it would read as a
+         rendering fault. In Punjabi the same class lands on the Gurmukhi
+         name, which is correct: both scripts get the same welcome. */
       titleEl.innerHTML =
-        '<h1 class="title-names"><span class="name-a">' + esc(n1) + n1Sub + '</span>' +
+        '<h1 class="title-names"><span class="name-a name-shimmer">' + esc(n1) + n1Sub + '</span>' +
         '<span class="amp-title">' + esc(conn()) + '</span>' +
-        '<span class="name-b">' + esc(n2) + n2Sub + '</span></h1>' +
+        '<span class="name-b name-shimmer">' + esc(n2) + n2Sub + '</span></h1>' +
         '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
@@ -266,22 +285,84 @@
   }
 
   // ---------- Day info ----------
+  /* Time and Venue only. The Date row was removed on purpose: the date is
+     already on screen three times by the time a guest reaches this card -
+     in the title block, in the Save-the-Date card, and again in the print
+     header - and repeating it a fourth time adds nothing.
+     The <h2> heading went with it for the same reason: it read "Reception",
+     which is the occasion, not a label for the two rows below it. */
   function renderDayInfo() {
     var el = document.getElementById('day-info');
     if (!el) return;
     if (features.dayInfo === false) { el.innerHTML = ''; return; }
-    var isPa = (currentLang === 'pa');
-    // Both languages must use the same occasion wording - "Reception" was
-    // leaking through as English inside Punjabi mode.
-    var heading = tx('receptionHeading', 'Reception');
-    var items = '';
     el.innerHTML =
-      '<h2>' + esc(heading) + '</h2>' +
-      '<div class="day-grid">' + items +
-      '<div class="day-item"><div class="label">' + esc(txWith('dayInfoDate', 'Date')) + '</div><div class="value">' + esc(dateText()) + '</div></div>' +
+      '<div class="day-grid">' +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoTime', 'Time')) + '</div><div class="value">' + esc(timeText() || '-') + '</div></div>' +
       '<div class="day-item"><div class="label">' + esc(txWith('dayInfoVenue', 'Venue')) + '</div><div class="value">' + esc(venueNameText()) + (venueAddrText() ? '<br>' + esc(venueAddrText()) : '') + '</div></div>' +
       '</div>';
+  }
+
+  /* A short burst of petals from the button the guest just pressed.
+     Web Animations API only - no library, and no fallback path that fakes
+     it: on a browser without el.animate the span is simply removed again
+     rather than left on screen as a stuck petal. The elements are created
+     fixed-position at the button's centre and removed on finish, so they
+     never take part in layout and never trigger a reflow of the page. */
+  function petalBurst(originEl) {
+    if (REDUCED || !originEl || !originEl.getBoundingClientRect) return;
+    var r = originEl.getBoundingClientRect();
+    if (!r.width) return;
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height / 2;
+    var colors = ['#a4243b', '#e8c877', '#fffdf7', '#c8a24b'];
+    for (var i = 0; i < 16; i++) {
+      var p = document.createElement('span');
+      p.setAttribute('aria-hidden', 'true');
+      p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;width:10px;height:14px;' +
+        'border-radius:70% 0 70% 0;pointer-events:none;z-index:10000;background:' + colors[i % 4] + ';';
+      document.body.appendChild(p);
+      if (!p.animate) { if (p.parentNode) p.parentNode.removeChild(p); continue; }
+      var a = Math.random() * Math.PI * 2;
+      var d = 60 + Math.random() * 90;
+      var dx = Math.cos(a) * d;
+      var dy = Math.sin(a) * d - 40 + 120;
+      var spin = Math.round(Math.random() * 540 - 270);
+      var anim;
+      try {
+        anim = p.animate([
+          { transform: 'translate(-50%,-50%) scale(0.6) rotate(0deg)', opacity: 1 },
+          { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(1) rotate(' + spin + 'deg)', opacity: 0 }
+        ], { duration: 1100 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' });
+      } catch (e) { if (p.parentNode) p.parentNode.removeChild(p); continue; }
+      anim.onfinish = (function (el) {
+        return function () { if (el.parentNode) el.parentNode.removeChild(el); };
+      })(p);
+    }
+  }
+
+  /* Replaces the whole form with a confirmation, and keeps a link to the
+     same WhatsApp thread. The link is not decoration: window.open() is
+     blocked outright by several in-app browsers (and by any pop-up blocker
+     on desktop), and without it a guest whose RSVP "did nothing" has no way
+     back to the chat they were meant to send. */
+  function showRsvpThanks(host, link) {
+    var box = document.createElement('div');
+    box.className = 'rsvp-thanks';
+    box.setAttribute('role', 'status');
+    var h = document.createElement('div');
+    h.className = 'rsvp-thanks-title';
+    h.textContent = txOr('rsvpThanks', 'Thank you!');
+    box.appendChild(h);
+    if (link) {
+      var a = document.createElement('a');
+      a.href = link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = txOr('rsvpReopen', 'Open WhatsApp again');
+      box.appendChild(a);
+    }
+    host.innerHTML = '';
+    host.appendChild(box);
   }
 
   // ---------- RSVP ----------
@@ -421,7 +502,20 @@
         // (and headless Chrome) nothing is shown at all - so the guest's RSVP
         // silently went nowhere. The options object sets the opener policy
         // correctly and always opens the chat.
-        if (link) window.open(link, '_blank', { noopener: true, noreferrer: true });
+        if (link) {
+          // Use an options OBJECT, not the positional features string.
+          // window.open(link, '_blank', 'noopener') treats 'noopener' as a
+          // window-FEATURES string: the browser opens a window literally named
+          // "noopener" with no opener, and in several mobile in-app browsers
+          // (and headless Chrome) nothing is shown at all - so the guest's RSVP
+          // silently went nowhere. The options object sets the opener policy
+          // correctly and always opens the chat.
+          window.open(link, '_blank', { noopener: true, noreferrer: true });
+          petalBurst(sendBtn);
+          showRsvpThanks(el, link);
+        } else {
+          rsvpError(txOr('rsvpErrorName', 'Please try again.'));
+        }
       });
     }
     var directOnly = document.getElementById('rsvp-direct-only');
@@ -748,6 +842,13 @@
     if (!card) return;
     var btn = document.getElementById('download-pdf');
     if (btn) { btn.textContent = tx('pdfWorking', 'Preparing...'); btn.disabled = true; }
+    /* The card ships display:none so its faces are not downloaded by the
+       99% of guests who never press this button. html2canvas cannot
+       rasterise a display:none subtree - it would produce a blank page -
+       so it is laid out here, just before the capture. The two script tags
+       below are fetched on demand and arrive after this anyway, so the
+       fonts have time to load inside that window. */
+    card.style.display = 'block';
     loadPdfLibs(function () {
       if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
         alert('PDF libraries could not be loaded. Please check your connection.');
@@ -763,6 +864,11 @@
          560px card, and JPEG at 0.92 is the right format for this: it is a
          photographic-style image with no transparency. Typical output is
          now ~300 KB. */
+      /* The card's faces (Great Vibes above all) are only requested now
+         that it is visible. Waiting for them here is the difference
+         between a card with script names on it and one where the names
+         have silently fallen back to a serif. */
+      function capture() {
       html2canvas(card, { scale: 1.5, useCORS: true, logging: false, backgroundColor: '#faf6ec' })
         .then(function (canvas) {
           // html2canvas cannot draw the QR modules, so paint them on here.
@@ -805,6 +911,22 @@
             btn.disabled = false;
           }
         });
+      }
+
+      /* document.fonts.ready is the only way to know Great Vibes has
+         actually arrived before html2canvas walks the DOM. Without the
+         wait the card renders with the names in a fallback serif and
+         nothing looks wrong - it just is not the invitation. */
+      if (window.document && document.fonts && document.fonts.ready &&
+          typeof document.fonts.load === 'function') {
+        try {
+          document.fonts.load('400 44px "Great Vibes"', p1 + p2)
+            .then(function () { return document.fonts.ready; })
+            .then(capture, capture);
+          return;
+        } catch (e) { /* fall through to the plain capture */ }
+      }
+      capture();
     });
   }
 
@@ -823,14 +945,14 @@
        Save-the-Date link and read as a bug - two competing calendar
        things stacked under each other.
 
-       The date block stays one big tap target via a stretched link that
-       covers the card (.sd-stretch), because tapping the date the guest
-       came to read should do the thing the page is asking for. The three
-       explicit options sit on top of it (z-index) so they stay tappable:
-           .ics file  - Android, desktop, iOS Safari standalone
-           webcal://  - iOS only, opens Calendar with no download step
-           Google     - the only option that works inside a WhatsApp or
-                        Instagram in-app browser
+       One button, not three links. Three equal pills plus two lines of
+       explanation asked the guest to work out which one applies to their
+       phone before they had read anything else on the page, and the whole
+       card was also a stretched download link on top of them, so there were
+       four competing affordances on one card. The options are all still
+       here and all still work - they are simply folded away behind a single
+       button until asked for.
+
        A real served file, not a data: URI - iOS cannot use data: URLs. */
     var google = (window.WeddingICS && window.WeddingICS.googleUrl)
       ? window.WeddingICS.googleUrl(config) : '';
@@ -871,20 +993,121 @@
 
     el.innerHTML =
       '<div class="save-date">' +
-        '<a class="sd-stretch" id="save-date-link" href="' + esc(ICS_FILE) + '" download="' + esc(icsDownloadName()) + '">' +
-          esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</a>' +
         '<div class="sd-title">' + esc(txOr('saveTheDateTitle', 'Save the Date')) + '</div>' +
         '<div class="sd-date">' + esc(full) + '</div>' +
         '<div class="sd-note">' + esc(txOr('saveTheDateNote', '')) + '</div>' +
-        '<div class="sd-cta">' + esc(txOr('saveTheDateCta', 'Tap to add to your calendar')) + '</div>' +
-        '<div class="cal-actions">' +
-          calBtn(primary, 'cal-btn cal-primary') +
-          rest.map(function (o) { return calBtn(o, 'cal-btn'); }).join('') +
+        '<button type="button" class="sd-cta cal-toggle" id="cal-toggle" aria-expanded="false" aria-controls="cal-panel">' +
+          esc(txOr('calendarLabel', 'Add to calendar')) +
+        '</button>' +
+        '<div class="cal-panel" id="cal-panel" hidden>' +
+          '<div class="cal-actions">' +
+            calBtn(primary, 'cal-btn cal-primary') +
+            rest.map(function (o) { return calBtn(o, 'cal-btn'); }).join('') +
+          '</div>' +
+          '<div class="cal-hint">' + esc(txOr('calendarHint',
+            ios ? 'Opens your calendar app straight away.'
+                 : 'Saves the event to your phone. On iPhone this opens Apple Calendar instead.')) + '</div>' +
         '</div>' +
-        '<div class="cal-hint">' + esc(txOr('calendarHint',
-          ios ? 'Opens your calendar app straight away.'
-               : 'Saves the event to your phone. On iPhone this opens Apple Calendar instead.')) + '</div>' +
       '</div>';
+
+    wireCalendarPanel(document.getElementById('cal-toggle'), document.getElementById('cal-panel'));
+  }
+
+  /* aria-expanded is what tells a screen reader whether the options are
+     there; the .open class is what animates them in. Both are set on every
+     toggle so the two can never disagree. */
+  function wireCalendarPanel(btn, panel) {
+    if (!btn || !panel) return;
+    panel.hidden = true;
+    panel.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', function () {
+      var willOpen = panel.hidden;
+      panel.hidden = !willOpen;
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      if (willOpen) panel.classList.add('open'); else panel.classList.remove('open');
+    });
+  }
+
+  /* ---------------------------------------------
+     "N days to go" + "In your time".
+     ---------------------------------------------
+     Both are driven off config.startISO, which carries an explicit +05:30.
+     The old eventDate is new Date('Dec 6, 2026 10:00:00'), which JavaScript
+     parses in the VIEWER's own timezone - so a guest in Melbourne was being
+     counted down against their local 10am rather than India's, which can
+     even land them on the wrong weekday.
+
+     Both lines live INSIDE the Save-the-Date card rather than loose in the
+     page flow: they are about the same event, and as bare siblings between
+     the card and "RECEPTION" they read as orphaned debris. */
+  function renderTimeLines() {
+    var host = document.getElementById('time');
+    if (!host || !config.startISO) return;
+
+    // Rebuilded wholesale on every render (first paint and every language
+    // switch). Replaced rather than mutated, so the pair can never end up
+    // duplicated or in the wrong order.
+    var oldD = document.getElementById('days-to-go');
+    var oldT = document.getElementById('tz-note');
+    if (oldD && oldD.parentNode) oldD.parentNode.removeChild(oldD);
+    if (oldT && oldT.parentNode) oldT.parentNode.removeChild(oldT);
+
+    var start = new Date(config.startISO);
+    if (isNaN(start.getTime())) return;
+
+    /* --- days to go. Deliberately NOT a ticking timer: a number that does
+       not change every second costs nothing and cannot distract.
+
+       Counted in whole CALENDAR DAYS IN INDIA, not in elapsed 24-hour
+       chunks. The brief specified Math.ceil(diff / 86400000), and that is
+       wrong at the edges: at 3am on the morning of the reception it returns
+       1 and the card says "Tomorrow" to a guest who is reading it seven
+       hours before they leave the house. What a guest means by "tomorrow"
+       is a calendar day, and the day that matters is the wedding's, so the
+       difference is taken between the two India dates.
+
+       India is a fixed +05:30 with no daylight saving, so shifting by that
+       constant is exact and needs no timezone database. */
+    var IST_OFFSET_MS = 330 * 60000;
+    var startDay = Math.floor((start.getTime() + IST_OFFSET_MS) / 86400000);
+    var nowDay = Math.floor((Date.now() + IST_OFFSET_MS) / 86400000);
+    var n = startDay - nowDay;
+    if (n >= 0) {
+      var label;
+      if (n === 0) label = txOr('daysZero', 'Today');
+      else if (n === 1) label = txOr('daysOne', 'Tomorrow');
+      else label = String(txOr('daysToGo', '{n} days to go').replace('{n}', String(n)));
+      var daysEl = document.createElement('div');
+      daysEl.id = 'days-to-go';
+      daysEl.className = 'days-to-go';
+      daysEl.textContent = label;
+      host.appendChild(daysEl);
+    }
+
+    // --- timezone line
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
+    var inIndia = (tz === '' || tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta');
+    var text = txOr('tzIst', 'IST (India time)');
+    /* Only a guest genuinely outside India gets the second half. Someone in
+       Punjab does not need the time twice, and if the device reports a zone
+       we do not recognise we still always print the India time, because
+       that is the one that is certain. */
+    if (!inIndia && window.Intl && Intl.DateTimeFormat) {
+      try {
+        var f = new Intl.DateTimeFormat(isPa() ? 'pa-IN' : undefined, {
+          weekday: 'short', day: 'numeric', month: 'short',
+          hour: 'numeric', minute: '2-digit', hour12: true
+        });
+        text += ' \u00B7 ' + txOr('tzYours', 'In your time') + ': ' + f.format(start);
+      } catch (e) {}
+    }
+    var tzEl = document.createElement('div');
+    tzEl.id = 'tz-note';
+    tzEl.className = 'tz-note';
+    tzEl.textContent = text;
+    host.appendChild(tzEl);
   }
 
 // ---------- Floating flowers ----------
@@ -924,23 +1147,82 @@
   }
 
   // ---------- Intro gate ----------
+  /* Two panels that slide apart, rather than the whole screen fading out.
+     The panels are created once, here, and are pure decoration
+     (aria-hidden, pointer-events off while closed only by being behind the
+     card). They are inserted BEFORE .card so the card sits on top. */
+  function buildGateDoors() {
+    var gate = document.getElementById('intro-gate');
+    if (!gate || gate.getElementsByClassName('gate-door').length) return;
+    var ref = null;
+    var sides = ['l', 'r'];
+    for (var i = 0; i < sides.length; i++) {
+      var d = document.createElement('div');
+      d.className = 'gate-door ' + sides[i];
+      d.setAttribute('aria-hidden', 'true');
+      /* Left first, then right inserted AFTER it. Both panels carry the
+         same z-index, so DOM order decides which paints on top; inserting
+         each before firstChild instead would leave 'r' first for no
+         reason. */
+      if (ref) gate.insertBefore(d, ref.nextSibling); else gate.insertBefore(d, gate.firstChild);
+      ref = d;
+    }
+  }
+
+  /* done() runs exactly once, whichever arrives first: the last panel's
+     transitionend, or the safety net. The net matters more than it looks -
+     a WebView that skips transitions, or one where the tab was backgrounded
+     mid-open, would otherwise leave a guest staring at a gate whose panels
+     have slid away but which still swallows every tap on the invitation. */
+  /* Read the setting again at the moment it is used. REDUCED is captured once
+     at load as specified, but the guest can turn the OS setting on while the
+     gate is open; in that case the flag is stale, the panels get
+     transition:none from the media query, transitionend never fires, and the
+     safety net would leave a faded-out gate over a dead page for 1.3s. */
+  function motionReduced() {
+    if (REDUCED) return true;
+    try {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { return false; }
+  }
+
+  function openGate(gate, done) {
+    if (motionReduced()) { done(); return; }
+    var finished = false;
+    function fin() {
+      if (finished) return;
+      finished = true;
+      done();
+    }
+    gate.classList.add('opening');
+    gate.addEventListener('transitionend', function (e) {
+      if (e.propertyName === 'transform' && e.target.classList &&
+          e.target.classList.contains('gate-door')) fin();
+    });
+    setTimeout(fin, 1300);
+  }
+
   function enterSite(gate, pick, btn) {
-    pick.querySelectorAll('button').forEach(function (x) { x.classList.remove('active'); });
+    pick.querySelectorAll('button').forEach(function (x) { x.classList.remove('active'); x.classList.remove('pre'); });
     if (btn) btn.classList.add('active');
     var lang = btn ? btn.getAttribute('data-lang') : null;
     if (lang && i18n[lang]) setLang(lang);
-    /* First deliberate tap of a language button (English or ਪੰਜਾਬੀ alike).
-       invite-motion.js listens for this and starts the music. It is
-       dispatched synchronously from inside the click handler, which is
-       what iOS Safari and mobile in-app browsers require for play().
-       setLang() never touches the audio, so switching language later
-       cannot restart or interrupt playback. */
+    /* Everything above is synchronous and INSIDE the guest's tap, on
+       purpose: setLang() and the wedding-enter dispatch both have to happen
+       before the browser's user-gesture window closes, or iOS Safari refuses
+       to start the music. The door animation below runs afterwards and
+       touches neither. */
     try { window.dispatchEvent(new CustomEvent('wedding-enter')); } catch (e) {}
     // Auto-enter straight after picking a language
     try { sessionStorage.setItem('wedding-intro-seen', '1'); } catch (e) {}
-    gate.classList.add('hide');
+    /* Immediate, not deferred to the end of the animation: the controls and
+       the scroll-reveal both key off this, and the page behind the panels is
+       meant to be revealed AS they part. */
     document.body.classList.add('intro-done');
-    setTimeout(function () { gate.style.display = 'none'; }, 500);
+    openGate(gate, function () {
+      gate.classList.add('hide');
+      gate.style.display = 'none';
+    });
     var wrap = document.querySelector('.wrap');
     if (wrap) {
       wrap.setAttribute('tabindex', '-1');
@@ -959,6 +1241,7 @@
       return;
     }
     updateIntroGate();
+    prefillGateLanguage();
     var pick = document.getElementById('intro-lang-pick');
     if (pick) {
       pick.querySelectorAll('button').forEach(function (b) {
@@ -970,8 +1253,12 @@
           if (btn) { e.preventDefault(); enterSite(gate, pick, btn); }
         }
       });
-      var firstBtn = pick.querySelector('button[data-lang="' + currentLang + '"]') || pick.querySelector('button');
-      if (firstBtn) firstBtn.focus();
+      /* No autofocus on load. The gate buttons are the first focusable
+         elements in the document, so Tab still lands on them first for a
+         keyboard user - but calling .focus() here made Chrome match
+         :focus-visible on load, which drew a ring round ENGLISH and made
+         one language look chosen again. That is the exact signal this whole
+         change exists to remove. */
     }
   }
 
@@ -979,10 +1266,72 @@
     var subEl = document.getElementById('intro-sub');
     if (subEl) subEl.textContent = txOr('introSub', 'Wedding Reception Invitation');
     var hintEl = document.getElementById('gate-hint');
-    if (hintEl) hintEl.textContent = txOr('gateHint', 'Tap your language to enter');
+    if (hintEl) renderGateHint(hintEl);
     // The occasion line is static in the HTML, so it never got localised.
     var medEl = document.getElementById('dance-med');
     if (medEl) medEl.textContent = tx('receptionHeading', 'Reception');
+  }
+
+  /* The gate hint is deliberately BILINGUAL - a guest who cannot read the
+     instruction in one language still has to be able to find their own, and
+     they should not have to work that out before tapping anything.
+     It is stored in config as one string ("English · Gurmukhi") and split
+     here on the middle dot into two runs, because the two halves need
+     OPPOSITE typography: the Latin half is tracked and upper-cased, and the
+     Gurmukhi half must be neither (letter-spacing severs the conjunct,
+     W3C Gurmukhi Layout Requirements 5.1 / 6). One run of mixed text
+     cannot be styled both ways. */
+  function renderGateHint(el) {
+    var raw = txOr('gateHintBoth', 'Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ');
+    var parts = String(raw).split(/\s*·\s*/);
+    if (parts.length < 2) {
+      el.textContent = raw;
+      return;
+    }
+    el.innerHTML = '';
+    var latin = document.createElement('span');
+    latin.className = 'hint-latin';
+    latin.textContent = parts[0];
+    var mid = document.createElement('span');
+    mid.className = 'hint-mid';
+    /* No spaces around the dot: flex layout trims leading and trailing
+       whitespace out of a flex item, so " · " arrives as "·" and closes up
+       against the Punjabi. The breathing room is margin - see .hint-mid. */
+    mid.textContent = '·';
+    mid.setAttribute('aria-hidden', 'true');
+    var pa = document.createElement('span');
+    pa.className = 'hint-pa';
+    pa.textContent = parts.slice(1).join(' · ');
+    el.appendChild(latin);
+    el.appendChild(mid);
+    el.appendChild(pa);
+  }
+
+  /* Runs once, before the gate is shown. Which language is pre-filled is a
+     suggestion, never a choice: nothing is pre-selected on a phone whose
+     language we do not recognise, so English is no longer highlighted by
+     default. A guest on a Punjabi phone still has to tap.
+     navigator.languages can be missing or throw in some in-app browsers, so
+     every read is guarded. */
+  function prefillGateLanguage() {
+    var pick = document.getElementById('intro-lang-pick');
+    if (!pick) return;
+    var langs = '';
+    try {
+      langs = (navigator.languages && navigator.languages.length)
+        ? navigator.languages.join(',') : (navigator.language || '');
+    } catch (e) { langs = ''; }
+    if (!langs) return;
+    /* Matches "pa", "pa-IN", "pa_Cyrl" and a preference list, but not
+       "pap" or "spa". */
+    var wantsPa = /(^|,)\s*pa([-_][A-Za-z0-9]+)?\s*(,|$)/i.test(langs);
+    if (!wantsPa) return;
+    var btns = pick.querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) {
+      if (String(btns[i].getAttribute('data-lang') || '').toLowerCase() === 'pa') {
+        btns[i].classList.add('pre');
+      }
+    }
   }
 
   // ---------- Boot ----------
@@ -994,9 +1343,11 @@
     // scoped to html[lang="pa"], and setLang() only runs on interaction.
     document.documentElement.lang = isPa() ? 'pa' : 'en';
     setupIntroGate();
+    buildGateDoors();
     updateIntroGate();   // gate copy must match the deep-linked language on load
     renderInvite();
     renderSaveTheDate();
+    renderTimeLines();
     renderDayInfo();
     renderRsvp();
     renderVenueMapEmbed();
@@ -1004,11 +1355,22 @@
     updatePdfLang();
     renderLangToggle();
     initAnimations();
+    /* Tell the motion layer what language we ended up in. invite-motion.js
+       paints its two buttons at parse time, which is BEFORE this point, and
+       it picks their labels from <html lang> - so on a guest arriving via
+       #lang=pa, or returning with Punjabi already remembered, the buttons
+       were labelled in English until they touched the language toggle.
+       setLang() dispatches this same event on every real switch. */
+    try { window.dispatchEvent(new CustomEvent('wedding-langchange')); } catch (e) {}
   }
 
   // ---------- Royal animation layer (GSAP, graceful fallback) ----------
   var royalAnimated = false;
 
+  /* Container ids only, never their rendered children. The renderers
+     replace innerHTML on every language switch, so observing a child would
+     mean observing a node that no longer exists; observing the stable
+     container means a switch cannot replay or break the effect. */
   function revealTargets() {
     var ids = ['invite-blessing', 'invite-title', 'time', 'invite-actions',
       'invite-footer', 'lang-toggle', 'day-info', 'qr-section',
@@ -1055,7 +1417,13 @@
       });
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
 
-    targets.forEach(function (el) { el.classList.add('reveal-target'); io.observe(el); });
+    targets.forEach(function (el, i) {
+      /* Stagger index, capped at 3: anything longer just makes a guest who
+         scrolls fast wait for content that is already on screen. */
+      el.classList.add('reveal-target');
+      try { el.style.setProperty('--i', String(i % 3)); } catch (e) {}
+      io.observe(el);
+    });
 
     // Failsafe: if the observer never fires (odd WebViews, restored bfcache
     // sessions), anything already inside the viewport is shown anyway.
@@ -1067,12 +1435,45 @@
     }, 2500);
   }
 
+  /* Deep language links: https://invite.nirmanpreet.com/#lang=pa (and #lang=en)
+     go straight past the gate.
+     resolveLang() has already applied the language to the whole page behind
+     the gate, so all that is left is to run enterSite() for it. That is
+     done with a real .click() on the button rather than by calling
+     enterSite() directly, so exactly one code path can dismiss the gate -
+     the same one a tap takes, including the synchronous dispatch of
+     wedding-enter.
+
+     A programmatic click is NOT a user gesture, so the browser will refuse
+     to start the music. That is expected and handled: invite-motion.js
+     catches the rejection and flips the button to its "off" icon so the
+     guest is not shown a speaker that is lying. A tap on it starts the
+     music normally. */
+  function autoEnterFromHash() {
+    var m = (window.location.hash || '').match(/#lang=([a-z]{2})/i);
+    if (!m) return;
+    var lang = m[1].toLowerCase();
+    if (!i18n[lang]) return;
+    var pick = document.getElementById('intro-lang-pick');
+    if (!pick) return;
+    var btn = pick.querySelector('button[data-lang="' + lang + '"]');
+    if (btn) btn.click();
+  }
+
   function initAnimations() {
     var gate = document.getElementById('intro-gate');
     var already = document.body.classList.contains('intro-done');
     if (already || !gate || gate.classList.contains('hide')) {
       setTimeout(playRoyalReveal, 120);
     } else {
+      // A #lang= link is a deliberate "take me straight there" - do not
+      // make that guest also dismiss a language screen they already
+      // answered in the URL.
+      try { autoEnterFromHash(); } catch (e) {}
+      if (document.body.classList.contains('intro-done')) {
+        setTimeout(playRoyalReveal, 260);
+        return;
+      }
       // Reveal once the intro gate is dismissed by any path.
       var iv = setInterval(function () {
         if (document.body.classList.contains('intro-done')) {

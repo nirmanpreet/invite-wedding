@@ -187,6 +187,17 @@
   var musicOn = loadPref(MUSIC_KEY) !== 'off';
   var musicStarted = false; // has the language screen been tapped yet
   var resumeAfterHide = false;
+  /* The guest WANTS music, but the browser would not start it. The only
+     way this happens is the one added later: a #lang= deep link, where the
+     language button is clicked programmatically rather than tapped, so the
+     play() call is outside any user gesture and iOS/Chrome refuse it.
+
+     Tracked separately from musicOn on purpose. musicOn is the guest's
+     stored intent and must survive, so the icon can honestly say "not
+     playing, tap to start it" instead of claiming music is on and then
+     staying silent - which is what this used to do, leaving a guest who
+     could not hear anything looking at a speaker icon that said otherwise. */
+  var musicBlocked = false;
 
   if (audio) {
     audio.setAttribute('preload', 'none');
@@ -196,12 +207,16 @@
 
   function tryPlay() {
     if (!audio || !musicAvailable || !musicOn || !musicStarted) return;
-    if (!audio.paused) return;
+    if (!audio.paused) { if (musicBlocked) { musicBlocked = false; paintMusic(); } return; }
     var p;
-    try { p = audio.play(); } catch (e) { return; }
-    // Autoplay refused (silent switch, locked WebView, low power mode):
-    // fail silently and leave the invitation completely intact.
-    if (p && typeof p.catch === 'function') p.catch(function () {});
+    try { p = audio.play(); } catch (e) { musicBlocked = true; paintMusic(); return; }
+    // Autoplay refused (silent switch, locked WebView, low power mode, or a
+    // programmatic click): fail quietly, but tell the guest with the icon
+    // instead of leaving a lie on screen.
+    if (p && typeof p.then === 'function') {
+      p.then(function () { if (musicBlocked) { musicBlocked = false; paintMusic(); } })
+       .catch(function () { if (!musicBlocked) { musicBlocked = true; paintMusic(); } });
+    }
   }
 
   // ==============================================================
@@ -254,6 +269,9 @@
 
   var controls = document.createElement('div');
   controls.className = 'im-controls';
+  /* No role or aria-label: each button already carries its own translated
+     label, and inventing a group name here would mean a new hard-coded
+     English string on a bilingual page. */
 
   var flowerBtn = document.createElement('button');
   flowerBtn.type = 'button';
@@ -278,13 +296,20 @@
     if (box) box.style.display = flowersOn ? '' : 'none';
   }
 
+  /* What the guest is actually hearing right now, which is not the same as
+     what they asked for. */
+  function musicPlaying() {
+    return musicOn && !musicBlocked;
+  }
+
   function paintMusic() {
     if (!musicAvailable) return;
-    musicBtn.setAttribute('aria-pressed', musicOn ? 'true' : 'false');
+    var playing = musicPlaying();
+    musicBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
     musicBtn.setAttribute('aria-label', lang() === 'pa'
-      ? (musicOn ? LABEL.pa.musicOn : LABEL.pa.musicOff)
-      : (musicOn ? LABEL.en.musicOn : LABEL.en.musicOff));
-    musicBtn.innerHTML = musicOn ? ICON.soundOn : ICON.soundOff;
+      ? (playing ? LABEL.pa.musicOn : LABEL.pa.musicOff)
+      : (playing ? LABEL.en.musicOn : LABEL.en.musicOff));
+    musicBtn.innerHTML = playing ? ICON.soundOn : ICON.soundOff;
   }
 
   // ---- flower toggle: touches nothing but the overlay ----
@@ -297,6 +322,8 @@
   // ---- music toggle: touches nothing but the audio element ----
   musicBtn.addEventListener('click', function () {
     musicOn = !musicOn;
+    // Whatever the browser refused before, a real tap is a new chance.
+    musicBlocked = false;
     savePref(MUSIC_KEY, musicOn ? 'on' : 'off');
     if (musicOn) { tryPlay(); } else if (audio) { try { audio.pause(); } catch (e) {} }
     paintMusic();
@@ -304,6 +331,50 @@
 
   paintFlowers();
   paintMusic();
+
+  /* ---------------------------------------------
+     Stop the controls competing with the text.
+     ---------------------------------------------
+     Two round icons in the corner of a phone are unavoidably over something:
+     at 390px a section card is 359px wide, so there is no corner left that
+     is not on top of text. Two things fix that, and both are here rather
+     than by hiding the buttons:
+       1. they dim while the guest is scrolling (the moment they would
+          actually be in the way), and
+       2. they announce themselves once, so they are not an unexplained
+          mystery on first sight.
+     Neither removes the buttons, so both toggles stay reachable throughout. */
+  (function controlExtras() {
+    // 1. Dim while scrolling. Passive, because scroll handlers run on the
+    //    compositor path and blocking it is felt on a cheap Android phone.
+    var scrollEnd = null;
+    window.addEventListener('scroll', function () {
+      document.documentElement.classList.add('is-scrolling');
+      if (scrollEnd) clearTimeout(scrollEnd);
+      scrollEnd = setTimeout(function () {
+        document.documentElement.classList.remove('is-scrolling');
+      }, 900);
+    }, { passive: true });
+
+    // 2. The one-time caption. sessionStorage is wrapped because in-app
+    //    browsers can throw on access, and a thrown read must not take the
+    //    flowers and the music down with it.
+    var shown = false;
+    try { shown = sessionStorage.getItem('wedding-tip') === '1'; } catch (e) { shown = false; }
+    if (shown || !musicBtn.parentNode) return;
+
+    var tip = document.createElement('span');
+    tip.className = 'im-tip';
+    tip.setAttribute('aria-hidden', 'true');
+    // Reuse the button's own translated label rather than adding a string
+    // that would need proofreading. On a Punjabi phone it reads in Punjabi.
+    tip.textContent = musicBtn.getAttribute('aria-label') || '';
+    controls.appendChild(tip);
+
+    setTimeout(function () { tip.classList.add('on'); }, 1400);
+    setTimeout(function () { tip.classList.remove('on'); }, 6000);
+    try { sessionStorage.setItem('wedding-tip', '1'); } catch (e) {}
+  })();
 
   // ==============================================================
   // WIRING
@@ -325,6 +396,11 @@
   });
 
   document.addEventListener('visibilitychange', function () {
+    /* A background tab still runs its animations, and this page runs up to
+       36 of them. Pausing them while the guest is in another app is the
+       single cheapest battery win on the whole page. */
+    if (box) box.classList.toggle('paused', document.hidden);
+
     if (!audio) return;
     if (document.hidden) {
       resumeAfterHide = !audio.paused;

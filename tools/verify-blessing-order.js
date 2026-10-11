@@ -42,8 +42,18 @@ function trailingJunk(line) {
 }
 
 function checkFile(label, raw) {
-  // config.json keeps the blessing in one physical line with \n escapes.
-  const text = raw.replace(/\\n/g, '\n');
+  // config.json keeps the blessing in one physical line with \n escapes, and
+  // both config.json and build.js spell the no-break space as the six
+  // characters \u00a0. A no-break space before the danda is folded back to a
+  // plain space before comparing: it is a deliberate typographic guard (so the
+  // mark can never wrap onto its own line), NOT part of the sacred text.
+  // Without this the canonical constants below stop matching after that change
+  // and the whole check goes silently blind - which is exactly the failure
+  // mode this file exists to prevent.
+  const text = raw
+    .replace(/\\n/g, '\n')
+    .replace(/\\u00a0/gi, '\u00A0')
+    .replace(/\u00A0/g, ' ');
   const lines = text.split(/\r?\n/);
   let found = 0, exact = 0;
 
@@ -76,15 +86,19 @@ function checkFile(label, raw) {
 }
 
 console.log('Every blessing line must match character for character.\n');
-for (const f of ['index.html', 'build.js', 'dist/index.html']) {
+for (const f of ['build.js', 'dist/index.html']) {
   if (!fs.existsSync(f)) { console.log(`  skip  ${f} (missing)`); continue; }
   checkFile(f, fs.readFileSync(f, 'utf8'));
 }
 
 const cfg = JSON.parse(fs.readFileSync('data/config.json', 'utf8'));
-for (const [k, s] of [['footer.message', cfg.footer.message],
-                     ['i18n.en.footerNote', cfg.i18n.en.footerNote],
-                     ['i18n.pa.footerNote', cfg.i18n.pa.footerNote]]) {
+// Same normalisation as checkFile, so these direct lookups compare the
+// Gurmukhi rather than tripping over the no-break space.
+const norm = (s) => String(s).replace(/\u00A0/g, ' ');
+for (const [k, s0] of [['footer.message', cfg.footer.message],
+                       ['i18n.en.footerNote', cfg.i18n.en.footerNote],
+                       ['i18n.pa.footerNote', cfg.i18n.pa.footerNote]]) {
+  const s = norm(s0);
   checkFile('config ' + k, s);
   if (s.indexOf(B) === -1) { problems.push(`config ${k}: first couplet line missing`); ok = false; }
   if (s.indexOf(A) === -1) { problems.push(`config ${k}: second couplet line missing`); ok = false; }

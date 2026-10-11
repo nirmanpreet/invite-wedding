@@ -26,12 +26,17 @@
 - SEO (JSON-LD Event schema) + PWA manifest (add to home screen)
 - Mobile-first, fast — no jQuery, flowers respect reduced-motion (slower, never hidden)
 
-## Run locally
+## Build and run locally
+
+There is one source of truth. Edit the files below, then:
 
 ```bash
-node serve.js
-# Open http://localhost:3000
+node build.js          # builds dist/ from css/, js/ and data/config.json
+node serve-dist.js     # serves dist/ on http://localhost:3200
 ```
+
+`dist/index.html` is **generated** - never hand-edit it, or the next build
+overwrites your change.
 
 ## Build for hosting (GitHub Pages / Vercel / Netlify)
 
@@ -47,18 +52,19 @@ Edit [data/config.json](data/config.json) — names, date, time, venue, RSVP dea
 ## Structure
 
 ```
-index.html            # main page (dev, served by serve.js)
-data/config.json      # all invitation content & settings
-js/script.js          # app logic (no dependencies)
-js/invite-motion.js   # floating flowers + flowers/music toggles
-js/qrcode.min.js      # vendored QR generator (MIT)
-css/style.css         # Sikh-theme styling (maroon / gold / ivory)
-css/invite-motion.css # flower animation + the two control buttons
-assets/icon.svg       # PWA home-screen icon
-music.mp3             # background music (non-sacred instrumental)
-build.js              # builds dist/ for static hosting
-serve.js              # tiny dev server with live config
-serve-dist.js         # static server for the built dist/ (QA)
+dist/                  # BUILD OUTPUT - generated, never hand-edited
+data/config.json       # all invitation content & settings
+build.js               # generates dist/ for static hosting
+serve-dist.js          # static server for the built dist/ (QA + local dev)
+js/script.js           # app logic (no dependencies)
+js/ics.js              # the one .ics generator, shared by the page and build.js
+js/invite-motion.js    # floating flowers + flowers/music toggles
+js/qrcode.min.js       # vendored QR generator (MIT)
+css/style.css          # Sikh-theme styling (maroon / gold / ivory)
+css/invite-motion.css  # flower animation + the two control buttons
+assets/fonts/          # self-hosted, subset woff2 faces
+assets/icon.svg        # PWA home-screen icon
+music.mp3              # background music (non-sacred instrumental)
 ```
 
 Save the date: **6 December 2026** — we look forward to celebrating with you. ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਿਹ!

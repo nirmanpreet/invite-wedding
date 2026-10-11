@@ -67,6 +67,26 @@ function isoDate(d) {
 }
 const eventIso = isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05:30';
 
+/* WhatsApp and iMessage both show only the TITLE of a shared link, so it has
+   to work in both languages at once - an English-only title hides the fact
+   that the whole page is bilingual from exactly the audience most likely to
+   want the Punjabi. It is assembled from config (not typed in) so changing a
+   name or the date cannot leave the share card out of step with the page. */
+const dateShort = (function () {
+  const parts = String(att(config, 'date', '')).trim().split(/\s+/);
+  if (parts.length < 3) return String(att(config, 'date', ''));
+  let day, monName, year;
+  if (/^[0-9]{1,2}$/.test(parts[0])) { day = parts[0]; monName = parts[1]; year = parts[2]; }
+  else { monName = parts[0]; day = parts[1]; year = parts[2]; }
+  const want = monName.replace(/[^A-Za-z]/g, '').toLowerCase();
+  const full = Object.keys(monthMap).find(function (k) { return k.toLowerCase() === want; });
+  return day + ' ' + (full ? full.slice(0, 3) : monName) + ' ' + year.replace(/[^0-9]/g, '');
+})();
+const titlePa = String(att(config, 'i18n.pa.inviteTitle', att(config, 'i18n._extra.pa.inviteTitle', '')));
+/* Built with a RAW ampersand and escaped once below, so it renders as a
+   literal "&" in the HTML source rather than "&amp;amp;". */
+const shareTitle = p1 + ' & ' + p2 + ' | ' + (titlePa || 'Wedding Reception') + ' | ' + dateShort;
+
 const css = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
 /* Floating-flower shower + the two guest toggles. Inlined into the same
@@ -87,9 +107,22 @@ try {
   console.warn('js/qrcode.min.js not found; QR codes disabled in build.');
 }
 
-// Small UI text injected statically (runtime localizes via window.__WEDDING_CONFIG__)
+/* Small UI text injected statically (runtime localizes via window.__WEDDING_CONFIG__) */
 const summaryEn = esc(extraEn.receptionHeading || 'Reception Party');
 const summaryPa = esc(extraPa.receptionHeading || 'ਰਿਸੈਪਸ਼ਨ ਪਾਰਟੀ');
+
+/* The gate hint is bilingual in both directions (see the comment on the
+   markup below). Split once here so the STATIC html is already correct for
+   a guest whose JavaScript has not finished - or failed - rather than
+   showing one untracked run of mixed script. */
+const gateHintHtml = (function () {
+  const raw = String(extraEn.gateHintBoth || 'Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ');
+  const parts = raw.split(/\s*·\s*/);
+  if (parts.length < 2) return esc(raw);
+  return '<span class="hint-latin">' + esc(parts[0]) + '</span>' +
+    '<span class="hint-mid" aria-hidden="true">·</span>' +
+    '<span class="hint-pa">' + esc(parts.slice(1).join(' · ')) + '</span>';
+})();
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -104,11 +137,15 @@ const html = `<!DOCTYPE html>
       <link rel="canonical" href="https://invite.nirmanpreet.com/">
       <link rel="apple-touch-icon" href="assets/img/icon-180.png">
       <meta property="og:type" content="website" />
-      <meta property="og:title" content="${esc(p1)} &amp; ${esc(p2)} | Wedding Reception | ${esc(att(config, 'date', 'Date'))}" />
+      <meta property="og:title" content="${esc(shareTitle)}" />
       <meta property="og:description" content="${esc(seoDesc)}" />
       <meta property="og:url" content="https://invite.nirmanpreet.com/" />
       <meta property="og:site_name" content="Nirman &amp; Simran" />
       <meta property="og:locale" content="en_US" />
+      <!-- One URL serves both languages (the page switches in place, there is
+           no /pa/ path), so this only tells a scraper the Punjabi wording
+           exists. Harmless if a platform ignores it; useful if it does not. -->
+      <meta property="og:locale:alternate" content="pa_IN" />
       <meta property="og:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
       <meta property="og:image:secure_url" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
       <meta property="og:image:type" content="image/jpeg" />
@@ -116,26 +153,36 @@ const html = `<!DOCTYPE html>
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026 — Wedding Reception on 6 December 2026 at Park City Resort, Malout" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Nirman & Simran | Wedding Reception | 6 December 2026" />
+      <meta name="twitter:title" content="${esc(shareTitle)}" />
       <meta name="twitter:description" content="${esc(seoDesc)}" />
       <meta name="twitter:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
-      <title>${esc(p1)} &amp; ${esc(p2)} | Wedding Reception | ${esc(att(config, 'date', 'Date'))}</title>
+      <title>${esc(shareTitle)}</title>
 
       <link rel="manifest" href="manifest.webmanifest">
 
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Font preloads were tried here and removed on the evidence: an A/B over
-       three alternating Lighthouse runs on a throttled phone gave LCP 6.54s
-       WITH them and 5.70s WITHOUT. See index.html for the full note. -->
-  <!-- Prefetch/preconnect: the share preview and first paint both depend on
-       these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show nothing.
-       The artwork is preloaded as the likely LCP element; the <picture> on the
-       page still picks WebP, so the preload and the element agree. -->
+      <!--
+       FONTS ARE SELF-HOSTED NOW. The Google Fonts <link> and its two
+       preconnects are gone: every guest on mobile data was paying a DNS
+       lookup, a TLS handshake and two round trips to a third party before a
+       single letter could be painted, and that <link rel=stylesheet> was
+       render-blocking. The @font-face rules are at the top of css/style.css
+       and the files come from tools/build-fonts.js.
+
+       Font PRELOADS were tried here and are still not here, on the evidence:
+       an A/B over three alternating Lighthouse runs on a throttled phone gave
+       LCP 6.54s WITH them and 5.70s WITHOUT. Preloads are high priority and
+       compete with the critical CSS and the LCP artwork. font-display:swap
+       already means nothing waits on a font. Do not add them back without
+       re-running that A/B.
+
+       Prefetch/preconnect: the share preview and first paint both depend on
+       these. og:image must be an ABSOLUTE URL or WhatsApp/iMessage show
+       nothing. The artwork is preloaded as the likely LCP element; the
+       <picture> on the page still picks WebP, so the preload and the element
+       agree. -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="preload" as="image" href="assets/img/anand-karaj-crop.webp" type="image/webp" fetchpriority="high">
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
       <style>
 ${css}
@@ -176,17 +223,31 @@ ${qrLib}
         <div class="card">
           <div class="ik" aria-hidden="true">ੴ</div>
           <div class="gate-blessing">
-            ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
-            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
-            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
+            ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ\u00a0॥<br>
+            ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ\u00a0।<br>
+            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ\u00a0॥
           </div>
-          <div class="gate-names">${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</div>
+          <div class="gate-names"><span class="gate-name">${esc(p1)}</span><span class="amp">${esc(connector)}</span><span class="gate-name">${esc(p2)}</span></div>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
           <div class="lang-pick" id="intro-lang-pick">
-            <button type="button" data-lang="en" class="active">English</button>
+            <!-- No .active on either button: highlighting one language by
+                 default reads as "this is the right one", and a large part of
+                 the guest list reads Punjabi. Both are equal until one is
+                 tapped; script.js may add .pre to Punjabi on a phone whose
+                 own language is Punjabi. -->
+            <button type="button" data-lang="en">English</button>
             <button type="button" data-lang="pa">ਪੰਜਾਬੀ</button>
           </div>
-          <div class="gate-hint" id="gate-hint">Tap your language to enter</div>
+          <!-- Bilingual on purpose: the guest should not have to recognise
+               their own language before being able to read the instruction.
+               The two halves are separate elements because the Latin half is
+               tracked and upper-cased and the Gurmukhi half must be NEITHER:
+               letter-spacing severs Gurmukhi conjuncts and breaks the join at
+               the top bar (W3C Gurmukhi Layout Requirements 5.1 / 6). One run
+               of mixed text could not be styled both ways.
+               Static so it reads correctly before script.js runs;
+               updateIntroGate() keeps it in sync with config afterwards. -->
+          <div class="gate-hint" id="gate-hint">${gateHintHtml}</div>
         </div>
       </div>
 
@@ -244,10 +305,16 @@ ${qrLib}
       <div class="actions" id="invite-actions"></div>
       <p class="footer" id="invite-footer"></p>
       <div id="day-info" class="day-info"></div>
-      <div id="qr-section" class="qr-section"></div>
-      <div id="photos" class="photos"></div>
+      <!-- RSVP and the map now come BEFORE the QR codes. A phone cannot scan
+           its own screen, so a QR block in the main flow is a dead end for
+           most guests and it was pushing the two things they CAN act on - a
+           reply and directions - a full screen further down. -->
       <div id="rsvp-section" class="rsvp-section"></div>
       <div id="venue-map-embed" class="venue-map-embed"></div>
+      <!-- Last on screen: hidden entirely on touch phones, where it cannot be
+           used. Still rendered on desktop, in print, and on the PDF card. -->
+      <div id="qr-section" class="qr-section"></div>
+      <div id="photos" class="photos"></div>
       <div id="print-section" class="print-section"></div>
       <p class="happiness" id="invite-social"></p>
       </main>
@@ -261,16 +328,24 @@ ${qrLib}
 
       <!-- Hidden PDF card. Portrait (was 700px landscape) so the Anand Karaj
            artwork has room without the card becoming a letterboxed strip.
-           Must stay in step with index.html - same ids, same inline styles. -->
-      <div id="pdf-card" class="pdf-card" style="position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
+           Must stay in step with updatePdfLang() in js/script.js - same ids.
+
+           display:none, not just parked off-screen at left:-9999px.
+           Parked off-screen it is still LAID OUT, so the browser sees text
+           set in its faces and downloads them for every guest who will
+           never tap "download". That was Great Vibes (30 KB) plus two
+           more faces pulled onto the critical path of every single visit
+           for a card most guests do not open. onDownloadPdfClick() turns
+           it back on before html2canvas reads it. -->
+      <div id="pdf-card" class="pdf-card" style="display:none; position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
           <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
-ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
-ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
+          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ\u00a0॥
+ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ\u00a0।
+ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ\u00a0॥</div>
           <!-- The Anand Karaj artwork, which the old card left out entirely.
                No crossorigin attribute: it would cache separately from the
-               same file the page loads and download it twice. See index.html. -->
+               same file the page loads and download it twice. -->
           <div style="margin:2px auto 14px; width:300px;">
             <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
@@ -287,7 +362,7 @@ ${qrLib}
         </div>
       </div>
 
-      <!-- The single .ics generator, shared by the page, build.js and serve.js. -->
+      <!-- The single .ics generator, shared by the page and this build. -->
       <script src="./js/ics.js"></script>
       <script src="./js/script.js"></script>
       <!-- Must come after script.js: it listens for the wedding-enter event
@@ -373,6 +448,23 @@ const iconSrc = path.join(ROOT, 'assets/icon.svg');
 if (fs.existsSync(iconSrc)) {
   fs.copyFileSync(iconSrc, path.join(iconDist, 'icon.svg'));
 }
+// Self-hosted, subsetted woff2 faces (tools/build-fonts.js). Copied as a
+// whole directory rather than a hard-coded list, so a weight added to the
+// generator ships without anyone having to remember a second place.
+const fontsSrc = path.join(ROOT, 'assets', 'fonts');
+if (fs.existsSync(fontsSrc)) {
+  const fontsDist = path.join(DIST, 'assets', 'fonts');
+  fs.rmSync(fontsDist, { recursive: true, force: true });
+  fs.mkdirSync(fontsDist, { recursive: true });
+  fs.readdirSync(fontsSrc).forEach(function (f) {
+    if (/\.woff2$/.test(f)) fs.copyFileSync(path.join(fontsSrc, f), path.join(fontsDist, f));
+  });
+  const n = fs.readdirSync(fontsDist).length;
+  const bytes = fs.readdirSync(fontsDist).reduce((a, f) => a + fs.statSync(path.join(fontsDist, f)).size, 0);
+  console.log('  Fonts   : ' + n + ' woff2, ' + (bytes / 1024).toFixed(0) + ' KB');
+} else {
+  console.warn('assets/fonts not found; text will fall back to Georgia/serif.');
+}
 // Royal ornament + Anand Karaj art
 const svgDist = path.join(iconDist, 'svg');
 fs.mkdirSync(svgDist, { recursive: true });
@@ -386,14 +478,20 @@ if (fs.existsSync(ornamentSrc)) {
 });
 const imgDist = path.join(iconDist, 'img');
 fs.mkdirSync(imgDist, { recursive: true });
-/* The page loads anand-karaj-crop.webp (241 KB) via <picture>, with
-   anand-karaj-crop-fallback.png (800px) only for browsers without WebP.
+/* The page loads anand-karaj-crop.webp (247 KB) via <picture>, with
+   anand-karaj-crop-fallback.png only for browsers without WebP.
    Both are cropped from the master: the source is a 1216px SQUARE canvas
    holding a 993x1194 PORTRAIT illustration, so cropping removes ~64px of
    dead width on every render and let the phone size go up (see
-   tools/crop-artwork.mjs). anand-karaj.png is the editable master and
-   must stay in the build for the crop to be reproducible. */
-['anand-karaj-crop.webp', 'anand-karaj-crop-fallback.png', 'anand-karaj.png', 'anand-karaj.jpg', 'og.jpg'].forEach(function (f) {
+   tools/crop-artwork.mjs).
+
+   anand-karaj.png and anand-karaj.jpg are the EDITABLE MASTER and the
+   original photo it came from. Nothing references either: a grep across
+   index.html, js/ and build.js finds no real use, and both were being
+   copied into dist/ anyway - 1.6 MB of deploy payload that no guest has
+   ever downloaded. They stay in assets/img/ so the crop stays
+   reproducible; they just no longer ship. */
+['anand-karaj-crop.webp', 'anand-karaj-crop-fallback.png', 'og.jpg'].forEach(function (f) {
   const src = path.join(ROOT, 'assets/img', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(imgDist, f));
 });
