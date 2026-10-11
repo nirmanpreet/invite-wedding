@@ -178,7 +178,7 @@ ${qrLib}
           <div class="gate-blessing">
             ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥<br>
             ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।<br>
-            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥ਕਰਾਈ ।
+            ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥
           </div>
           <div class="gate-names">${esc(p1)} <span class="amp">${esc(connector)}</span> ${esc(p2)}</div>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
