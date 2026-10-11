@@ -1048,22 +1048,31 @@ html[lang="pa"] .title h1 {
     text-shadow: none;
     /* The gold band was 40%-60% of a 250%-wide background - a 20% window,
        which on a name 350px wide is about 28px of gold sliding across.
-       That reads as a flicker, not a sweep. Widened to 34%-66% (a 32%
-       window, ~45px of gold) and the peak lightened to #e0b862 so the
-       highlight actually looks like light rather than a darker patch. */
+       That reads as a flicker, not a sweep. Now 32%-68% (a 36% window,
+       ~50px of gold) with a three-stop peak: a wide pale shoulder, a
+       near-white hot centre at 50%, and the pale shoulder again, so the
+       highlight has a core and falls off instead of being a flat band of
+       gold sliding sideways. */
     background: linear-gradient(100deg,
-      var(--royal) 0%, var(--royal) 34%, #e0b862 50%, var(--royal) 66%, var(--royal) 100%);
+      var(--royal) 0%, var(--royal) 32%, #f0d48c 44%, #fff3d0 50%, #f0d48c 56%, var(--royal) 68%, var(--royal) 100%);
     background-size: 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    /* Twice, not once. A single 2.4s pass is easy to miss entirely: the
-       guest taps through the gate, the page is already moving, and by the
-       time they look at the names the sweep has finished. Two passes over
-       3.6s mean the second one catches a guest who has only just arrived,
-       and `both` still parks it on the maroon end afterwards. */
-    animation: name-shine 1.8s ease-in-out 0.5s 2 both;
+    /* SLOWER, and that is the whole fix. Two earlier passes went the wrong
+       way on speed: 2.4s once was "hardly noticeable", and shortening it to
+       1.8s twice made it worse - the owner called it "way too fast to
+       become noticeable", which is exactly right. A highlight that crosses
+       the name in under two seconds is too quick to track with the eye, so
+       it reads as a flicker rather than as light travelling across text.
+       The fix for "can't notice it" is a slower sweep, not a faster one.
+
+       4s per pass, twice, 0.7s in. Each pass is slow enough to follow the
+       whole way across; the second one catches a guest who arrived late.
+       `both` still parks it on the maroon end, so the name never ends up
+       frozen mid-sweep. */
+    animation: name-shine 4s ease-in-out 0.7s 2 both;
   }
   @keyframes name-shine {
     from { background-position: 120% 0; }
@@ -1511,33 +1520,51 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   top: 50%;
   /* min() with 96vw: the aura used to be 124% of a 92%-wide box, i.e.
      wider than the viewport - the 3-5px horizontal overflow (QA F1). */
-  width: min(124%, 96vw);
-  height: 130%;
+  width: min(132%, 96vw);
+  height: 142%;
   transform: translate(-50%, -50%);
+  /* TWO gradients, not one. A single soft wash reads as a vignette, which is
+     what this looked like before: the artwork was sitting on a slightly
+     warm rectangle rather than glowing. A real aura is a tight bright core
+     sitting inside a wide soft halo - the core gives the palki an edge to
+     catch the light, the halo spreads it into the maroon behind. Both are
+     still one element and one gradient paint, so the cost is unchanged. */
   background:
     radial-gradient(closest-side,
-      rgba(232, 200, 119, 0.42) 0%,
-      rgba(232, 200, 119, 0.18) 46%,
-      rgba(232, 200, 119, 0.05) 70%,
-      rgba(232, 200, 119, 0) 84%);
+      rgba(255, 236, 186, 0.60) 0%,
+      rgba(245, 214, 140, 0.30) 28%,
+      rgba(232, 200, 119, 0.10) 52%,
+      rgba(232, 200, 119, 0) 72%),
+    radial-gradient(closest-side,
+      rgba(232, 200, 119, 0.46) 0%,
+      rgba(232, 200, 119, 0.22) 42%,
+      rgba(232, 200, 119, 0.07) 68%,
+      rgba(232, 200, 119, 0) 86%);
   pointer-events: none;
-  /* FASTER and with a higher floor than the first pass. At 5.5s with a
-     0.45-0.95 swing the glow was real but slow enough that the owner
-     described it as "hardly noticeable" - by the time it had visibly
-     brightened it had already dimmed again. 3.4s is about one and a half
-     breaths per screenful, which reads as alive rather than as a pulse
-     you have to wait for. The floor rose 0.45 -> 0.58 so the artwork is
-     never sitting in near-darkness between beats. */
-  animation: art-glow 3.4s ease-in-out infinite;
+  /* SLOWER, and with a much wider swing, because the owner's second
+     complaint was that the animations were "very fast, can't really notice
+     them at all". The last pass answered that by shortening the cycle to
+     3.4s, which made the glow pulse rather than breathe - a fast change
+     has to be watched to be seen, and a slow one is noticed by peripheral
+     vision. 5.2s is close to the original 5.5s, but the amplitude is what
+     changed.
+
+     Measured at both ends of a real cycle: at a 0.30 floor the background
+     went almost white at the trough, which meant for half of every 5.2s
+     there was no aura on screen at all - and an aura that disappears is
+     not an aura. The floor is 0.45, so there is always a warm bloom around
+     the palki and the beat is an intensification of something already
+     there, rather than an off/on flash. Peak stays at 1. */
+  animation: art-glow 5.2s ease-in-out infinite;
 }
 @keyframes art-glow {
-  0%, 100% { opacity: 0.58; transform: translate(-50%, -50%) scale(0.97); }
-  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.05); }
+  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.97); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.12); }
 }
 /* force-motion:on */
 /*
 @media (prefers-reduced-motion: reduce) {
-  .ceremony-image::before { animation: none; opacity: 0.6; }
+  .ceremony-image::before { animation: none; opacity: 0.7; }
 }
 */
 /* force-motion:off */
@@ -1591,7 +1618,10 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
         740px tall (Android)   -> 252px art
         844px tall (iPhone 14) -> 287px art  */
   .ceremony-image img { max-height: min(380px, 34vh); }
-  .ceremony-image::before { width: min(126%, 96vw); height: 122%; }
+  /* Aura scaled with the base rule above. The old 126%/122% was tuned to
+     the single-gradient aura; the two-gradient version needs a little more
+     room for the halo to spread without the core crowding the palki. */
+  .ceremony-image::before { width: min(134%, 96vw); height: 134%; }
 }
 
 /* Short screens (landscape phones, very small handsets). Only the margins
@@ -1969,12 +1999,15 @@ html[lang="pa"] .save-date .sd-date {
 html.js-reveal .reveal-target {
   opacity: 0;
   /* 18px over .7s was too shy to notice on a phone - a card that fades in
-     from 18px away reads as "it was just there". 34px over .8s with a
-     longer stagger is the smallest change that is clearly an arrival.
-     The stagger cap in script.js is unchanged, so nothing waits long. */
-  transform: translateY(34px) scale(0.985);
-  transition: opacity .8s var(--ease), transform .8s var(--ease);
-  transition-delay: calc(var(--i, 0) * 120ms);
+     from 18px away reads as "it was just there". Now 38px of travel, and
+     slowed to .95s: the owner asked for animations that can be seen, and a
+     reveal that completes in under a second while you are still scrolling
+     toward it is over before your eye arrives. The slower duration is paid
+     for by a slightly shorter stagger, so the last card in a group still
+     lands at about the same moment as before. */
+  transform: translateY(38px) scale(0.98);
+  transition: opacity .95s var(--ease), transform .95s var(--ease);
+  transition-delay: calc(var(--i, 0) * 105ms);
 }
 html.js-reveal .reveal-target.revealed {
   opacity: 1;

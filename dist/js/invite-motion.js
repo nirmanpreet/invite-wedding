@@ -89,25 +89,31 @@
   // n = count [phone, desktop], s = size px, d = fall seconds,
   // sw = sway px, op = opacity, wx = sideways drift px, k = species pool
   //
-  // MOGRA AND MARIGOLD DOMINATE. The owner asked for both to be much more
-  // visible, so mogra is now ~44% of all draws and the marigold head ~17%
-  // (was 29% and 6%). Roses are the accent that stays: still 33% in total,
-  // because a shower of nothing but two species reads as wallpaper rather
-  // than as a garden. The lotus remains near-layer only.
+  // MOGRA AND MARIGOLD BOTH DOMINATE. Mogra went up first (29% -> 35%), then
+  // the owner asked for marigold "a little bit more" on top. Measured over
+  // 700 draws, that lands at: mogra ~35%, marigold head ~23%, marigold petal
+  // ~13%, roses ~26%, lotus ~3%. So marigold in total is ~36% where it was
+  // 18%, and mogra is NOT sacrificed to get there.
   //
-  // The far layer is where mogra and marigold heads were thinnest, and that
-  // is exactly where they were least visible - 0.42 opacity and 12-20px.
-  // So both were raised in ALL THREE pools, and the far layer's opacity
-  // went 0.42 -> 0.52 so the extra mogra is actually legible at that depth.
+  // That last part took two goes. A first attempt at "more marigold" put
+  // heads at 34% and quietly pushed mogra down to 23% - the exact flower the
+  // owner had just asked to increase more of. A shower that is one species
+  // plus filler stops reading as a garden, so the pools below keep mogra at
+  // least a third of every layer and take the increase from the roses.
   //
-  // FALL TIMES SHORTENED by roughly a third across all three layers. At
-  // 26-34s the far layer crawled at about 30 px/second, which on a phone
-  // is roughly one screen every nine seconds - far too slow to register as
-  // motion at a glance, so the shower read as a static arrangement of
-  // flowers rather than as falling petals. Sway widened on the same pass
-  // for the same reason: a drifting flower reads as falling even when the
-  // fall itself is slow. The spread between layers is preserved, because
-  // that ratio is what creates the sense of depth.
+  // Marigold is now in ALL THREE layers. It used to be absent from the near
+  // layer, which is the one a guest actually looks straight at - the biggest
+  // flowers on screen were the only ones that were never marigold.
+  //
+  // FALL TIMES. Two passes in opposite directions, and the second one is
+  // the honest one. 26-34s per fall was "hardly noticeable"; 17-22s was
+  // "very fast, can't really notice them at all". Both complaints were
+  // really about the same thing - a change you have to watch for is not
+  // noticed. Speed is not the lever. Amplitude is, so the fall times now
+  // sit between the two (24-30 / 15-20 / 10-14s) while the sway amplitude
+  // went UP again, because a flower that drifts a long way sideways while
+  // descending slowly reads clearly as falling, whereas one that drops
+  // fast in a narrow line just reads as something falling.
   //
   // Still cheap: every flower is one element with a CSS transform
   // animation, no per-frame JS, so the count costs paint, not main-thread
@@ -115,9 +121,9 @@
   // nothing; it came out of the rose share.
   // ==============================================================
   var LAYERS = [
-    { name: 'far',  n: [12, 16], s: [12, 20], d: [17, 22], sw: [14, 30], op: 0.52, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'm', 'r3', 'r3'] },
-    { name: 'mid',  n: [10, 13], s: [20, 32], d: [11, 15], sw: [24, 48], op: 0.72, wx: 0,       k: ['j', 'j', 'j', 'g', 'r2', 'r2', 'r3', 'm'] },
-    { name: 'near', n: [6, 7],   s: [30, 46], d: [7, 11],  sw: [38, 74], op: 0.94, wx: [10, 40], k: ['j', 'j', 'r1', 'r2', 'l', 'g'] }
+    { name: 'far',  n: [12, 16], s: [12, 20], d: [24, 30], sw: [16, 34], op: 0.52, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'm', 'r3', 'r3'] },
+    { name: 'mid',  n: [10, 13], s: [20, 32], d: [15, 20], sw: [28, 54], op: 0.72, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'r2', 'r3', 'm'] },
+    { name: 'near', n: [6, 7],   s: [30, 46], d: [10, 14], sw: [44, 84], op: 0.94, wx: [10, 40], k: ['j', 'j', 'g', 'm', 'r1', 'r2', 'l'] }
   ];
 
   function R(a, b) { return a + Math.random() * (b - a); }
@@ -178,16 +184,21 @@
           (L.wx ? ';--wx:' + F(R(L.wx[0], L.wx[1])) + 'px' : '');
         w.style.cssText =
           '--sw:' + F(R(L.sw[0], L.sw[1])) + 'px;' +
-          /* Sway and tumble sped up to match the faster fall: a petal that drops
-           quickly but swings every 5s looks like it is being dragged.
-           Now the two stay in the same register, so it reads as one
-           drifting object rather than three animations happening to the
-           same element. */
-          '--sd:' + F(R(2.2, 4.0) * calm, 1) + 's;' +
-          '--sdl:' + F(-R(0, 4), 1) + 's';
+          /* Sway is back to being the SLOWEST thing on screen, because that
+           is what makes a falling petal legible: the descent carries it
+           down while the sway carries it across, so the eye follows a
+           drifting path rather than a straight line. At 2.2-4.0s the swing
+           outran the fall and the flower looked like it was being dragged
+           sideways through the air. 3.6-6.4s is slower than the fall it
+           sits on, so the side-to-side motion is the thing you notice. */
+          '--sd:' + F(R(3.6, 6.4) * calm, 1) + 's;' +
+          '--sdl:' + F(-R(0, 5), 1) + 's';
         s.style.cssText =
           '--img:var(--k_' + kind + ');' +
-          '--r:' + F(R(3.2, 6) * calm, 1) + 's;' +
+          /* Tumble likewise: a flower that spins every 3s looks like it is
+             being shaken. At 4.6-8.4s each turn has time to read as the
+             flower turning over as it drops. */
+          '--r:' + F(R(4.6, 8.4) * calm, 1) + 's;' +
           '--rdl:' + F(-R(0, 6), 1) + 's;' +
           '--rz:' + F(R(120, 300)) + 'deg';
 
