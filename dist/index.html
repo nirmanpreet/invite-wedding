@@ -416,7 +416,7 @@ html[lang="pa"] .title h1 {
 }
 .save-date .sd-title {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 3.4px;
   text-transform: uppercase;
@@ -593,10 +593,13 @@ html[lang="pa"] .title h1 {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 18px 12px;
 }
+/* Raised from 10.5px to 13px. This label sits directly above the date,
+   time and venue on a card that will be read by guests who may be wearing
+   reading glasses. 10.5px was under any reasonable threshold for that. */
 .day-item .label {
   display: block;
   font-family: var(--font-display);
-  font-size: 10.5px;
+  font-size: 13px;
   letter-spacing: 2.6px;
   text-transform: uppercase;
   color: var(--gold-text);
@@ -633,7 +636,7 @@ html[lang="pa"] .title h1 {
 .qr-label {
   margin-top: 10px;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 2.4px;
   text-transform: uppercase;
   color: var(--gold-text);
@@ -1046,18 +1049,33 @@ html[lang="pa"] .name-latin {
   text-transform: none;
 }
 
-/* Long Punjabi place names / addresses must fit narrow phones */
-html[lang="pa"] .day-item .value,
-html[lang="pa"] .sd-date {
+/* Long Punjabi place names / addresses must fit narrow phones.
+   .sd-date is deliberately NOT in here any more. It was swept into this
+   clamp when the rule was written for the long venue address, and the
+   date - the one line on the whole card a guest most needs to read - was
+   silently reduced to 14px in Punjabi while English rendered it at 22px.
+   "Sunday, 6 December 2026" and "ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026" are almost the same
+   length; the date never needed shrinking and now gets its own size. */
+html[lang="pa"] .day-item .value {
   font-size: clamp(13px, 3.6vw, 16px);
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: auto;
   text-wrap: balance;
 }
+/* Sits just under the English clamp(20px, 5.6vw, 28px) rather than matching
+   it exactly - Gurmukhi runs a little wider per character, so matching
+   outright would make the Punjabi line wrap on a narrow phone. */
+html[lang="pa"] .sd-date {
+  font-size: clamp(18px, 5vw, 25px);
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
 
 @media (max-width: 420px) {
-  html[lang="pa"] .day-item .value { font-size: 13px; }
+  html[lang="pa"] .day-item .value { font-size: 14.5px; }
   html[lang="pa"] .day-grid { grid-template-columns: 1fr 1fr; gap: 14px 8px; }
   html[lang="pa"] .day-item:last-child { grid-column: 1 / -1; }
 }
@@ -1071,6 +1089,44 @@ html[lang="pa"] #print-invite {
   letter-spacing: normal;
   text-transform: none;
 }
+
+/* ============================================================
+   PUNJABI READABILITY
+   Gurmukhi runs about 1px "smaller" than Latin at the same font-size,
+   because the letterforms carry more vertical detail - matras above the
+   line and the lower loops - so the x-height that the eye actually reads
+   is smaller while the declared size is unchanged. Every small element
+   below therefore sits about 1px above its English counterpart rather
+   than level with it. This is a deliberate offset, not a rounding drift.
+   The names, the blessing and the date are handled separately.
+   ============================================================ */
+html[lang="pa"] .day-item .label,
+html[lang="pa"] .qr-label,
+html[lang="pa"] .save-date .sd-title,
+html[lang="pa"] .pdf-qr-title {
+  font-size: 14px;
+}
+html[lang="pa"] .qr-note,
+html[lang="pa"] .rsvp-by,
+html[lang="pa"] .map-label {
+  font-size: 13.5px;
+}
+html[lang="pa"] .day-info h4,
+html[lang="pa"] .day-info h2,
+html[lang="pa"] .day-info h5,
+html[lang="pa"] .qr-section h4,
+html[lang="pa"] .qr-section h2,
+html[lang="pa"] .rsvp-section h4,
+html[lang="pa"] .rsvp-section h2,
+html[lang="pa"] .calendar-section h4,
+html[lang="pa"] .print-section h4 {
+  font-size: clamp(14px, 3.6vw, 16px);
+}
+html[lang="pa"] .title .title-sub {
+  font-size: clamp(14px, 3.6vw, 18px);
+}
+html[lang="pa"] .save-date .sd-cta { font-size: 13.5px; }
+html[lang="pa"] .cal-hint { font-size: 14px; }
 
 /* The old "ROSE PETALS" block that stood here described a CSS-mask petal
    implementation (data-URI mask, --petal colour, diagonal drift). It was
@@ -1529,7 +1585,7 @@ html[lang="pa"] .save-date .sd-cta {
   font-family: "Noto Sans Gurmukhi", var(--font-gurmukhi), sans-serif;
   letter-spacing: 0;
   text-transform: none;
-  font-size: 12.5px;
+  font-size: 13.5px;
   padding: 8px 15px;
 }
 html[lang="pa"] .save-date .sd-title,
@@ -1672,7 +1728,7 @@ html[lang="pa"] .cal-btn {
 }
 html[lang="pa"] .cal-hint {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
-  font-size: 13px;
+  font-size: 14px;
 }
 @media (forced-colors: active) {
   .cal-btn { border: 1px solid CanvasText; }
@@ -2086,7 +2142,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "onWording": "on",
         "atWording": "at",
         "shareLabel": "Share the happiness!",
-        "qrTitle": "Scan me for venue",
+        "qrTitle": "Scan me or tap me",
         "qrMap": "Venue Map",
         "qrContact": "Contact Details",
         "qrNote": "Scan with your phone camera, or tap a code to open it",
@@ -2138,7 +2194,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "onWording": "ਨੂੰ",
         "atWording": "",
         "inviteTitle": "ਵਿਆਹ ਦੀ ਰਿਸੈਪਸ਼ਨ",
-        "qrTitle": "ਸਥਾਨ ਲਈ ਸਕੈਨ ਕਰੋ",
+        "qrTitle": "ਸਕੈਨ ਕਰੋ ਜਾਂ ਟੈਪ ਕਰੋ",
         "qrMap": "ਸਥਾਨ ਦਾ ਨਕਸ਼ਾ",
         "qrContact": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
         "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ, ਜਾਂ ਖੋਲ੍ਹਣ ਲਈ ਟੈਪ ਕਰੋ",
@@ -2285,12 +2341,19 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         <div class="title" id="invite-title"></div>
       </div>
 
+      <!-- Moved up from below the contact numbers. It used to sit 44% down the
+           page, so a guest who picked the wrong language had to scroll past the
+           blessing, the artwork, the names, the date and the buttons before they
+           could change it - and nothing on the page hinted that it was there.
+           Directly under the names it is visible immediately. It is a link, not
+           an action, so it does not compete with Save the Date. -->
+      <div class="lang-toggle" id="lang-toggle"></div>
+
       <div id="time"></div>
       <p class="dance-med" id="dance-med">Reception</p>
 
       <div class="actions" id="invite-actions"></div>
       <p class="footer" id="invite-footer"></p>
-      <div class="lang-toggle" id="lang-toggle"></div>
       <div id="day-info" class="day-info"></div>
       <div id="qr-section" class="qr-section"></div>
       <div id="photos" class="photos"></div>
