@@ -770,12 +770,28 @@
           var imgData = canvas.toDataURL('image/jpeg', 0.92);
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-          var pw = pdf.internal.pageSize.getWidth();
-          var ph = Math.min((canvas.height * pw) / canvas.width, pdf.internal.pageSize.getHeight());
-          // Centre the card on the page; otherwise a tall A4 page leaves a
-          // wide empty band under a wide, short card.
-          var offY = Math.max(0, (pdf.internal.pageSize.getHeight() - ph) / 2);
-          pdf.addImage(imgData, 'JPEG', 0, offY, pw, ph, undefined, 'FAST');
+          /* Fit the card onto the page WITHOUT distorting it.
+             The old code did:
+               pw = pageWidth;                       // always 210
+               ph = min(cardH * pw / cardW, 297);   // clamped to the page
+             When the card is taller than A4 - which it is, at 840x1674
+             against a 210x297 page - the clamp cut the HEIGHT but left
+             the width at a full 210mm. The card was then drawn 210x297,
+             squashing every pixel vertically by 29%: the Gurmukhi came
+             out wide and flat, the Anand Karaj lost its proportions, and
+             the QR codes were stretched (they still decoded, but only by
+             luck and the decoder's tolerance).
+             Scaling both dimensions by ONE factor keeps the card's real
+             proportions; centring it in both axes leaves a slim margin
+             down each side, which is how a mounted card is meant to print. */
+          var pageW = pdf.internal.pageSize.getWidth();
+          var pageH = pdf.internal.pageSize.getHeight();
+          var fit = Math.min(pageW / canvas.width, pageH / canvas.height);
+          var pw = canvas.width * fit;
+          var ph = canvas.height * fit;
+          var offX = (pageW - pw) / 2;
+          var offY = (pageH - ph) / 2;
+          pdf.addImage(imgData, 'JPEG', offX, offY, pw, ph, undefined, 'FAST');
           pdf.save('Invitation - ' + p1 + ' ' + connector + ' ' + p2 + '.pdf');
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
