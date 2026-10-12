@@ -391,6 +391,100 @@ button, input {
   color: var(--maroon);
   margin-bottom: 14px;
 }
+
+/* ============================================================
+   THE IK ONKAR - a gold aura, on both pages
+   ============================================================
+   The owner asked for the Ik Onkar to "be glowing gold aura cause its
+   sacred". It appeared twice - the intro gate and the top of the
+   invitation - as flat maroon with no shadow at all, which is the one
+   place on the page that reads as merely decorative.
+
+   The glyph itself KEEPS its dark maroon. Only the light around it is
+   gold. That is deliberate and it is the difference between a sacred
+   mark and a gold sticker: a gold glyph on cream would land at about
+   2.9:1 and be unreadable, whereas --maroon at 9.2:1 with a gold aura
+   behind it stays fully legible AND glows. The aura is the light the
+   mark is standing in, not a coat of paint on the mark.
+
+   Four shadow layers, tightest and brightest first, so the falloff reads
+   as light leaving the glyph rather than as a fuzzy outline. Plus a
+   separate radial halo on ::before, because a text-shadow is clipped to
+   the glyph's own box and cannot spread far enough to feel like an aura.
+
+   The pulse is deliberately slow (7s) and never fades to nothing - the
+   same reasoning as the ceremony artwork's glow: an aura that
+   disappears between beats is not an aura. 0.72 is the floor. */
+.blessing .ik,
+.intro-gate .ik {
+  position: relative;
+  color: var(--maroon);
+  text-shadow:
+    0 0 5px  rgba(255, 244, 210, 0.95),
+    0 0 12px rgba(240, 212, 140, 0.85),
+    0 0 26px rgba(232, 200, 119, 0.60),
+    0 0 48px rgba(200, 162, 75, 0.40),
+    0 0 78px rgba(200, 162, 75, 0.22);
+  animation: ik-aura 7s ease-in-out infinite;
+}
+
+/* The halo. Sits behind the glyph (z-index -1 against the mark's own
+   stacking), is pointer-events:none so it cannot eat the language tap
+   on the gate, and is sized in em so it tracks the font-size at every
+   breakpoint without a second value to keep in step. */
+.blessing .ik::before,
+.intro-gate .ik::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2.9em;
+  height: 2.9em;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(255, 246, 216, 0.85) 0%,
+    rgba(245, 222, 156, 0.55) 26%,
+    rgba(232, 200, 119, 0.28) 48%,
+    rgba(200, 162, 75, 0.12) 68%,
+    rgba(200, 162, 75, 0) 82%);
+  animation: ik-halo 7s ease-in-out infinite;
+}
+
+@keyframes ik-aura {
+  0%, 100% { opacity: 0.86; }
+  50%      { opacity: 1; }
+}
+@keyframes ik-halo {
+  0%, 100% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.94); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.10); }
+}
+
+/* High Contrast strips box-shadow and background-image, which would leave
+   a maroon glyph on a plain field - legible, but the aura is the whole
+   point of the change and it would silently vanish. Drop the animation
+   rather than pay for something the user cannot see. */
+@media (forced-colors: active) {
+  .blessing .ik,
+  .intro-gate .ik {
+    text-shadow: none;
+    animation: none;
+  }
+  .blessing .ik::before,
+  .intro-gate .ik::before { display: none; }
+}
+/* force-motion:on */
+/*
+@media (prefers-reduced-motion: reduce) {
+  .blessing .ik,
+  .intro-gate .ik { animation: none; }
+  .blessing .ik::before,
+  .intro-gate .ik::before { animation: none; }
+}
+*/
+/* force-motion:off */
 /* Names on the intro gate and the invite heading.
    Great Vibes is a hairline script: its strokes sit near the edge of
    legibility on a cream ground at small sizes. These rules keep the
@@ -2131,6 +2225,39 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
     .intro-gate .ik { font-size: 30px; margin-bottom: 6px; }
     .intro-gate h2, .intro-gate .gate-names { font-size: 34px; }
     .intro-gate .gate-blessing { font-size: 13px; line-height: 1.5; }
+  }
+
+  /* ---- 5. Short viewports: the gate must FIT, not scroll ---------
+     Measured at 844x390 (landscape phone) and 1100x420 (a half-height
+     Chrome window): the card is 408px tall and the gate panel is 390px,
+     so the bottom 18-42px is clipped. The hint "TAP YOUR LANGUAGE TO
+     ENTER - ਭਾਸ਼ਾ ਚੁਣੋ" is sliced in half by the viewport edge.
+
+     The panel already scrolls (overflow-y:auto from the rule above), but
+     a first-time guest sees half a line of text and no scrollbar and
+     reads it as a broken page, not as an invitation to scroll.
+
+     Reclaimed from MARGINS ONLY - 58px, no text gets smaller, because
+     the sacred Gurbani and the language buttons are the two things on
+     this screen that must stay exactly as legible as they are:
+
+         card padding        26/22 -> 16/14      18px
+         blessing margin-b    20  -> 10          10px
+         sub margin-b         30  -> 14          16px
+         hint margin-t        26  -> 12          14px
+
+     408 - 58 = 350px card + 24px panel padding = 374px, which clears a
+     390px viewport with 16px to spare. The 48-56px tier above is left
+     alone: it fits at those heights already. */
+  @media (max-height: 452px) {
+    .intro-gate { padding: 8px; }
+    .intro-gate .card {
+      padding: 16px 28px 14px;
+      margin: auto 0;
+    }
+    .intro-gate .gate-blessing { margin-bottom: 10px; }
+    .intro-gate .sub { margin-bottom: 14px; }
+    .intro-gate .gate-hint { margin-top: 12px; }
   }
 }
 
