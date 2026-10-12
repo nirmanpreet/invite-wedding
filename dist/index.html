@@ -362,7 +362,9 @@ button, input {
 
 .intro-gate .ik {
   font-family: var(--font-gurmukhi);
-  font-size: 46px;
+  /* Was 46px; lifted 4px for presence. */
+  font-size: 50px;
+  font-weight: 600;
   line-height: 1;
   color: var(--maroon);
   margin-bottom: 14px;
@@ -376,9 +378,11 @@ button, input {
 html[lang="pa"] .intro-gate h2,
 html[lang="pa"] .intro-gate .gate-names {
   font-family: var(--font-gurmukhi);
-  font-size: clamp(32px, 8vw, 40px);
-  font-weight: 600;
-  line-height: 1.6;
+  /* Was clamp(32px, 8vw, 40px); lifted 4px max. */
+  font-size: clamp(34px, 8.5vw, 44px);
+  /* Was 600; 700 for clearer strokes on cream. */
+  font-weight: 700;
+  line-height: 1.5;
   letter-spacing: normal;
   text-shadow: none;
 }
@@ -411,7 +415,10 @@ html[lang="pa"] .intro-gate .gate-blessing {
    Breathing room keeps "Nirman & Simran" from reading as one word. */
 .intro-gate .sub {
   font-family: var(--font-display);
-  font-size: 12px;
+  /* Was 12px; lifted 1.5px so the subtitle reads as a caption rather
+     than as fine print under the names. */
+  font-size: 13.5px;
+  font-weight: 500;
   letter-spacing: 3.4px;
   text-transform: uppercase;
   color: var(--gold-text);
@@ -441,8 +448,9 @@ html[lang="pa"] .intro-gate .gate-blessing {
      "ਪੰਜਾਬੀ" must use the Gurmukhi face with no tracking (W3C §5.1/§6).
      One rule for both would give the Punjabi label the wrong typeface. */
   font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 500;
+  /* Was 14px; lifted 1.5px. */
+  font-size: 15.5px;
+  font-weight: 600;
   letter-spacing: 1.6px;
   text-transform: uppercase;
   cursor: pointer;
@@ -450,8 +458,9 @@ html[lang="pa"] .intro-gate .gate-blessing {
 }
 .intro-gate .lang-pick button[data-lang="pa"] {
   font-family: var(--font-gurmukhi);
-  font-size: 17px;
-  font-weight: 600;
+  /* Was 17px; lifted 1.5px. */
+  font-size: 18.5px;
+  font-weight: 700;
   letter-spacing: normal;
   text-transform: none;
 }
@@ -597,9 +606,10 @@ html[lang="pa"] .title h1 {
   margin: 14px 0 0;
 }
 .title p {
-  /* Base was 15-18px; lifted 1px so body text on the invitation is
-     comfortable for guests wearing reading glasses. */
-  font-size: clamp(16px, 4.2vw, 19px);
+  /* Base was 15-18px; lifted 2px total for readability. */
+  font-size: clamp(17px, 4.4vw, 20px);
+  /* Weight lifted to 500 so text holds on parchment. */
+  font-weight: 500;
   line-height: 1.85;
   color: var(--dark);
   max-width: 620px;
@@ -665,8 +675,10 @@ html[lang="pa"] .title h1 {
   margin-bottom: 8px;
 }
 .save-date .sd-note {
-  /* Was 13px; lifted 1px so the explanatory note is readable. */
-  font-size: 14px;
+  /* Was 13px; lifted 2px total. */
+  font-size: 15px;
+  /* Weight lifted to 500. */
+  font-weight: 500;
   line-height: 1.7;
   color: var(--brown);
   opacity: 0.9;
@@ -841,8 +853,10 @@ html[lang="pa"] .title h1 {
 }
 .day-item .value {
   display: block;
-  /* Was clamp(14px, 3.7vw, 16px); lifted 1px for readability. */
-  font-size: clamp(15px, 3.9vw, 17px);
+  /* Was clamp(14px, 3.7vw, 16px); lifted 2px total. */
+  font-size: clamp(16px, 4.1vw, 18px);
+  /* Weight lifted to 500. */
+  font-weight: 500;
   line-height: 1.6;
   color: var(--dark);
 }
@@ -878,8 +892,10 @@ html[lang="pa"] .title h1 {
 }
 .qr-note {
   margin-top: 16px;
-  /* Was 12.5px; lifted 1px. */
-  font-size: 13.5px;
+  /* Was 12.5px; lifted 2px total. */
+  font-size: 14.5px;
+  /* Weight lifted to 500. */
+  font-weight: 500;
   letter-spacing: 0.6px;
   color: var(--brown);
   opacity: 0.85;
@@ -902,8 +918,9 @@ html[lang="pa"] .title h1 {
    ============================================================ */
 .rsvp-by {
   font-family: var(--font-display);
-  /* Was 12.5px; lifted 1px. */
-  font-size: 13.5px;
+  /* Was 12.5px; lifted 2px total. */
+  font-size: 14.5px;
+  font-weight: 500;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--gold-text);
@@ -912,8 +929,9 @@ html[lang="pa"] .title h1 {
 .rsvp-attend-label {
   display: block;
   margin: 4px 0 12px;
-  /* Was 15px; lifted 1px. */
-  font-size: 16px;
+  /* Was 15px; lifted 2px total. */
+  font-size: 17px;
+  font-weight: 500;
   color: var(--dark);
 }
 .rsvp-attending,
@@ -946,8 +964,9 @@ html[lang="pa"] .title h1 {
   border: 1px solid var(--gold);
   border-radius: 2px;
   color: var(--royal);
-  /* Was 14.5px; lifted 0.5px for readability. */
-  font-size: 15px;
+  /* Was 14.5px; lifted 1.5px total. */
+  font-size: 16px;
+  font-weight: 500;
   letter-spacing: 1.2px;
   cursor: pointer;
   transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
@@ -1089,12 +1108,17 @@ html[lang="pa"] .title h1 {
 .title h1 {
   font-family: var(--font-script);
   font-weight: 700;
-  font-size: clamp(56px, 15vw, 96px);
-  line-height: 1.14;
+  /* Was clamp(56px, 15vw, 96px); lifted 4px max. */
+  font-size: clamp(60px, 16vw, 100px);
+  line-height: 1.1;
   letter-spacing: 0;
   margin: 10px 0 0;
   color: var(--royal);
   text-transform: none;
+  /* Stronger glow for the main invitation names. */
+  text-shadow:
+    0 1px 0 rgba(255, 253, 247, 0.9),
+    0 2px 20px rgba(140, 35, 64, 0.28);
 }
 
 /* A single gold pass across each name, once, on arrival.
@@ -1187,17 +1211,19 @@ html[lang="pa"] .title h1 {
 .intro-gate h2,
 .intro-gate .gate-names {
   font-family: var(--font-script);
+  /* Was 700; already at max weight for Dancing Script. Size lifted 4px. */
   font-weight: 700;
-  font-size: 40px;
-  font-size: clamp(34px, 10.5vw, 48px);
-  line-height: 1.05;
+  font-size: 44px;
+  font-size: clamp(38px, 11vw, 52px);
+  line-height: 1.02;
   letter-spacing: 0;
   color: var(--royal);
   margin: 2px 0 6px;
   text-transform: none;
+  /* Glow strengthened so the script strokes pop on cream. */
   text-shadow:
-    0 1px 0 rgba(255, 253, 247, 0.75),
-    0 2px 12px rgba(140, 35, 64, 0.12);
+    0 1px 0 rgba(255, 253, 247, 0.9),
+    0 2px 16px rgba(140, 35, 64, 0.22);
 }
 /* One name per line, "&" on a line of its own.
    As inline text "Nirman & Simran" had no break opportunity between the
@@ -1511,7 +1537,7 @@ html[lang="pa"] .title .title-sub {
   font-size: clamp(14px, 3.6vw, 18px);
 }
 html[lang="pa"] .save-date .sd-cta { font-size: 13.5px; }
-html[lang="pa"] .cal-hint { font-size: 14px; }
+html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-weight: 500; }
 
 /* The old "ROSE PETALS" block that stood here described a CSS-mask petal
    implementation (data-URI mask, --petal colour, diagonal drift). It was
@@ -1606,16 +1632,26 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
      catch the light, the halo spreads it into the maroon behind. Both are
      still one element and one gradient paint, so the cost is unchanged. */
   background:
+    /* Core: bright warm center that catches the palki's edge */
     radial-gradient(closest-side,
-      rgba(255, 236, 186, 0.85) 0%,
-      rgba(245, 214, 140, 0.50) 28%,
-      rgba(232, 200, 119, 0.22) 52%,
-      rgba(232, 200, 119, 0) 72%),
+      rgba(255, 244, 210, 0.95) 0%,
+      rgba(255, 236, 186, 0.85) 18%,
+      rgba(245, 214, 140, 0.55) 38%,
+      rgba(232, 200, 119, 0.15) 60%,
+      rgba(232, 200, 119, 0) 76%),
+    /* Middle halo: spreads the gold into the maroon */
     radial-gradient(closest-side,
-      rgba(232, 200, 119, 0.65) 0%,
-      rgba(232, 200, 119, 0.35) 42%,
-      rgba(232, 200, 119, 0.14) 68%,
-      rgba(232, 200, 119, 0) 86%);
+      rgba(232, 200, 119, 0.75) 0%,
+      rgba(232, 200, 119, 0.42) 38%,
+      rgba(232, 200, 119, 0.18) 65%,
+      rgba(232, 200, 119, 0) 82%),
+    /* Outer beam: very wide, low-opacity reach that makes it feel like light
+       radiating beyond the frame rather than a contained glow */
+    radial-gradient(closest-side,
+      rgba(245, 214, 140, 0.35) 0%,
+      rgba(232, 200, 119, 0.18) 30%,
+      rgba(232, 200, 119, 0.06) 58%,
+      rgba(232, 200, 119, 0) 78%);
   pointer-events: none;
   /* SLOWER, and with a much wider swing, because the owner's second
      complaint was that the animations were "very fast, can't really notice
@@ -1628,19 +1664,23 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
      Measured at both ends of a real cycle: at a 0.30 floor the background
      went almost white at the trough, which meant for half of every 5.2s
      there was no aura on screen at all - and an aura that disappears is
-     not an aura. The floor is 0.45, so there is always a warm bloom around
+     not an aura. The floor is 0.65, so there is always a warm bloom around
      the palki and the beat is an intensification of something already
-     there, rather than an off/on flash. Peak stays at 1. */
+     there, rather than an off/on flash.
+
+     BEAMING update: peak scale 1.12 -> 1.18, floor 0.65 -> 0.75. The three
+     gradient layers now give a core+halo+beam structure that reads as
+     radiating light rather than a breathing oval. */
   animation: art-glow 5.2s ease-in-out infinite;
 }
 @keyframes art-glow {
-  0%, 100% { opacity: 0.65; transform: translate(-50%, -50%) scale(0.97); }
-  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.12); }
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.96); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.18); }
 }
 /* force-motion:on */
 /*
 @media (prefers-reduced-motion: reduce) {
-  .ceremony-image::before { animation: none; opacity: 0.8; }
+  .ceremony-image::before { animation: none; opacity: 0.85; }
 }
 */
 /* force-motion:off */
@@ -1695,9 +1735,9 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
         844px tall (iPhone 14) -> 287px art  */
   .ceremony-image img { max-height: min(380px, 34vh); }
   /* Aura scaled with the base rule above. The old 126%/122% was tuned to
-     the single-gradient aura; the two-gradient version needs a little more
-     room for the halo to spread without the core crowding the palki. */
-  .ceremony-image::before { width: min(134%, 96vw); height: 134%; }
+     the single-gradient aura; the three-gradient version needs a little more
+     room for the beam to spread without the core crowding the palki. */
+  .ceremony-image::before { width: min(138%, 96vw); height: 140%; }
 }
 
 /* Short screens (landscape phones, very small handsets). Only the margins
@@ -1854,14 +1894,25 @@ html[lang="pa"] .cal-hint { font-size: 14px; }
   .footer .phone { color: #000; }
 }
 
-/* A phone cannot scan its own screen. On a touch phone the QR block was two
-   screens of scrolling that could not be used by anyone standing in front of
-   that phone - the guest would have had to find a second device. Hidden
-   there, kept on desktop, restored in print above, and never removed from
-   the DOM, so the PDF card (whose codes live in #pdf-qr, outside this
-   element) is unaffected either way. */
+/* THE QR BLOCK IS NOW SHOWN ON PHONES.
+   It used to be hidden on touch devices, on the reasoning that a phone cannot
+   scan its own screen. That was true, but it answered the wrong question: a
+   guest on a phone is holding the card up to someone ELSE - a cousin reading
+   it across the table, or a laptop scanning it - and on a phone the QR is the
+   only way to pass the card on. Hiding it removed the one action the block
+   exists for, on the device most guests are actually using.
+
+   Each code is wrapped in an <a> that downloads the invitation card, so it is
+   tappable: tapping the code does the same thing as the "Download invitation
+   card" button further up. That is what makes it useful on a screen that
+   cannot scan itself. The tap target was already 44px+ and keeps its
+   focus ring, so nothing about the affordance had to change - only whether
+   the block was rendered at all.
+
+   The empty media block below is deliberate: it keeps this reasoning next to
+   where the rule used to sit, instead of leaving a bare removal. */
 @media screen and (hover: none) and (pointer: coarse) {
-  #qr-section { display: none; }
+  /* No longer hiding #qr-section. */
 }
 
 /* ============================================================
@@ -2157,16 +2208,18 @@ html.js-reveal .reveal-target.revealed {
 .days-to-go {
   margin-top: 14px;
   font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
+  /* Was 15px; lifted 2px. */
+  font-size: 17px;
+  font-weight: 700;
   letter-spacing: 2.2px;
   text-transform: uppercase;
   color: var(--highlight);
 }
 .tz-note {
   margin: 8px auto 0;
-  /* Was 13.5px; lifted 1px. */
-  font-size: 14.5px;
+  /* Was 13.5px; lifted 2px total. */
+  font-size: 15.5px;
+  font-weight: 500;
   line-height: 1.6;
   letter-spacing: 0.3px;
   color: var(--gold-text);
@@ -2178,8 +2231,10 @@ html[lang="pa"] .tz-note {
   letter-spacing: normal;
   text-transform: none;
 }
-html[lang="pa"] .days-to-go { font-size: 17px; }
-html[lang="pa"] .tz-note { font-size: 15.5px; }
+html[lang="pa"] .days-to-go { /* Gurmukhi reads smaller at the same size, so pa runs 1px above the en base. */
+  font-size: 18px;
+  font-weight: 700; }
+html[lang="pa"] .tz-note { font-size: 16.5px; }
 
 .cal-actions {
   position: relative;
@@ -2200,8 +2255,9 @@ html[lang="pa"] .tz-note { font-size: 15.5px; }
   border: 1px solid var(--gold-line);
   border-radius: 999px;
   color: var(--royal);
-  /* Was 12.5px; lifted 1px. */
-  font-size: 13.5px;
+  /* Was 12.5px; lifted 2px total. */
+  font-size: 14.5px;
+  font-weight: 500;
   letter-spacing: 1.2px;
   cursor: pointer;
   transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
@@ -2230,13 +2286,14 @@ html[lang="pa"] .cal-btn {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
   letter-spacing: normal;
   text-transform: none;
-  /* Was 14px; lifted 1px. */
-  font-size: 15px;
+  /* Gurmukhi reads smaller, so pa runs above the en base. */
+  font-size: 16px;
+  font-weight: 500;
 }
 html[lang="pa"] .cal-hint {
   font-family: 'Noto Sans Gurmukhi', var(--font-gurmukhi), sans-serif;
-  /* Was 14px; lifted 1px. */
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
 }
 @media (forced-colors: active) {
   .cal-btn { border: 1px solid CanvasText; }
@@ -2635,8 +2692,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
   "date": "6 December 2026",
   "time": "10:00 AM onwards",
   "startISO": "2026-12-06T10:00:00+05:30",
-  "endISO": "2026-12-06T15:00:00+05:30",
-  "_endISO_note": "EDIT (Nirman): placeholder. Confirm the real end time. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
+  "endISO": "2026-12-06T16:00:00+05:30",
+  "_endISO_note": "CONFIRMED (Nirman): 10:00 AM to 4:00 PM IST. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
   "countdownTarget": "Dec 6, 2026 10:00:00",
   "venue": {
     "name": "Park City Resort",

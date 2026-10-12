@@ -12,8 +12,8 @@
   "date": "6 December 2026",
   "time": "10:00 AM onwards",
   "startISO": "2026-12-06T10:00:00+05:30",
-  "endISO": "2026-12-06T15:00:00+05:30",
-  "_endISO_note": "EDIT (Nirman): placeholder. Confirm the real end time. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
+  "endISO": "2026-12-06T16:00:00+05:30",
+  "_endISO_note": "CONFIRMED (Nirman): 10:00 AM to 4:00 PM IST. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
   "countdownTarget": "Dec 6, 2026 10:00:00",
   "venue": {
     "name": "Park City Resort",

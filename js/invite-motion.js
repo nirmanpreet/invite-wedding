@@ -105,6 +105,14 @@
   // layer, which is the one a guest actually looks straight at - the biggest
   // flowers on screen were the only ones that were never marigold.
   //
+  // THE GOLD SHIMMER IS NO LONGER DEAD. Species 's' - a four-pointed star in
+  // antique gold - had been defined in the SVG map since the first pass but
+  // placed in no pool, so it never once drew. It is in the near layer now, one
+  // entry in eight, which measures at about 2.7% of all draws: a glint among
+  // the blossoms roughly every half minute, not a fourth kind of flower.
+  // Deliberately near-only. It is a highlight rather than a bloom, and at
+  // 12-20px in the far layer it would read as a speck of dust.
+  //
   // FALL TIMES. Two passes in opposite directions, and the second one is
   // the honest one. 26-34s per fall was "hardly noticeable"; 17-22s was
   // "very fast, can't really notice them at all". Both complaints were
@@ -123,7 +131,7 @@
   var LAYERS = [
     { name: 'far',  n: [12, 16], s: [12, 20], d: [24, 30], sw: [16, 34], op: 0.52, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'm', 'r3', 'r3'] },
     { name: 'mid',  n: [10, 13], s: [20, 32], d: [15, 20], sw: [28, 54], op: 0.72, wx: 0,       k: ['j', 'j', 'j', 'g', 'g', 'r2', 'r3', 'm'] },
-    { name: 'near', n: [6, 7],   s: [30, 46], d: [10, 14], sw: [44, 84], op: 0.94, wx: [10, 40], k: ['j', 'j', 'g', 'm', 'r1', 'r2', 'l'] }
+    { name: 'near', n: [6, 7],   s: [30, 46], d: [10, 14], sw: [44, 84], op: 0.94, wx: [10, 40], k: ['j', 'j', 'g', 'm', 'r1', 'r2', 'l', 's'] }
   ];
 
   function R(a, b) { return a + Math.random() * (b - a); }
@@ -239,17 +247,61 @@
     if (musicSrc) audio.setAttribute('src', musicSrc);
   }
 
+  /* A #lang= deep link enters the site WITHOUT a user gesture, so the first
+     play() is refused by every browser that enforces an autoplay policy.
+     There is no way to switch that policy off from a page, and pretending
+     otherwise would only mean a speaker icon lying about silence.
+
+     What IS true is that a guest who arrived by opening a link has tapped,
+     scrolled or pressed a key within a second or two of landing - long
+     before they reach the end of the page. So the FIRST real gesture retries
+     the play from inside that gesture, where it is permitted. In practice the
+     music is already running by the time anyone reads the invitation, which
+     is what "on by default" has to mean in practice.
+
+     One-shot, and safe against overriding a later choice: the listeners
+     remove themselves on the first gesture, and the retry no-ops when
+     musicOn is false, so a guest who deliberately muted it never has it
+     forced back on. The one-time tip is unaffected - it is a label, not a
+     state change. */
+  var gestureArmed = false;
+  function armFirstGesture() {
+    if (gestureArmed) return;
+    gestureArmed = true;
+    function once() {
+      document.removeEventListener('pointerdown', once, true);
+      document.removeEventListener('touchstart', once, true);
+      document.removeEventListener('keydown', once, true);
+      /* Re-read the pref: the guest may have muted it between the refusal
+         and this gesture, and their choice outranks the original intent. */
+      if (!musicOn || !musicAvailable || !audio || !musicStarted) return;
+      tryPlay();
+    }
+    document.addEventListener('pointerdown', once, true);
+    document.addEventListener('touchstart', once, true);
+    document.addEventListener('keydown', once, true);
+  }
+
   function tryPlay() {
     if (!audio || !musicAvailable || !musicOn || !musicStarted) return;
     if (!audio.paused) { if (musicBlocked) { musicBlocked = false; paintMusic(); } return; }
     var p;
-    try { p = audio.play(); } catch (e) { musicBlocked = true; paintMusic(); return; }
+    try {
+      p = audio.play();
+    } catch (e) {
+      musicBlocked = true; paintMusic(); armFirstGesture(); return;
+    }
     // Autoplay refused (silent switch, locked WebView, low power mode, or a
-    // programmatic click): fail quietly, but tell the guest with the icon
-    // instead of leaving a lie on screen.
+    // programmatic click from a #lang= deep link): fail quietly, but tell the
+    // guest with the icon instead of leaving a lie on screen - and arm the
+    // first-gesture retry, so the music starts the moment they touch anything
+    // rather than needing a second visit.
     if (p && typeof p.then === 'function') {
       p.then(function () { if (musicBlocked) { musicBlocked = false; paintMusic(); } })
-       .catch(function () { if (!musicBlocked) { musicBlocked = true; paintMusic(); } });
+       .catch(function () {
+         if (!musicBlocked) { musicBlocked = true; paintMusic(); }
+         armFirstGesture();
+       });
     }
   }
 
