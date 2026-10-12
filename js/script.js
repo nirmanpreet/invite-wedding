@@ -843,6 +843,23 @@
     c.appendChild(s1); c.appendChild(s2);
   }
 
+  /* Put the card back the way it shipped.
+     It must be explicitly set to 'none', NOT cleared to ''. build.js emits
+     the card with an INLINE display:none, and the stylesheet's own .pdf-card
+     rule says display:block - deliberately, so html2canvas can capture it.
+     Clearing the inline value therefore falls back to display:block and the
+     card stays laid out. It is positioned off-screen (position:absolute,
+     left:-9999px) so it never disturbs the page flow and a guest would
+     never see it - but it stays in the render tree with its faces resolved
+     for the rest of the session, which is exactly what the inline
+     display:none was there to avoid.
+
+     Called from all THREE exits: success, capture failure, and the case
+     where html2canvas/jsPDF never loaded from the CDN. */
+  function hideCard(card) {
+    if (card) card.style.display = 'none';
+  }
+
   function onDownloadPdfClick() {
     var card = document.getElementById('pdf-card');
     if (!card) return;
@@ -857,6 +874,7 @@
     card.style.display = 'block';
     loadPdfLibs(function () {
       if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+        hideCard(card);
         alert('PDF libraries could not be loaded. Please check your connection.');
         if (btn) {
           btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
@@ -905,12 +923,14 @@
           var offY = (pageH - ph) / 2;
           pdf.addImage(imgData, 'JPEG', offX, offY, pw, ph, undefined, 'FAST');
           pdf.save('Invitation - ' + p1 + ' ' + connector + ' ' + p2 + '.pdf');
+          hideCard(card);
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
             btn.disabled = false;
           }
         })
         .catch(function () {
+          hideCard(card);
           alert('Could not generate the PDF. Please try again.');
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
@@ -1102,7 +1122,19 @@
        that is the one that is certain. */
     if (!inIndia && window.Intl && Intl.DateTimeFormat) {
       try {
-        var f = new Intl.DateTimeFormat(isPa() ? 'pa-IN' : undefined, {
+        /* en-GB, deliberately NOT pa-IN. The Punjabi branch used to pass
+           isPa() ? 'pa-IN' : undefined here, and Chrome's ICU returns
+           "M12 6, Sun 3:30 PM" for pa-IN - a month called "M12", and the
+           weekday out of order. Node's ICU returns "ਐਤ, 6 ਦਸੰ, 3:30 PM"
+           for the same locale, so it renders correctly in one runtime and
+           as garbage in the one that actually runs this page.
+           This line is a machine-formatted timestamp, not prose, so it does
+           not want a localised face anyway - and the rest of the Punjabi
+           page already uses Latin digits ("6 ਦਸੰਬਰ 2026", "10:00 ਵਜੇ"),
+           so en-GB is consistent as well as safe. It yields the same
+           "Sun 6 Dec, 3:30 pm" in both languages, which is what a guest
+           converting a time wants to see. */
+        var f = new Intl.DateTimeFormat('en-GB', {
           weekday: 'short', day: 'numeric', month: 'short',
           hour: 'numeric', minute: '2-digit', hour12: true
         });
