@@ -65,7 +65,16 @@ function isoDate(d) {
   year = String(year).replace(/[^0-9]/g, '') || '2026';
   return year + '-' + mon + '-' + (day.length < 2 ? '0' + day : day);
 }
-const eventIso = isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05:30';
+/* The structured-data event times. Driven by config.startISO / config.endISO
+   - the SAME two values the .ics, the Google Calendar link and the page's
+   own countdown read - so a search result, a calendar entry and the card a
+   guest is looking at cannot disagree about when the reception is. They
+   carry an explicit +05:30, so no guesswork about the build machine's
+   timezone is involved. endDate was missing entirely: Google reads a
+   missing end as "same day", which is not the same as "ends at 4pm". */
+const eventIso = att(config, 'startISO', '') ||
+  isoDate(att(config, 'date', '6 December 2026')) + 'T10:00:00+05:30';
+const eventEndIso = att(config, 'endISO', '');
 
 /* WhatsApp and iMessage both show only the TITLE of a shared link, so it has
    to work in both languages at once - an English-only title hides the fact
@@ -204,7 +213,8 @@ ${qrLib}
         "@context": "https://schema.org",
         "@type": "Event",
         "name": "${esc(p1)} & ${esc(p2)} — Wedding Reception",
-        "startDate": "${eventIso}",
+        "startDate": "${eventIso}",${eventEndIso ? `
+        "endDate": "${eventEndIso}",` : ''}
         "eventStatus": "https://schema.org/EventScheduled",
         "location": {
           "@type": "Place",
@@ -340,8 +350,8 @@ ${qrLib}
            it back on before html2canvas reads it. -->
       <div id="pdf-card" class="pdf-card" style="display:none; position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ\u00a0॥
+          <div style="font-size:32px; color:#86162c; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:14px; line-height:1.85; color:#5f1526; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ\u00a0॥
 ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ\u00a0।
 ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ\u00a0॥</div>
           <!-- The Anand Karaj artwork, which the old card left out entirely.
@@ -351,15 +361,15 @@ ${qrLib}
             <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
           <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">${esc(att(config, '_pdf.subtext', 'You are cordially invited to the Reception of'))}</div>
-          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">${esc(p1)}</div>
-          <div style="font-size:20px; color:#8a6624; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
-          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">${esc(p2)}</div>
-          <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
+          <div style="font-size:44px; color:#5f1526; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">${esc(p1)}</div>
+          <div style="font-size:20px; color:#7a5a16; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">${esc(connector)}</div>
+          <div style="font-size:44px; color:#5f1526; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">${esc(p2)}</div>
+          <div style="font-size:14px; letter-spacing:2px; color:#6b1a2e; margin-bottom:8px;" id="pdf-event-line">${esc(extraEn.receptionHeading || 'Reception')} &bull; ${esc(att(config, 'date', ''))}</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">${esc(att(config, 'time', ''))}</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">${esc(att(config, 'venue.name', ''))}${att(config, 'venue.address') ? ', ' + esc(att(config, 'venue.address')) : ''}</div>
           <div id="pdf-qr" class="pdf-qr"></div>
           <div style="margin-top:20px; border-top:1px solid #e3d5b3; padding-top:12px; font-size:13px; color:#4a1220;" id="pdf-footer-note">${esc(att(config, '_pdf.footerNote', 'With love and joy, together with their families'))}</div>
-          <div style="margin-top:5px; font-size:12px; color:#7a5c2e;" id="pdf-contact">${esc(att(config, 'footer.contact', ''))}</div>
+          <div style="margin-top:5px; font-size:12px; color:#5f4718;" id="pdf-contact">${esc(att(config, 'footer.contact', ''))}</div>
         </div>
       </div>
 

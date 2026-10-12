@@ -38,6 +38,56 @@
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
+  /* RFC 5545 section 3.1: a content line longer than 75 octets SHOULD be
+     split with CRLF followed by a single space, and the leading space is
+     not part of the value.
+
+     DESCRIPTION and LOCATION both exceed 75 here - the address alone is 86
+     octets, and the description grew when the IST label went in. Every
+     major client tolerates an unfolded long line, so this was never visibly
+     broken; but "tolerates" is not "conforms", and a strict parser is
+     entitled to truncate. Unfolding is mandatory for any conforming parser,
+     so folding is the safe direction to err.
+
+     Counting is in OCTETS, not characters, and the split must not land in
+     the middle of a multi-byte sequence - the Punjabi address and any
+     Gurmukhi in a description would otherwise be corrupted, so the buffer
+     is built out of whole code points. */
+  var FOLD_AT = 75;
+  function fold(line) {
+    if (line.length <= FOLD_AT && octets(line) <= FOLD_AT) return line;
+    var out = [];
+    var cur = '';
+    var curBytes = 0;
+    var limit = FOLD_AT;
+    /* Split by code point, not UTF-16 unit: Array.from yields whole
+       characters, so a surrogate pair is never torn apart. */
+    var chars = Array.from(line);
+    for (var i = 0; i < chars.length; i++) {
+      var c = chars[i];
+      var cb = octets(c);
+      if (curBytes + cb > limit) {
+        out.push(cur);
+        cur = '';
+        curBytes = 0;
+        /* Every continuation line spends one octet on the leading space. */
+        limit = FOLD_AT - 1;
+      }
+      cur += c;
+      curBytes += cb;
+    }
+    if (cur) out.push(cur);
+    return out.join('\r\n ');
+  }
+
+  function octets(s) {
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(s).length;
+    /* Fallback for an old runtime without TextEncoder. encodeURIComponent
+       throws on a lone surrogate, which cannot occur here because fold()
+       splits on whole code points. */
+    return unescape(encodeURIComponent(s)).length;
+  }
+
   /* A timed event, emitted in UTC.
      An all-day event (VALUE=DATE) is the safer kind of thing in general - it
      cannot be shown at the wrong hour - but it is wrong here: the reception
@@ -109,15 +159,35 @@
       .replace(/\r?\n/g, '\\n');
   }
 
+  /* The start time as prose, always carrying "IST".
+
+     config.time already ends in "IST", but this guarantees it. The event
+     time a guest reads in their calendar app is rendered in THEIR zone, so
+     a guest in Melbourne opening this event sees 3:30 pm and, with nothing
+     else on screen saying "India", has no way to know the reception starts
+     at 10. That is the whole reason the label goes into both the .ics
+     DESCRIPTION and the Google Calendar details: the instants are correct
+     either way, but a bare timestamp is not self-describing.
+
+     A config hand-edit that drops "IST" - which is exactly what the live
+     site had, for its entire life - can therefore no longer produce an
+     unlabelled event. */
+  function timeLine(config) {
+    var t = String(att(config, 'time', '') || '').trim();
+    if (!t) return '';
+    if (!/(^|[^A-Za-z])IST([^A-Za-z]|$)/.test(t)) t += ' IST';
+    return t;
+  }
+
   function buildIcs(config) {
     config = config || {};
     var p1 = att(config, 'couple.partner1', 'Partner 1');
     var p2 = att(config, 'couple.partner2', 'Partner 2');
     var conn = att(config, 'couple.connector', '&');
     var dateText = att(config, 'date', '');
-    var timeText = att(config, 'time', '');
     var venueName = att(config, 'venue.name', '');
     var venueAddress = att(config, 'venue.address', '');
+    var timeLineText = timeLine(config);
     var lat = att(config, 'venue.lat', '');
     var lng = att(config, 'venue.lng', '');
 
@@ -159,7 +229,8 @@
         ? 'DTEND:' + timed.end
         : 'DTEND;VALUE=DATE:' + icsEnd,
       'DESCRIPTION:' + esc('Wedding Reception for ' + p1 + ' ' + conn + ' ' + p2 +
-        ' on ' + dateText + ' at ' + venueName + (timeText ? ', ' + timeText : '')),
+        ' on ' + dateText + (timeLineText ? ' at ' + timeLineText : '') +
+        ', ' + venueName),
       /* LOCATION stays Latin: calendar apps and GPS need the ASCII address. */
       'LOCATION:' + esc(venueName + (venueAddress ? ', ' + venueAddress : '')),
       'STATUS:CONFIRMED',
@@ -182,7 +253,7 @@
     lines.push('END:VEVENT', 'END:VCALENDAR');
     /* RFC 5545 requires CRLF line endings; a bare \n is tolerated by most
        parsers but rejected by Apple's. */
-    return lines.join('\r\n') + '\r\n';
+    return lines.map(fold).join('\r\n') + '\r\n';
   }
 
   /* Google Calendar renders its own confirmation page and then hands the
@@ -218,8 +289,13 @@
       action: 'TEMPLATE',
       text: p1 + ' ' + conn + ' ' + p2 + ' - Wedding Reception',
       dates: dates,
+      /* The time is IN the details, not only in `dates`. `dates` is a UTC
+         instant pair that Google renders in the guest's own zone, so a guest
+         in Melbourne opens this and sees "3:30 pm" with no idea it means
+         10:00 in Punjab. The same self-describing rule as the .ics. */
       details: 'Wedding Reception for ' + p1 + ' ' + conn + ' ' + p2 + ' on ' +
-        att(config, 'date', '') + ' at ' + att(config, 'venue.name', ''),
+        att(config, 'date', '') + (timeLine(config) ? ' at ' + timeLine(config) : '') +
+        '.\n\nIndia Standard Time (IST, UTC+5:30). The times above are shown in your own timezone.',
       location: att(config, 'venue.name', '') + ', ' + att(config, 'venue.address', ''),
     });
     return 'https://calendar.google.com/calendar/render?' + q.toString();

@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>6 December 2026 • 10:00 AM onwards • Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</strong>
+  <strong>6 December 2026 • 10:00 AM onwards IST • Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</strong>
 </p>
 
 ## Features

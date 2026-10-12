@@ -1056,7 +1056,7 @@
   }
 
   /* ---------------------------------------------
-     "N days to go" + "In your time".
+     "N days to go" + the India start time.
      ---------------------------------------------
      Both are driven off config.startISO, which carries an explicit +05:30.
      The old eventDate is new Date('Dec 6, 2026 10:00:00'), which JavaScript
@@ -1111,36 +1111,21 @@
       host.appendChild(daysEl);
     }
 
-    // --- timezone line
-    var tz = '';
-    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
-    var inIndia = (tz === '' || tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta');
-    var text = txOr('tzIst', 'IST (India time)');
-    /* Only a guest genuinely outside India gets the second half. Someone in
-       Punjab does not need the time twice, and if the device reports a zone
-       we do not recognise we still always print the India time, because
-       that is the one that is certain. */
-    if (!inIndia && window.Intl && Intl.DateTimeFormat) {
-      try {
-        /* en-GB, deliberately NOT pa-IN. The Punjabi branch used to pass
-           isPa() ? 'pa-IN' : undefined here, and Chrome's ICU returns
-           "M12 6, Sun 3:30 PM" for pa-IN - a month called "M12", and the
-           weekday out of order. Node's ICU returns "ਐਤ, 6 ਦਸੰ, 3:30 PM"
-           for the same locale, so it renders correctly in one runtime and
-           as garbage in the one that actually runs this page.
-           This line is a machine-formatted timestamp, not prose, so it does
-           not want a localised face anyway - and the rest of the Punjabi
-           page already uses Latin digits ("6 ਦਸੰਬਰ 2026", "10:00 ਵਜੇ"),
-           so en-GB is consistent as well as safe. It yields the same
-           "Sun 6 Dec, 3:30 pm" in both languages, which is what a guest
-           converting a time wants to see. */
-        var f = new Intl.DateTimeFormat('en-GB', {
-          weekday: 'short', day: 'numeric', month: 'short',
-          hour: 'numeric', minute: '2-digit', hour12: true
-        });
-        text += ' \u00B7 ' + txOr('tzYours', 'In your time') + ': ' + f.format(start);
-      } catch (e) {}
-    }
+    // --- the time line
+    /* The India time, and ONLY the India time.
+
+       This used to read "IST (India time) - In your time: Sun 6 Dec, 3:30
+       pm", with the second half built from Intl.DateTimeFormat in the
+       VIEWER's zone. On a phone set to Melbourne that rendered "3:30 pm"
+       directly under the Save-the-Date card, and because the card showed
+       no India time anywhere, a guest read 3:30 pm as the start of the
+       reception. It is gone: the owner asked for one time they can read,
+       not two to convert between.
+
+       config.time already ends in "IST", so this line needs no formatting
+       of its own. The same string drives the title, the day-info card and
+       the PDF card, so they cannot drift apart. */
+    var text = txOr('tzIst', timeText() || time || '10:00 AM onwards IST');
     var tzEl = document.createElement('div');
     tzEl.id = 'tz-note';
     tzEl.className = 'tz-note';

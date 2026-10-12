@@ -190,16 +190,25 @@
 }
 
 :root {
-  --maroon: #6d1a2d;
-  --maroon-2: #8c2340;
+  --maroon: #5f1526;
+  --maroon-2: #7a1a33;
   --royal: #4a1220;
   /* Main body text was #3d0d18 - made darker for readability while
      keeping the warm undertone. #2d0a10 is closer to black but still
      reads as deep maroon rather than flat black on the parchment. */
   --dark: #2d0a10;
-  --highlight: #a4243b;
-  --gold: #a88533;
-  --gold-2: #8a6624;
+  /* The date, the countdown and the small accent links. Was #a4243b at
+     6.72:1 on the parchment. That already passed AA, but on a phone in
+     daylight the red was the first thing on the card to wash out, so it is
+     deepened to #86162c - 8.99:1, still recognisably the same accent red. */
+  --highlight: #86162c;
+  /* The ampersand, the hairlines and the artwork borders. Was #a88533,
+     which is only 3.21:1 as text - legal for the 31-44px ampersand because
+     it counts as large text, but visibly the faintest thing on the page.
+     #8a6a1c gives 4.68:1, so it now clears the 4.5:1 small-text bar too
+     and the & reads as gold rather than as a smudge. */
+  --gold: #8a6a1c;
+  --gold-2: #6f5216;
   --gold-soft: #e8c877;
   --gold-line: #e0cfa8;
   /* Small labels are MAROON, not gold. Gold was the original problem: at
@@ -209,15 +218,15 @@
      Gold now carries only what it is good at - the ampersand, hairlines,
      borders and artwork - while every small label gets the deep accent
      colour at 9.35:1, which is both prettier and far more legible. */
-  /* Gold text for labels was #7a1f38 - deepened so upper-case labels
-     are legible at small sizes without increasing tracking. */
-  --gold-text: #6b1a2e;
+  /* Gold text for labels was #7a1f38 - deepened to #6b1a2e, then again to
+     #5c1526 (12.24:1) for the same daylight reason as --highlight. */
+  --gold-text: #5c1526;
   --ivory: #faf6ec;
   --ivory-2: #fffdf7;
   --parchment: #f4ead4;
   /* Brown for secondary notes was #6b4f26 - darkened so it reads as
-     intentional rather than faded. */
-  --brown: #5a3d18;
+     intentional rather than faded, then to #452c10 (12.01:1). */
+  --brown: #452c10;
   /* Shadow colour updated to match new --dark (#2d0a10 = 45,10,16) */
   --shadow-soft: 0 10px 34px rgba(45, 10, 16, 0.10);
   --shadow-card: 0 18px 50px rgba(45, 10, 16, 0.14);
@@ -953,6 +962,15 @@ html[lang="pa"] .title h1 {
   white-space: nowrap;
   border: 0;
 }
+
+/* The name field's visible label IS its placeholder - the <label> above is
+   screen-reader-only - so this string is not a hint, it is the only thing
+   telling a guest what to type. Chrome's default placeholder grey (#757575)
+   is 4.46:1 on this card's background, which is under the 4.5:1 bar and is
+   the faintest text on the page. #7a6270 is a desaturated maroon at 5.34:1:
+   comfortably readable, and still lighter than the --dark the guest's typed
+   name appears in, so it never looks like real content. */
+#rsvp-name::placeholder { color: #7a6270; opacity: 1; }
 
 .attend-btn,
 #rsvp-name,
@@ -2690,7 +2708,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     "connectorPa": "ਅਤੇ"
   },
   "date": "6 December 2026",
-  "time": "10:00 AM onwards",
+  "_time_note": "The guest-facing time. 'IST' is IN the string on purpose, not appended by the code: it is the one word that stops a guest in Melbourne or Dubai reading 10:00 as their own wall clock. It is shown in the title, the Save-the-Date card, the day-info card, the PDF card, the print header and the .ics DESCRIPTION, and it must match startISO below.",
+  "time": "10:00 AM onwards IST",
   "startISO": "2026-12-06T10:00:00+05:30",
   "endISO": "2026-12-06T16:00:00+05:30",
   "_endISO_note": "CONFIRMED (Nirman): 10:00 AM to 4:00 PM IST. Everything downstream - the .ics DTEND, the Google Calendar link, and the end time a guest sees in their own calendar - is driven by this one value, so changing it here is enough. It must stay +05:30 (India) and must match startISO's date.",
@@ -2857,8 +2876,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrNote": "Scan with your phone camera, or tap a code to open it",
         "gateHint": "Tap your language to enter",
         "gateHintBoth": "Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ",
-        "tzIst": "IST (India time)",
-        "tzYours": "In your time",
+        "_tz_note": "tzIst is the line under the countdown in the Save-the-Date card. It used to read 'IST (India time)' next to an 'In your time: <local>' conversion, which meant the card showed NO India time at all - a guest outside India saw only their own clock and read it as the start time. It now carries the actual start time, and tzYours (the local conversion) is gone: the owner asked for one unambiguous time, not two to compare.",
+        "tzIst": "10:00 AM onwards IST",
         "daysToGo": "{n} days to go",
         "daysOne": "Tomorrow",
         "daysZero": "Today",
@@ -2917,8 +2936,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "qrNote": "ਆਪਣੇ ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਸਕੈਨ ਕਰੋ, ਜਾਂ ਖੋਲ੍ਹਣ ਲਈ ਟੈਪ ਕਰੋ",
         "gateHint": "ਅੰਦਰ ਜਾਣ ਲਈ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
         "gateHintBoth": "Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ",
-        "tzIst": "ਭਾਰਤੀ ਸਮਾਂ (IST)",
-        "tzYours": "ਤੁਹਾਡੇ ਸਮੇਂ ਅਨੁਸਾਰ",
+        "tzIst": "ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ ਭਾਰਤੀ ਸਮਾਂ (IST)",
         "daysToGo": "{n} ਦਿਨ ਬਾਕੀ",
         "daysOne": "ਕੱਲ੍ਹ",
         "daysZero": "ਅੱਜ",
@@ -2984,7 +3002,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
     }
   },
   "datePa": "6 ਦਸੰਬਰ 2026",
-  "timePa": "ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ"
+  "timePa": "ਸਵੇਰੇ 10:00 ਵਜੇ ਤੋਂ ਭਾਰਤੀ ਸਮਾਂ (IST)"
 };
       </script>
 
@@ -2994,6 +3012,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
         "@type": "Event",
         "name": "Nirman & Simran — Wedding Reception",
         "startDate": "2026-12-06T10:00:00+05:30",
+        "endDate": "2026-12-06T16:00:00+05:30",
         "eventStatus": "https://schema.org/EventScheduled",
         "location": {
           "@type": "Place",
@@ -3129,8 +3148,8 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
            it back on before html2canvas reads it. -->
       <div id="pdf-card" class="pdf-card" style="display:none; position:absolute; left:-9999px; top:0; width:560px; background:#faf6ec; color:#4a1220; font-family:'Cormorant Garamond', Georgia, serif; border:1px solid #e3d5b3; padding:34px 30px 26px; box-sizing:border-box;">
         <div style="text-align:center;">
-          <div style="font-size:32px; color:#a4243b; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
-          <div style="font-size:14px; line-height:1.85; color:#6d1a2d; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
+          <div style="font-size:32px; color:#86162c; line-height:1; margin-bottom:10px;" id="pdf-ik">ੴ</div>
+          <div style="font-size:14px; line-height:1.85; color:#5f1526; margin-bottom:16px; font-family:'Noto Sans Gurmukhi', serif; white-space:pre-line;" id="pdf-blessing">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥
 ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ ।
 ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ ॥</div>
           <!-- The Anand Karaj artwork, which the old card left out entirely.
@@ -3140,15 +3159,15 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
             <img src="assets/img/anand-karaj-crop.webp" alt="" style="display:block; width:100%; height:auto;">
           </div>
           <div style="font-size:14px; color:#4a1220; font-style:italic; margin-bottom:8px;" id="pdf-subtext">With the blessings of Waheguru, you are cordially invited to the Reception of</div>
-          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
-          <div style="font-size:20px; color:#8a6624; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
-          <div style="font-size:44px; color:#6d1a2d; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
-          <div style="font-size:14px; letter-spacing:2px; color:#7a1f38; margin-bottom:8px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
-          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards</div>
+          <div style="font-size:44px; color:#5f1526; font-family:'Great Vibes', cursive; margin:2px 0; line-height:1.1;" id="pdf-name-1">Nirman</div>
+          <div style="font-size:20px; color:#7a5a16; font-family:'Great Vibes', cursive; line-height:1.1;" id="pdf-connector">&amp;</div>
+          <div style="font-size:44px; color:#5f1526; font-family:'Great Vibes', cursive; margin:2px 0 8px; line-height:1.1;" id="pdf-name-2">Simran</div>
+          <div style="font-size:14px; letter-spacing:2px; color:#6b1a2e; margin-bottom:8px;" id="pdf-event-line">Reception &bull; 6 December 2026</div>
+          <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-time-line">10:00 AM onwards IST</div>
           <div style="font-size:15px; color:#4a1220; margin:3px 0;" id="pdf-venue-line">Park City Resort, Malout, Fazilka Rd, Malout Rural, Punjab 152107, India</div>
           <div id="pdf-qr" class="pdf-qr"></div>
           <div style="margin-top:20px; border-top:1px solid #e3d5b3; padding-top:12px; font-size:13px; color:#4a1220;" id="pdf-footer-note">With love and joy, together with their families</div>
-          <div style="margin-top:5px; font-size:12px; color:#7a5c2e;" id="pdf-contact">For any queries: +61 423 594 009</div>
+          <div style="margin-top:5px; font-size:12px; color:#5f4718;" id="pdf-contact">For any queries: +61 423 594 009</div>
         </div>
       </div>
 
