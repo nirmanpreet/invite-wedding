@@ -11,24 +11,59 @@
 
   Copy is read from data/config.json at render time, never hardcoded here,
   so the card cannot drift out of sync with the invitation.
+
+  COLOUR IS THE SITE'S PALETTE, not a private one. The card used to carry its
+  own hexes (#8c2340 names, #c6a05a ampersand, #8a6a4a venue line) and had
+  drifted a long way from css/style.css. Two of those failed WCAG outright on
+  the card's own background: the ampersand measured 2.41:1 and the 96px names
+  around it were the most legible thing on the page, and the venue line
+  measured 4.38:1. Every text colour below is now one of the --maroon /
+  --maroon-2 / --brown / --dark / --gold tokens, so the next palette change
+  has to be made in one place.
+
+  FONTS ARE SELF-HOSTED, same as the live page. This used to link Google Fonts,
+  which meant the card could be re-rendered in a different face whenever the
+  CDN served an update, and needed network access to produce anything at all.
 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Dancing+Script:wght@400;700&family=Noto+Sans+Gurmukhi:wght@500;600&display=swap" rel="stylesheet">
 <style>
+  /* The live page's faces, from assets/fonts/. Relative to tools/, which is
+     where make-og.js renders this file from. */
+  @font-face { font-family: 'Cormorant Garamond'; font-weight: 400; font-display: block; src: url('../assets/fonts/cormorant-garamond-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Cormorant Garamond'; font-weight: 500; font-display: block; src: url('../assets/fonts/cormorant-garamond-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Cormorant Garamond'; font-weight: 600; font-display: block; src: url('../assets/fonts/cormorant-garamond-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Cormorant Garamond'; font-weight: 700; font-display: block; src: url('../assets/fonts/cormorant-garamond-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Dancing Script'; font-weight: 700; font-display: block; src: url('../assets/fonts/dancing-script-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans Gurmukhi'; font-weight: 500; font-display: block; src: url('../assets/fonts/noto-sans-gurmukhi-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans Gurmukhi'; font-weight: 600; font-display: block; src: url('../assets/fonts/noto-sans-gurmukhi-600.woff2') format('woff2'); }
+
+  /* Mirrors the :root tokens in css/style.css. */
+  :root {
+    --maroon:   #5f1526;
+    --maroon-2: #7a1a33;
+    --royal:    #4a1220;
+    --dark:     #2d0a10;
+    --gold:     #7d5f18;   /* --gold deepened: #8a6a1c is 4.47:1 on the lightest
+                               part of this card's own gradient, i.e. under the
+                               bar. This is the same hue, one step darker. */
+    --gold-soft: #c6a05a;  /* decorative only: frame, corners, rules */
+    --brown:    #452c10;
+    --ivory:    #faf6ec;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1200px; height: 630px; overflow: hidden; }
   body {
     font-family: 'Cormorant Garamond', Georgia, serif;
     background:
-      radial-gradient(760px 420px at 50% -6%, rgba(200,162,75,0.22), transparent 62%),
-      radial-gradient(520px 380px at 50% 112%, rgba(164,36,59,0.10), transparent 60%),
+      radial-gradient(760px 420px at 50% -6%, rgba(125,95,24,0.18), transparent 62%),
+      radial-gradient(520px 380px at 50% 112%, rgba(122,26,51,0.10), transparent 60%),
       linear-gradient(168deg, #fffdf8 0%, #fdf6e9 58%, #faf0dd 100%);
-    color: #4a2c2f;
+    color: var(--dark);
     position: relative;
+    -webkit-font-smoothing: antialiased;
   }
   /* gold hairline frame, inset from the edge */
   .frame {
@@ -48,7 +83,7 @@
   .corner {
     position: absolute;
     width: 13px; height: 13px;
-    background: #c6a05a;
+    background: var(--gold-soft);
     transform: rotate(45deg);
     opacity: 0.85;
   }
@@ -73,7 +108,7 @@
   .ik {
     font-family: 'Noto Sans Gurmukhi', serif;
     font-size: 36px;
-    color: #8c2340;
+    color: var(--maroon-2);
     line-height: 1;
     margin-bottom: 8px;
   }
@@ -82,20 +117,20 @@
     font-weight: 500;
     font-size: 19px;
     line-height: 1.6;
-    color: #6d1a2d;
+    color: var(--maroon);
     margin-bottom: 4px;
   }
   .blessing-en {
     font-size: 17px;
     letter-spacing: 1.1px;
-    color: #8a6a4a;
+    color: var(--brown);
     font-style: italic;
     margin-bottom: 10px;
   }
 
   /* ceremony art */
   .art {
-    height: 148px;
+    height: 138px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,22 +147,23 @@
     font-weight: 700;
     /* letter-spacing must stay 0: this is a connected script face */
     letter-spacing: 0;
-    font-size: 96px;
+    font-size: 92px;
     line-height: 1.02;
-    color: #8c2340;
+    color: var(--maroon-2);
     margin-bottom: 4px;
   }
   .names .amp {
     display: inline-block;
     margin: 0 0.06em;
-    color: #c6a05a;
+    /* was #c6a05a: 2.41:1, unreadable at any size on this background */
+    color: var(--gold);
   }
   .heading {
     font-size: 19px;
     font-weight: 600;
     letter-spacing: 8px;
     text-transform: uppercase;
-    color: #a9813a;
+    color: var(--gold);
     margin-bottom: 16px;
   }
 
@@ -141,21 +177,25 @@
   .details {
     display: flex;
     align-items: center;
-    gap: 30px;
-    font-size: 24px;
-    font-weight: 600;
-    color: #5c3238;
+    gap: 26px;
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--dark);
+    white-space: nowrap;
   }
   .details .sep {
     width: 5px; height: 5px;
-    background: #c6a05a;
+    background: var(--gold-soft);
     transform: rotate(45deg);
     flex: 0 0 auto;
   }
+  /* The IST label is the whole point of this card's time line, so it is set
+     slightly larger than the date rather than trailing it at body size. */
+  .details .when { font-weight: 700; }
   .venue {
     font-size: 21px;
-    font-weight: 400;
-    color: #8a6a4a;
+    font-weight: 500;
+    color: var(--brown);
     margin-top: 12px;
     letter-spacing: 0.3px;
   }
@@ -167,7 +207,8 @@
     font-size: 15px;
     letter-spacing: 3.6px;
     text-transform: uppercase;
-    color: rgba(138,106,74,0.85);
+    color: var(--brown);
+    opacity: 0.9;
   }
 
   /* ---- floating flowers (static) --------------------------------
@@ -197,12 +238,12 @@
   <div class="card" id="card">
     <div class="ik">ੴ</div>
     <div class="gurbani" id="gurbani"></div>
-    <div class="blessing-en">With the blessings of Waheguru</div>
+    <div class="blessing-en" id="blessing"></div>
 
     <div class="art"><img src="../assets/img/anand-karaj-crop.webp" alt=""></div>
 
     <div class="names" id="names"></div>
-    <div class="heading">Wedding Reception</div>
+    <div class="heading" id="heading"></div>
 
     <div class="rule"></div>
 
@@ -215,7 +256,7 @@
 
 <script>
 /* Copy is injected by tools/make-og.js from data/config.json. */
-  window.__OG__ = { gurbani: ['', ''], p1: '', p2: '', connector: '&', date: '', time: '', venue: '', domain: '' };
+  window.__OG__ = { gurbani: ['', ''], blessing: '', heading: '', p1: '', p2: '', connector: '&', date: '', time: '', venue: '', domain: '' };
 
   /* Flower art, identical to the SVG paths in js/invite-motion.js so the
      share card and the live shower share one set of shapes. */
@@ -240,8 +281,8 @@
   var SHAPE = {
     mogra: svg('0 0 48 48', ring(5, 10, 8, 13, 'fill="#fffdf6" stroke="#e3d5b3" stroke-width=".7"') +
       '<circle cx="24" cy="24" r="3.5" fill="#dfae3a"/>'),
-    rose: svg('0 0 40 48', grad('#e5a9b8', '#a4243b') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
-    roseDeep: svg('0 0 40 48', grad('#b23a58', '#6d1a2d') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
+    rose: svg('0 0 40 48', grad('#e5a9b8', '#86162c') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
+    roseDeep: svg('0 0 40 48', grad('#b23a58', '#5f1526') + '<path d="' + ROSE + '" fill="url(#g)"/>'),
     marigold: svg('0 0 48 48', ring(12, 11, 5, 11, 'fill="#c8a24b"') +
       ring(8, 7, 4, 8, 'fill="#e5c46d"') + '<circle cx="24" cy="24" r="4" fill="#7a5c22"/>'),
     petal: svg('0 0 40 48', grad('#e5c46d', '#a8812e') + '<path d="' + MARI + '" fill="url(#g)"/>')
@@ -254,7 +295,7 @@
     ['marigold', 58, 470, 34,   -8, 0.26],
     ['mogra',  1088, 486, 42,   16, 0.32],
     ['petal',  1148, 300, 26,   34, 0.20],
-    ['roseDeep',300,  28, 26,   -24, 0.22],
+    ['roseDeep',300,  28, 26,  -24, 0.22],
     ['mogra',   856, 566, 28,   28, 0.22]
   ];
   (function () {
@@ -275,14 +316,19 @@
   function paint() {
     var o = window.__OG__;
     document.getElementById('gurbani').innerHTML = o.gurbani[0] + '<br>' + o.gurbani[1];
+    document.getElementById('blessing').textContent = o.blessing;
+    document.getElementById('heading').textContent = o.heading;
     document.getElementById('names').innerHTML =
       o.p1 + ' <span class="amp">' + o.connector + '</span> ' + o.p2;
     document.getElementById('details').innerHTML =
-      '<span>' + o.date + '</span><span class="sep"></span><span>' + o.time + '</span>';
+      '<span>' + o.date + '</span><span class="sep"></span><span class="when">' + o.time + '</span>';
     document.getElementById('venue').textContent = o.venue;
     document.getElementById('domain').textContent = o.domain;
   }
   paint();
+  /* font-display: block above means the text is invisible until the face
+     loads, so the fonts.ready repaint is what makes the card legible at all -
+     do not remove it. */
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(paint).catch(function () {});
   }

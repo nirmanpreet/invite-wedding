@@ -96,6 +96,34 @@ const titlePa = String(att(config, 'i18n.pa.inviteTitle', att(config, 'i18n._ext
    literal "&" in the HTML source rather than "&amp;amp;". */
 const shareTitle = p1 + ' & ' + p2 + ' | ' + (titlePa || 'Wedding Reception') + ' | ' + dateShort;
 
+/* The og:description / twitter:description body.
+
+   It used to be config.seo.description verbatim - 125 characters, which a
+   phone truncates mid-sentence, and which spent its whole budget on "With
+   Waheguru blessings, you are warmly invited" while saying NOTHING about
+   when or where the reception actually is. The preview card is often the
+   only thing a guest reads before deciding to tap, so the two facts that
+   decide that are the date, the IST time and the venue.
+
+   Assembled from config for the same reason shareTitle is: a hand-written
+   description is a second copy of the date and time that nobody updates. */
+const ogDescription = [
+  p1 + ' ' + connector + ' ' + p2,
+  titlePa || 'Wedding Reception',
+  dateShort,
+  att(config, 'time', ''),
+  att(config, 'venue.name', '')
+].filter(Boolean).join(' · ');
+/* og:image:alt is the text a screen reader reads when the image cannot be
+   seen, and the fallback WhatsApp shows while the image loads. The old one
+   read "Nirman & Simran | Wedding Reception | 6 December 2026 - Wedding
+   Reception on 6 December 2026 at Park City Resort, Malout" - the same
+   facts twice, in two different date formats, with a hardcoded couple name
+   that no longer followed config. */
+const ogImageAlt = p1 + ' ' + connector + ' ' + p2 + ' - ' +
+  (titlePa || 'Wedding Reception') + ' on ' + att(config, 'date', '') +
+  ' at ' + att(config, 'time', '') + ', ' + att(config, 'venue.name', '');
+
 const css = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
 /* Floating-flower shower + the two guest toggles. Inlined into the same
@@ -141,15 +169,27 @@ const html = `<!DOCTYPE html>
       <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
       <meta name="description" content="${esc(seoDesc)}">
       <meta name="author" content="${esc(p1)} &amp; ${esc(p2)}">
-      <meta name="theme-color" content="#6d1a2d">
-      <meta name="robots" content="noindex, nofollow">
+      <meta name="theme-color" content="#5f1526">
+      <!-- SEARCH indexing is blocked, but NOT with a blanket noindex.
+           This used to say <meta name="robots" content="noindex, nofollow">,
+           on the reasoning (now recorded in robots.txt) that noindex "is about
+           search indexing, not fetching". That is true of most crawlers and
+           is exactly the wrong assumption here: the WhatsApp card is built by
+           the Facebook crawler, facebookexternalhit, and a blanket noindex is
+           a documented way to get a link shared with no preview at all. The
+           owner wants this invitation SHARED on WhatsApp far more than they
+           want it searchable, so the directive is scoped to the search bots
+           instead. Google stays out; WhatsApp, iMessage, Slack and Facebook
+           can now build a card. robots.txt blocks the same bots one layer up. -->
+      <meta name="googlebot" content="noindex, nofollow, noimageindex">
+      <meta name="bingbot" content="noindex, nofollow">
       <link rel="canonical" href="https://invite.nirmanpreet.com/">
       <link rel="apple-touch-icon" href="assets/img/icon-180.png">
       <meta property="og:type" content="website" />
       <meta property="og:title" content="${esc(shareTitle)}" />
-      <meta property="og:description" content="${esc(seoDesc)}" />
+      <meta property="og:description" content="${esc(ogDescription)}" />
       <meta property="og:url" content="https://invite.nirmanpreet.com/" />
-      <meta property="og:site_name" content="Nirman &amp; Simran" />
+      <meta property="og:site_name" content="${esc(p1)} &amp; ${esc(p2)}" />
       <meta property="og:locale" content="en_US" />
       <!-- One URL serves both languages (the page switches in place, there is
            no /pa/ path), so this only tells a scraper the Punjabi wording
@@ -160,11 +200,12 @@ const html = `<!DOCTYPE html>
       <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content="Nirman &amp; Simran | Wedding Reception | 6 December 2026 — Wedding Reception on 6 December 2026 at Park City Resort, Malout" />
+      <meta property="og:image:alt" content="${esc(ogImageAlt)}" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="${esc(shareTitle)}" />
-      <meta name="twitter:description" content="${esc(seoDesc)}" />
+      <meta name="twitter:description" content="${esc(ogDescription)}" />
       <meta name="twitter:image" content="https://invite.nirmanpreet.com/assets/img/og.jpg" />
+      <meta name="twitter:image:alt" content="${esc(ogImageAlt)}" />
       <title>${esc(shareTitle)}</title>
 
       <link rel="manifest" href="manifest.webmanifest">

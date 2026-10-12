@@ -1,10 +1,46 @@
-# Link previews (WhatsApp, iMessage, Slack, Facebook) fetch this URL and
-# the og:image. The hosting platform falls back to index.html for any file
-# that does not exist on disk, so without this file a crawler asking for
-# /robots.txt receives a 200 HTML page instead of a policy.
+# Policy for invite.nirmanpreet.com
 #
-# The page itself carries <meta name="robots" content="noindex, nofollow">,
-# which is about SEARCH indexing, not fetching. Crawlers must be allowed to
-# fetch the page for the share preview to render at all.
+# Two audiences pull this URL, and they want OPPOSITE things:
+#
+#   1. Link-preview crawlers - WhatsApp, iMessage, Facebook, Slack, Twitter,
+#      Discord, Teams. They fetch the page and the og:image to build the card
+#      a guest sees in the chat. They must be allowed in, or the invitation is
+#      shared as a bare blue URL with no picture, no title and no date.
+#
+#   2. Search engines. This is a private invitation: two names, a home venue,
+#      two phone numbers and a home town. It has no business in a search
+#      result, so the search bots are kept out.
+#
+# CORRECTION - the previous version of this file said:
+#
+#   "The page itself carries <meta name="robots" content="noindex, nofollow">,
+#    which is about SEARCH indexing, not fetching."
+#
+# That is the assumption that caused "shared on WhatsApp, no preview". It is
+# true for most crawlers and false for the one that matters: the WhatsApp card
+# is built by the Facebook crawler (facebookexternalhit), which can honour a
+# blanket noindex and decline to generate a card at all. The <meta name="robots">
+#   tag has since been replaced by googlebot/bingbot-specific directives in
+#   build.js, and the same split is enforced here.
+#
+# Note the ordering: the most specific User-agent group wins, so Googlebot is
+# Disallowed despite the blanket Allow below.
+
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+# Everyone else - every link-preview crawler, every browser - is welcome.
 User-agent: *
 Allow: /

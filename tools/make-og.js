@@ -71,11 +71,15 @@ class Tab {
   if (!p1 || !p2) { console.error('could not read couple names from config'); process.exit(1); }
 
   const venue = config.venue || {};
+  const extra = (config.i18n && config.i18n._extra) || {};
+  const en = extra.en || {};
   const og = {
     gurbani: [
       'ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥',
-      'ਲਖ ਖੁਸੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥'
+      'ਲਖ ਖੁਸ਼ੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥'
     ],
+    blessing: en.blessing || 'With the blessings of Waheguru',
+    heading: (en.receptionHeading || 'Wedding Reception').toUpperCase(),
     p1, p2,
     connector: conn,
     date: config.date,
@@ -83,6 +87,16 @@ class Tab {
     venue: venue.name + ' · ' + String(venue.address || '').split(',')[0],
     domain: SITE.replace(/^https?:\/\//, '').replace(/\/$/, '')
   };
+
+  // A preview card that hides the start time is worse than none: a guest reads
+  // '6 December 2026' in the chat, assumes a morning, and misses it. config.time
+  // carries 'IST' for exactly this reason - refuse to build if a hand-edit
+  // drops it, rather than shipping a card with no timezone on it.
+  if (!/(^|[^A-Za-z])IST([^A-Za-z]|$)/.test(String(og.time || ''))) {
+    console.error('config.time is "' + og.time + '" - it must name the timezone, e.g. "10:00 AM onwards IST".');
+    console.error('A guest in another country cannot convert an unlabelled time, and the card is often all they see.');
+    process.exit(1);
+  }
 
   // inject the copy into the template
   const tplPath = path.join(ROOT, 'tools/og-template.html');
@@ -108,10 +122,51 @@ class Tab {
   await tab.ev('document.fonts.ready').catch(() => {});
   await sleep(2500);
 
+  // The template uses font-display:block, so until the faces resolve the text
+  // is INVISIBLE - a screenshot taken too early is a blank card with no error
+  // anywhere. Assert the faces actually loaded rather than trusting
+  // document.fonts.ready to mean "the right ones are ready".
+  //
+  // Checked per DESCRIPTOR the card actually sets text in, not by walking
+  // document.fonts: a declared-but-unused face is legitimately never fetched,
+  // so listing all of them reports failures that do not affect the output.
+  // Read off the template's OWN computed styles rather than hand-listing them.
+  // A hand-written list is wrong the moment someone edits a font-weight, and
+  // a wrong entry fails the build for no reason: .ik is weight 400, not 600.
+  const NEEDED = JSON.parse(await tab.ev(
+    "JSON.stringify(['.ik','.gurbani','.names','.heading','.venue','.blessing-en'].map(function(s){" +
+    "var e=document.querySelector(s); if(!e) return null;" +
+    "var c=getComputedStyle(e);" +
+    "return [c.fontFamily.split(',')[0].replace(/[\"']/g,''), c.fontWeight, s];}))"
+  )).filter(Boolean);
+  // Push the list in as a page global rather than splicing JSON into an
+  // expression string: the family names contain spaces and the descriptor
+  // needs real quote characters, which is exactly where hand-built escaping
+  // goes wrong.
+  await tab.ev('window.__NEEDED_FONTS__ = ' + JSON.stringify(NEEDED));
+  const fontCheck = JSON.parse(await tab.ev(
+    'JSON.stringify(window.__NEEDED_FONTS__.map(function(d) {' +
+    ' return d[0] + " | " + d[1] + " | " + d[2] + " = " +' +
+    ' document.fonts.check(d[1] + " 32px \\\"" + d[0] + "\\\"");' +
+    '}))'
+  ));
+  const bad = fontCheck.filter(s => s.trim().slice(-4) !== 'true');
+  if (bad.length) {
+    console.error('these faces did not load - the card would be blank or in a fallback face:');
+    bad.forEach(s => console.error('  ' + s));
+    console.error('Check the paths in tools/og-template.html (../assets/fonts/...).');
+    process.exit(1);
+  }
+  console.log('  fonts   : all ' + fontCheck.length + ' faces in use are loaded');
+
   const metrics = await tab.ev(
-    "(function(){var d=document.documentElement;" +
+    "(function(){var d=document.documentElement,c=document.getElementById('card');" +
+    "var last=c.lastElementChild.getBoundingClientRect();" +
+    "var dom=document.getElementById('domain').getBoundingClientRect();" +
     "return JSON.stringify({w:d.scrollWidth,h:d.scrollHeight," +
-    "overflowX:d.scrollWidth-d.clientWidth});})()"
+    "overflowX:d.scrollWidth-d.clientWidth," +
+    "overflowY:d.scrollHeight-d.clientHeight," +
+    "cardBottom:Math.round(last.bottom), domainTop:Math.round(dom.top)});})()"
   );
   const m = JSON.parse(metrics);
   if (m.w !== 1200 || m.h !== 630) {
@@ -119,6 +174,18 @@ class Tab {
     process.exit(1);
   }
   if (m.overflowX > 0) console.warn('WARNING: horizontal overflow ' + m.overflowX + 'px');
+  if (m.overflowY > 0) console.warn('WARNING: vertical overflow ' + m.overflowY + 'px');
+  /* The canvas is overflow:hidden, so copy past the edge is not merely
+     untidy - it is silently CROPPED off the finished card. A venue line or a
+     date that does not fit is invisible to whoever runs this script and very
+     visible to a guest, so it has to be a hard failure. */
+  if (m.cardBottom > 570 || m.domainTop < 555) {
+    console.error('the copy does not fit: lowest text ends at y=' + m.cardBottom +
+      ', the domain line starts at y=' + m.domainTop + ' (need <=570 and >=555).');
+    console.error('overflow:hidden means anything past the edge is cut off the card.');
+    process.exit(1);
+  }
+  console.log('  layout  : copy ends y=' + m.cardBottom + ', domain line at y=' + m.domainTop);
 
   const shot = await tab.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
   const rawPng = Buffer.from(shot.data, 'base64');
