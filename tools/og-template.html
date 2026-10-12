@@ -115,11 +115,18 @@
   .gurbani {
     font-family: 'Noto Sans Gurmukhi', serif;
     font-weight: 500;
-    font-size: 19px;
-    line-height: 1.6;
+    /* 18px, not 19px: the blessing is now THREE Gurmukhi lines read from
+       config rather than two, and at 19px the block collided with the
+       artwork. */
+    font-size: 18px;
+    line-height: 1.55;
     color: var(--maroon);
     margin-bottom: 4px;
   }
+  /* One <span> per line, laid out as blocks: a Gurmukhi line longer than the
+     card is wide has to WRAP rather than push the layout sideways. */
+  .gurbani span { display: block; }
+  .gurbani span + span { margin-top: 2px; }
   .blessing-en {
     font-size: 17px;
     letter-spacing: 1.1px;
@@ -315,7 +322,13 @@
 
   function paint() {
     var o = window.__OG__;
-    document.getElementById('gurbani').innerHTML = o.gurbani[0] + '<br>' + o.gurbani[1];
+    /* Join EVERY line, not just the first two. This was o.gurbani[0] + '<br>' +
+       o.gurbani[1], which silently dropped everything past the second - so a
+       three-line blessing from config rendered as two, and the third line
+       ("ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ...") never reached the card at all. Length of
+       the blessing must come from config, not from this file. */
+    document.getElementById('gurbani').innerHTML =
+      o.gurbani.map(function (l) { return '<span>' + l + '</span>'; }).join('');
     document.getElementById('blessing').textContent = o.blessing;
     document.getElementById('heading').textContent = o.heading;
     document.getElementById('names').innerHTML =

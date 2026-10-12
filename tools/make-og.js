@@ -73,11 +73,47 @@ class Tab {
   const venue = config.venue || {};
   const extra = (config.i18n && config.i18n._extra) || {};
   const en = extra.en || {};
+  const i18n = config.i18n || {};
+
+  /* The Gurmukhi blessing, taken from config instead of being typed here.
+
+     This WAS hardcoded, and it had drifted: the card carried
+     "ਲਖ ਖੁਸ਼ੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥" - an OLD version of the blessing
+     that no longer appears anywhere on the invitation, whose current text is
+     "ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ। / ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ...".
+     A guest comparing the share card against the page would see two different
+     blessings, and the card is what strangers see first.
+
+     i18n.pa.footerNote holds the Gurmukhi only; i18n.en.footerNote appends an
+     English line after it. Take the Gurmukhi lines from the Punjabi block,
+     drop the leading "ੴ" (the card draws it separately, larger, above), and
+     stop at the first line that is not Gurmukhi. */
+  /* Explicit loop, not an IIFE. The IIFE form relied on `return` inside a
+     for-loop, and a stray blank line in the config silently truncated the
+     blessing to its first line while the tool still reported success. */
+  const blessingLines = [];
+  {
+    const raw = String((i18n.pa && i18n.pa.footerNote) || '');
+    const lines = raw.split(/\r?\n/)
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+    for (const line of lines) {
+      // A line with no Gurmukhi at all is the trailing English sentence.
+      if (!/[਀-੿]/.test(line)) break;
+      // The leading Ik Onkar is drawn separately by the template.
+      const cleaned = line.replace(/^਴\s*/, '').trim();
+      if (cleaned) blessingLines.push(cleaned);
+    }
+  }
+
+  if (!blessingLines.length) {
+    console.error('could not read any Gurmukhi blessing lines from i18n.pa.footerNote in data/config.json');
+    console.error('The share card must use the SAME blessing as the invitation, not a private copy.');
+    process.exit(1);
+  }
+
   const og = {
-    gurbani: [
-      'ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥',
-      'ਲਖ ਖੁਸ਼ੀਆ ਪਾਤਿਸਾਹੀਆ ਜੇ ਸਤਿਗੁਰੁ ਨਦਰਿ ਕਰੇਇ ॥'
-    ],
+    gurbani: blessingLines,
     blessing: en.blessing || 'With the blessings of Waheguru',
     heading: (en.receptionHeading || 'Wedding Reception').toUpperCase(),
     p1, p2,
@@ -139,6 +175,61 @@ class Tab {
     "var c=getComputedStyle(e);" +
     "return [c.fontFamily.split(',')[0].replace(/[\"']/g,''), c.fontWeight, s];}))"
   )).filter(Boolean);
+  /* The blessing is read from config, so its length is not fixed. A longer
+     one must not silently push the layout around, and it must not be allowed
+     to collide with the artwork - so check the gap rather than eyeball it.
+     Overflow is already fatal below, but a collision reads as "fits fine" and
+     is the more embarrassing of the two. */
+  const blessingCheck = JSON.parse(await tab.ev(
+    "JSON.stringify((function(){var g=document.getElementById('gurbani')," +
+    "a=document.querySelector('.art');" +
+    "var gr=g.getBoundingClientRect(), ar=a.getBoundingClientRect();" +
+    "return {" +
+    "bottom:Math.round(gr.bottom), artTop:Math.round(ar.top)," +
+    // Return the rendered text whole and count the lines here in Node.
+    // Splitting inside the expression string means pushing a backslash
+    // through two parsers, and getting that wrong silently yields one
+    // empty line - which reads as "the blessing does not match config".
+    // NOT JSON.stringify'd on the inner value: the outer JSON.stringify of
+    // the object already encodes it, and doing both leaves the text arriving
+    // here still quoted with literal \n sequences instead of real newlines.
+    "text:(g.innerText || g.textContent || '')," +
+    "h:Math.round(gr.height)};})())"
+  ));
+  const gap = blessingCheck.artTop - blessingCheck.bottom;
+  const rendered = String(blessingCheck.text || '').split('\n').map(s => s.trim()).filter(Boolean);
+  console.log('  blessing: ' + rendered.length + ' Gurmukhi lines, ends y=' +
+    blessingCheck.bottom + ', artwork starts y=' + blessingCheck.artTop + ' (gap ' + gap + 'px)');
+  /* The rendered blessing must match the one in config, line for line. The
+     whole point of reading it from config was that the card can never show a
+     blessing the invitation does not, and that guarantee is only worth
+     anything if it is checked. */
+  /* Every line handed to the template must appear on the card.
+     This does NOT check the blessing against the invitation - both sides come
+     from the same config read, so that is true by construction. What it does
+     catch is the TEMPLATE silently dropping lines, which is precisely the bug
+     that shipped: the template painted o.gurbani[0] + '<br>' + o.gurbani[1]
+     and threw away everything after the second line, so a three-line blessing
+     from config reached the card as two. */
+  const expected = og.gurbani;
+  const same = rendered.length === expected.length &&
+    rendered.every((l, i) => l === expected[i]);
+  if (!same) {
+    console.error('the card is not showing every line it was given.');
+    console.error('  injected (' + expected.length + '):');
+    expected.forEach((l, i) => console.error('    ' + (i + 1) + '. ' + l));
+    console.error('  rendered on the card (' + rendered.length + '):');
+    rendered.forEach((l, i) => console.error('    ' + (i + 1) + '. ' + l));
+    console.error('Check paint() in tools/og-template.html - it must render ALL lines,');
+    console.error('not a hardcoded first and second.');
+    process.exit(1);
+  }
+  if (gap < 6) {
+    console.error('the blessing runs into the ceremony artwork (' + gap + 'px gap; need at least 6).');
+    console.error('It has ' + rendered.length + ' lines now - reduce the copy in i18n.pa.footerNote');
+    console.error('or drop .gurbani font-size a step in tools/og-template.html.');
+    process.exit(1);
+  }
   // Push the list in as a page global rather than splicing JSON into an
   // expression string: the family names contain spaces and the descriptor
   // needs real quote characters, which is exactly where hand-built escaping
