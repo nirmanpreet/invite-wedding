@@ -1117,23 +1117,35 @@ html[lang="pa"] .title h1 {
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    /* SLOWER, and that is the whole fix. Two earlier passes went the wrong
-       way on speed: 2.4s once was "hardly noticeable", and shortening it to
-       1.8s twice made it worse - the owner called it "way too fast to
-       become noticeable", which is exactly right. A highlight that crosses
-       the name in under two seconds is too quick to track with the eye, so
-       it reads as a flicker rather than as light travelling across text.
-       The fix for "can't notice it" is a slower sweep, not a faster one.
+    /* LOOPED, and SLOWER. Both were reported: the shine "is only shown once
+       and too fast".
 
-       4s per pass, twice, 0.7s in. Each pass is slow enough to follow the
-       whole way across; the second one catches a guest who arrived late.
-       `both` still parks it on the maroon end, so the name never ends up
-       frozen mid-sweep. */
-    animation: name-shine 4s ease-in-out 0.7s 2 both;
+       "Only once" is exact. This was `animation-iteration-count: 2` with a
+       0.7s delay, so the whole effect lasted 8.7 seconds and then STOPPED
+       FOREVER - `fill-mode: both` parked the name on the maroon end and left
+       it there for the rest of the guest's visit. Two passes were a
+       placeholder for "it should keep going", not a finished behaviour.
+
+       The speed is the same story told three times in this file's history:
+       2.4s "hardly noticeable", then 1.8s twice, which the owner called
+       "way too fast to become noticeable". Every one of those shortened it.
+       A highlight crossing a name in under two seconds cannot be tracked with
+       the eye, so it reads as a flicker rather than as light travelling.
+
+       8s per cycle, infinite. The cycle is deliberately asymmetric: a single
+       one-way sweep restarting at the same instant reads as a mechanical
+       jump, so it sweeps across, holds off the letterforms while the eye
+       catches up, and comes back. -20% and 130% are the same margin either
+       side, which is what makes the loop seamless. */
+    animation: name-shine 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   }
   @keyframes name-shine {
-    from { background-position: 120% 0; }
-    to   { background-position: -20% 0; }
+    0%   { background-position:  130% 0; }
+    38%  { background-position:  -30% 0; }
+    /* Held off the text, not mid-sweep: without this pause the highlight
+       teleports from one edge back to the other and the loop is visible. */
+    62%  { background-position:  -30% 0; }
+    100% { background-position:  130% 0; }
   }
   /* The Latin subtitle in Punjabi sits INSIDE .name-a. It must opt out:
      without this it inherits the transparent fill and disappears entirely,
@@ -1559,7 +1571,27 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
 .ceremony-image {
   position: relative;
   margin: 18px auto 30px;
-  width: min(500px, 92%);
+  /* The box HUGS the artwork instead of being a wide slot.
+     This is the fix for the aura sitting "behind the artwork but misplaced".
+
+     assets/img/anand-karaj-crop.webp is 993x1194 - PORTRAIT, aspect 0.83 -
+     while this box was min(500px, 92%) wide, i.e. 374px on a phone. The img
+     was width:100% with object-fit:contain, so the element box came out
+     374x287 (landscape, aspect 1.30) and the artwork was letterboxed inside
+     it at roughly 239x287: about 67px of DEAD SPACE down each side.
+
+     Both the aura (::before) and the hairline frame (::after) are centred on
+     this box, so they were centred 67px wider than the palki on the left and
+     67px wider on the right. The glow spread into empty margin and the
+     brightest part of the aura missed the artwork entirely - which is what
+     reads as "misplaced".
+
+     fit-content makes the box exactly as wide as the rendered image, so the
+     aura, the frame and the art all share one centre line. The artwork's
+     painted SIZE is unchanged (it was already height-capped); only the dead
+     space around it goes away. */
+  width: fit-content;
+  max-width: 96%;
   text-align: center;
 }
 
@@ -1578,9 +1610,16 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
   left: 50%;
   top: 50%;
   /* min() with 96vw: the aura used to be 124% of a 92%-wide box, i.e.
-     wider than the viewport - the 3-5px horizontal overflow (QA F1). */
-  width: min(132%, 96vw);
-  height: 142%;
+     wider than the viewport - the 3-5px horizontal overflow (QA F1).
+
+     140%, not 132%: now that the box hugs the artwork (see .ceremony-image)
+     a percentage here means 140% of the ARTWORK, which is the figure the
+     look was always asking for. At 132% of the old box width it measured
+     100% of the box - the clamp silently won, so on a phone the aura was
+     exactly as wide as the container and spread into the dead margin
+     instead of around the palki. */
+  width: min(140%, 94vw);
+  height: 138%;
   transform: translate(-50%, -50%);
   /* TWO gradients, not one. A single soft wash reads as a vignette, which is
      what this looked like before: the artwork was sitting on a slightly
@@ -1652,7 +1691,12 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
 .ceremony-image img {
   position: relative;
   display: block;
-  width: 100%;
+  /* width:auto, not width:100%. A portrait source in a percentage-width box
+     is letterboxed by object-fit, which is what left the dead space described
+     on .ceremony-image. Sizing from the natural aspect instead lets the box
+     hug the artwork; max-width still stops a wide screen overflowing. */
+  width: auto;
+  max-width: 100%;
   height: auto;
   max-height: 340px;
   object-fit: contain;
@@ -1679,7 +1723,7 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
   /* The artwork is served cropped to its alpha bounding box (993x1194,
      portrait) instead of the original 1216x1216 square canvas, so the box
      holds artwork rather than ~64px of dead width. */
-  .ceremony-image { width: min(430px, 96%); margin: 16px auto 26px; }
+  .ceremony-image { width: fit-content; max-width: 96%; margin: 16px auto 26px; }
   /* Height-aware rather than a fixed cap. This is the fix for the artwork
      looking tiny: the rule below used to crush it to 150px on short
      screens, and a 390x664 viewport is exactly what Safari gives an iPhone
@@ -1694,7 +1738,7 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
   /* Aura scaled with the base rule above. The old 126%/122% was tuned to
      the single-gradient aura; the three-gradient version needs a little more
      room for the beam to spread without the core crowding the palki. */
-  .ceremony-image::before { width: min(138%, 96vw); height: 140%; }
+  .ceremony-image::before { width: min(146%, 94vw); height: 138%; }
 }
 
 /* Short screens (landscape phones, very small handsets). Only the margins
@@ -2378,3 +2422,48 @@ html[lang="pa"] .rsvp-thanks a {
 }
 */
 /* force-motion:off */
+
+/* MOBILE TEXT FLOOR
+   ============================================================
+   The owner asked to "increase the small text more so everything is
+   clear". These are every style that measured under 15px on a 390px
+   phone, smallest first, with the rule that produced it.
+
+   Raised as one appended block rather than by editing 15 declarations
+   in place: the originals are the historical record of every size
+   change these stylesheets have been through (several carry a
+   "was 14px, lifted 1px" note), and a block reverts in one move.
+
+   The Punjabi overrides that sat at 13.5px are deliberately NOT
+   touched: Gurmukhi sits visually smaller than Latin at the same
+   font-size and Punjabi strings are longer, so they were already at
+   their own ceiling.
+   ============================================================ */
+  /* 11.5px -> 13.5px. the Save-the-Date tap target label: the smallest text on the page, on the card the owner is most likely to miss */
+  .save-date .sd-cta { font-size: 13.5px; }
+  /* 12px -> 14px. two whole buttons, read from across a table */
+  .actions .venue { font-size: 14px; }
+  /* 12px -> 13.5px. the only label on the map embed */
+  .map-label { font-size: 13.5px; }
+  /* 12.5px -> 14.5px. the primary RSVP action */
+  #rsvp-send, #print-invite { font-size: 14.5px; }
+  /* 12.5px -> 14px. the instruction that decides whether a guest thinks they have actually RSVPd */
+  .rsvp-note, .cal-note { font-size: 14px; }
+  /* 13px -> 14.5px. the language switch, needed on first contact */
+  .lang-toggle a { font-size: 14.5px; }
+  /* 13px -> 15px. the heading of the main card */
+  .save-date .sd-title { font-size: 15px; }
+  /* 13px -> 14.5px. the TIME / VENUE labels */
+  .day-item .label { font-size: 14.5px; }
+  /* 13px -> 14.5px. sits under a QR a guest holds up to someone else */
+  .qr-label { font-size: 14.5px; }
+  /* clamp(13px, 3.4vw, 17px) -> clamp(14.5px, 3.9vw, 18px). "Wedding Reception" directly under the names */
+  .title h3, .title .title-sub { font-size: clamp(14.5px, 3.9vw, 18px); }
+  /* clamp(13px, 3.4vw, 15px) -> clamp(14.5px, 3.8vw, 17px). the RSVP / QR / VENUE MAP section headings */
+  .day-info h4, .day-info h2, .qr-section h4, .qr-section h2, .rsvp-section h4, .rsvp-section h2, .calendar-section h4, .print-section h4 { font-size: clamp(14.5px, 3.8vw, 17px); }
+  /* 14.5px -> 15.5px. the RSVP deadline - the date a guest most needs to read correctly */
+  .rsvp-by { font-size: 15.5px; }
+  /* 14.5px -> 15px. how to use the QR codes */
+  .qr-note { font-size: 15px; }
+  /* clamp(14px, 3.8vw, 16px) -> clamp(15px, 4.1vw, 17px). the contact numbers at the very bottom */
+  .footer { font-size: clamp(15px, 4.1vw, 17px); }

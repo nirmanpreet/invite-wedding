@@ -244,3 +244,22 @@ main#invite-main { padding-bottom: 76px; }
 }
 */
 /* force-motion:off */
+
+/* MOBILE TEXT FLOOR (motion stylesheet)
+   ============================================================
+   The owner asked to "increase the small text more so everything is
+   clear". These are every style that measured under 15px on a 390px
+   phone, smallest first, with the rule that produced it.
+
+   Raised as one appended block rather than by editing 15 declarations
+   in place: the originals are the historical record of every size
+   change these stylesheets have been through (several carry a
+   "was 14px, lifted 1px" note), and a block reverts in one move.
+
+   The Punjabi overrides that sat at 13.5px are deliberately NOT
+   touched: Gurmukhi sits visually smaller than Latin at the same
+   font-size and Punjabi strings are longer, so they were already at
+   their own ceiling.
+   ============================================================ */
+  /* 13px -> 13.5px. a transient toast; slightly lower because it overlaps the flowers */
+  .im-tip { font-size: 13.5px; }
