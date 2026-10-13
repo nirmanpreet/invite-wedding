@@ -416,7 +416,10 @@ button, input {
    The pulse is deliberately slow (7s) and never fades to nothing - the
    same reasoning as the ceremony artwork's glow: an aura that
    disappears between beats is not an aura. 0.72 is the floor. */
-.blessing .ik,
+The pulse is deliberately slow (7s) and never fades to nothing - the
+    same reasoning as the ceremony artwork's glow: an aura that
+    disappears between beats is not an aura. 0.72 is the floor. */
+
 .intro-gate .ik {
   position: relative;
   color: var(--maroon);
@@ -428,6 +431,24 @@ button, input {
     0 0 78px rgba(200, 162, 75, 0.22);
   animation: ik-aura 7s ease-in-out infinite;
 }
+
+.blessing .ik {
+  position: relative;
+  color: var(--maroon);
+  text-shadow:
+    0 0 5px  rgba(255, 244, 210, 0.95),
+    0 0 12px rgba(240, 212, 140, 0.85),
+    0 0 26px rgba(232, 200, 119, 0.60),
+    0 0 48px rgba(200, 162, 75, 0.40),
+    0 0 78px rgba(200, 162, 75, 0.22);
+  /* No animation here - the ik-onkar class adds the pulse */
+}
+
+.blessing .ik.ik-onkar {
+  animation: ik-pulse 4s ease-in-out infinite;
+}
+
+/* The halo. Sits behind the glyph (z-index -1 against the mark's own
 
 /* The halo. Sits behind the glyph (z-index -1 against the mark's own
    stacking), is pointer-events:none so it cannot eat the language tap
@@ -2945,6 +2966,7 @@ html[lang="pa"] .rsvp-thanks a {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
 
 
 
