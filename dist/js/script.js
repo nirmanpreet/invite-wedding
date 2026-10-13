@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wedding Invite - Nirman & Simran (reception)
  * No jQuery. PDF libraries load on demand only.
  */
@@ -17,6 +17,57 @@
      static: no doors, no shimmer, no glow, no burst. The owner saw a dead
      page and reported it as "no animation". */
   var REDUCED = false;
+/* Manual Reduce Motion Toggle â€” guest-controlled, session-persisted.
+   This respects accessibility WITHOUT killing motion for everyone.
+   Toggles .reduce-motion on <html> which CSS uses to disable decorative
+   animations while keeping functional transitions instant. */
+var reduceMotionToggle = null;
+function initReduceMotionToggle() {
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'reduce-motion-btn';
+  btn.className = 'im-btn';
+  btn.setAttribute('aria-pressed', 'false');
+  btn.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+    '<path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M12 12l-4 4M12 12l4-4M12 12l-4-4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>' +
+    '</svg>';
+  btn.title = 'Reduce motion';
+  var labelEn = 'Reduce motion';
+  var labelPa = 'à¨¹à¨²à¨šà¨² à¨˜à¨Ÿà¨¾à¨“';
+  btn.setAttribute('aria-label', isPa() ? labelPa : labelEn);
+  btn.addEventListener('click', function () {
+    var html = document.documentElement;
+    var isReduced = html.classList.toggle('reduce-motion');
+    btn.setAttribute('aria-pressed', isReduced ? 'true' : 'false');
+    btn.setAttribute('aria-label', isPa() ? (isReduced ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : labelPa) : (isReduced ? 'Increase motion' : labelEn));
+    try { sessionStorage.setItem('wedding-reduce-motion', isReduced ? '1' : '0'); } catch (e) {}
+    /* Also tell invite-motion.js to slow/thin the shower */
+    window.dispatchEvent(new CustomEvent('wedding-reduce-motion', { detail: { reduced: isReduced } }));
+  });
+  document.body.appendChild(btn);
+  /* Restore preference */
+  try {
+    if (sessionStorage.getItem('wedding-reduce-motion') === '1') {
+      document.documentElement.classList.add('reduce-motion');
+      btn.setAttribute('aria-pressed', 'true');
+      btn.setAttribute('aria-label', isPa() ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : 'Increase motion');
+    }
+  } catch (e) {}
+  /* Update label on language change */
+  window.addEventListener('wedding-langchange', function () {
+    var isReduced = document.documentElement.classList.contains('reduce-motion');
+    btn.setAttribute('aria-label', isPa()
+      ? (isReduced ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : labelPa)
+      : (isReduced ? 'Increase motion' : labelEn));
+  });
+  /* Position it above the other controls */
+  btn.style.cssText = 'position:fixed;right:calc(10px+env(safe-area-inset-right,0px));bottom:calc(120px+env(safe-area-inset-bottom,0px));z-index:5;';
+  reduceMotionToggle = btn;
+}
+
   var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? window.__WEDDING_CONFIG__ : {};
   var couple = config.couple || {};
   var p1 = couple.partner1 || 'Nirman';
@@ -144,8 +195,8 @@
   var G = {
     headingPa: '\u0A30\u0A3F\u0A38\u0A48\u0A2A\u0A38\u0A3C\u0A28',
     headRsvpPa: 'RSVP',
-    pdfSubPa: 'ਤੁਹਾਨੂੰ ਰਿਸੈਪ਼ਣ ਲਈ ਸੱਦਾ ਦਿੱਤਾ ਗਿਆ ਹੈ',
-    pdfFootPa: 'ਪਿਆਰ ਅਤੇ ਖੁਸ਼ੀ ਨਾਲ, ਉਨ੍ਹਾਂ ਦੇ ਪਰਿਵਾਰਾਂ ਦੇ ਨਾਲ',
+    pdfSubPa: 'à¨¤à©à¨¹à¨¾à¨¨à©‚à©° à¨°à¨¿à¨¸à©ˆà¨ªà¨¼à¨£ à¨²à¨ˆ à¨¸à©±à¨¦à¨¾ à¨¦à¨¿à©±à¨¤à¨¾ à¨—à¨¿à¨† à¨¹à©ˆ',
+    pdfFootPa: 'à¨ªà¨¿à¨†à¨° à¨…à¨¤à©‡ à¨–à©à¨¸à¨¼à©€ à¨¨à¨¾à¨², à¨‰à¨¨à©à¨¹à¨¾à¨‚ à¨¦à©‡ à¨ªà¨°à¨¿à¨µà¨¾à¨°à¨¾à¨‚ à¨¦à©‡ à¨¨à¨¾à¨²',
   };
 
   // ---------- Language switching ----------
@@ -179,10 +230,10 @@
       // Punjabi mode: Gurmukhi name with the Latin name underneath.
       var n1Sub = isPa() ? '<span class="name-latin">' + esc(name1Latin()) + '</span>' : '';
       var n2Sub = isPa() ? '<span class="name-latin">' + esc(name2Latin()) + '</span>' : '';
-      // Punjabi puts the "on" marker (ਨੂੰ) AFTER the date; English before it.
+      // Punjabi puts the "on" marker (à¨¨à©‚à©°) AFTER the date; English before it.
       var datePart, timePart = '';
       if (isPa()) {
-        datePart = '<span class="date">' + esc(dateText()) + '</span> ' + esc(tx('onWording', 'ਨੂੰ'));
+        datePart = '<span class="date">' + esc(dateText()) + '</span> ' + esc(tx('onWording', 'à¨¨à©‚à©°'));
         timePart = timeText() ? ' &middot; ' + esc(timeText()) : '';
       } else {
         datePart = esc(tx('onWording', 'on')) + ' <span class="date">' + esc(dateText()) + '</span>';
@@ -203,7 +254,7 @@
         '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
-    // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
+    // Blessing at the top of the page: à©´ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
       var blessingText = t('footerNote');
@@ -217,7 +268,7 @@
       blessingText = esc(blessingText);
       blessingText = blessingText.replace(/\u0001/g, '<br>');
       blessingEl.innerHTML =
-        '<span class="ik" aria-hidden="true">ੴ</span>' +
+        '<span class="ik" aria-hidden="true">à©´</span>' +
         '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
@@ -375,8 +426,8 @@
   // "Yes"/"No" -> Punjabi, for the outgoing WhatsApp message
   function translateAttend(v) {
     var s = String(v || '');
-    if (/^yes$/i.test(s)) return rsvpWhatsApp.attendYesPa || 'ਹਾਂ';
-    if (/^no$/i.test(s)) return rsvpWhatsApp.attendNoPa || 'ਨਹੀਂ';
+    if (/^yes$/i.test(s)) return rsvpWhatsApp.attendYesPa || 'à¨¹à¨¾à¨‚';
+    if (/^no$/i.test(s)) return rsvpWhatsApp.attendNoPa || 'à¨¨à¨¹à©€à¨‚';
     return s;
   }
 
@@ -399,7 +450,7 @@
     if (attending) {
       // The button carries data-attend="Yes"/"No"; the outgoing message
       // must state it in the reader's language, not echo the English token.
-      var aKey = isPa ? 'ਹਾਜ਼ਰੀ: ' : 'Attending: ';
+      var aKey = isPa ? 'à¨¹à¨¾à¨œà¨¼à¨°à©€: ' : 'Attending: ';
       parts.push(aKey + (isPa ? translateAttend(attending) : attending));
     }
     var msg = parts.length ? parts.join(' | ') + ' | ' + baseMsg : baseMsg;
@@ -546,8 +597,8 @@
     // The iframe needs a title: an unlabelled frame fails axe and leaves
     // screen readers announcing just "frame".
     var frameTitle = venueName
-      ? (venueName + ' — Google Maps')
-      : 'Venue — Google Maps';
+      ? (venueName + ' â€” Google Maps')
+      : 'Venue â€” Google Maps';
     el.innerHTML =
       '<iframe src="' + esc(embedUrl) + '" title="' + esc(frameTitle) + '" allowfullscreen loading="lazy"></iframe>' +
       '<div class="map-label">' + esc(tx('venueMapLabel', 'View venue on map')) + '</div>';
@@ -797,16 +848,18 @@
         ? "'Noto Sans Gurmukhi', 'Cormorant Garamond', serif"
         : "'Playfair Display', 'Cormorant Garamond', serif";
       n1.style.fontWeight = '700';
+      n1.classList.add(isPa ? 'name-shimmer-pa' : 'name-shimmer');
     }
     var n2 = document.getElementById('pdf-name-2');
     if (n2) {
       n2.textContent = name2();
       if (n1) n2.style.fontFamily = n1.style.fontFamily;
       n2.style.fontWeight = '700';
+      n2.classList.add(isPa ? 'name-shimmer-pa' : 'name-shimmer');
     }
     var cn = document.getElementById('pdf-connector');
     if (cn) cn.textContent = conn();
-    // Event line: "Reception • 6 December 2026"
+    // Event line: "Reception â€¢ 6 December 2026"
     var ev = document.getElementById('pdf-event-line');
     if (ev) ev.textContent = tx('receptionHeading', 'Reception') + ' \u2022 ' + dateText();
     var tl = document.getElementById('pdf-time-line');
@@ -820,6 +873,8 @@
     }
     // Gurmukhi blessing lines (same 2 lines as the page, minus Ik Onkar)
     var bl = document.getElementById('pdf-blessing');
+    var ikEl = document.getElementById('pdf-ik');
+    if (ikEl) ikEl.classList.add('ik-onkar');
     if (bl) {
       var note = t('footerNote') || '';
       var lines = String(note).split('\u2014')[0].replace(/\\s+$/, '');
@@ -864,7 +919,7 @@
     var card = document.getElementById('pdf-card');
     if (!card) return;
     var btn = document.getElementById('download-pdf');
-    if (btn) { btn.textContent = tx('pdfWorking', 'Preparing...'); btn.disabled = true; }
+    if (btn) { btn.textContent = tx('pdfWorking', 'Preparing...'); btn.disabled = true; btn.classList.add('loading'); }
     /* The card ships display:none so its faces are not downloaded by the
        99% of guests who never press this button. html2canvas cannot
        rasterise a display:none subtree - it would produce a blank page -
@@ -923,6 +978,7 @@
           var offY = (pageH - ph) / 2;
           pdf.addImage(imgData, 'JPEG', offX, offY, pw, ph, undefined, 'FAST');
           pdf.save('Invitation - ' + p1 + ' ' + connector + ' ' + p2 + '.pdf');
+            if (btn) btn.classList.remove('loading');
           hideCard(card);
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
@@ -932,6 +988,7 @@
         .catch(function () {
           hideCard(card);
           alert('Could not generate the PDF. Please try again.');
+            if (btn) btn.classList.remove('loading');
           if (btn) {
             btn.textContent = t('downloadBtn') || 'DOWNLOAD INVITATION CARD';
             btn.disabled = false;
@@ -964,7 +1021,7 @@
     el.style.display = '';
     var wd = weekdayText();
     var dTxt = dateText();
-    // Punjabi: "ਐਤਵਾਰ, 6 ਦਸੰਬਰ 2026"  |  English: "Sunday, 6 December 2026"
+    // Punjabi: "à¨à¨¤à¨µà¨¾à¨°, 6 à¨¦à¨¸à©°à¨¬à¨° 2026"  |  English: "Sunday, 6 December 2026"
     var full = wd ? wd + ', ' + dTxt : dTxt;
     /* One card carries everything calendar-related. There used to be a
        separate "Add to your calendar" section as well, which duplicated the
@@ -1209,6 +1266,7 @@
 
   function openGate(gate, done) {
     if (motionReduced()) { done(); return; }
+    gate.classList.add('opening');
     var finished = false;
     function fin() {
       if (finished) return;
@@ -1296,15 +1354,15 @@
   /* The gate hint is deliberately BILINGUAL - a guest who cannot read the
      instruction in one language still has to be able to find their own, and
      they should not have to work that out before tapping anything.
-     It is stored in config as one string ("English · Gurmukhi") and split
+     It is stored in config as one string ("English Â· Gurmukhi") and split
      here on the middle dot into two runs, because the two halves need
      OPPOSITE typography: the Latin half is tracked and upper-cased, and the
      Gurmukhi half must be neither (letter-spacing severs the conjunct,
      W3C Gurmukhi Layout Requirements 5.1 / 6). One run of mixed text
      cannot be styled both ways. */
   function renderGateHint(el) {
-    var raw = txOr('gateHintBoth', 'Tap your language to enter · ਭਾਸ਼ਾ ਚੁਣੋ');
-    var parts = String(raw).split(/\s*·\s*/);
+    var raw = txOr('gateHintBoth', 'Tap your language to enter Â· à¨­à¨¾à¨¸à¨¼à¨¾ à¨šà©à¨£à©‹');
+    var parts = String(raw).split(/\s*Â·\s*/);
     if (parts.length < 2) {
       el.textContent = raw;
       return;
@@ -1316,13 +1374,13 @@
     var mid = document.createElement('span');
     mid.className = 'hint-mid';
     /* No spaces around the dot: flex layout trims leading and trailing
-       whitespace out of a flex item, so " · " arrives as "·" and closes up
+       whitespace out of a flex item, so " Â· " arrives as "Â·" and closes up
        against the Punjabi. The breathing room is margin - see .hint-mid. */
-    mid.textContent = '·';
+    mid.textContent = 'Â·';
     mid.setAttribute('aria-hidden', 'true');
     var pa = document.createElement('span');
     pa.className = 'hint-pa';
-    pa.textContent = parts.slice(1).join(' · ');
+    pa.textContent = parts.slice(1).join(' Â· ');
     el.appendChild(latin);
     el.appendChild(mid);
     el.appendChild(pa);
@@ -1355,7 +1413,30 @@
     }
   }
 
-  // ---------- Boot ----------
+  
+  /* ============================================================
+     SCROLL PROGRESS — Gold Thread Wayfinding
+     ============================================================ */
+  function initScrollProgress() {
+    var progressBar = document.querySelector('.scroll-progress');
+    if (!progressBar) return;
+    var raf = null;
+    function onScroll() {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var progress = scrollHeight > 0 ? Math.min(1, Math.max(0, scrollTop / scrollHeight)) : 0;
+        document.documentElement.style.setProperty('--scroll', (progress * 100) + '%');
+        raf = null;
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Initial paint
+    onScroll();
+  }
+
+// ---------- Boot ----------
   function boot() {
     // Reveal styles only apply when JS is running: content is visible by
     // default so a JS failure can never leave the invite blank.
@@ -1376,6 +1457,8 @@
     updatePdfLang();
     renderLangToggle();
     initAnimations();
+    initReduceMotionToggle();
+    initScrollProgress();
     /* Tell the motion layer what language we ended up in. invite-motion.js
        paints its two buttons at parse time, which is BEFORE this point, and
        it picks their labels from <html lang> - so on a guest arriving via
@@ -1512,3 +1595,5 @@
     boot();
   }
 })();
+
+

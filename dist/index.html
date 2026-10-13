@@ -2103,23 +2103,40 @@ html[lang="pa"] .cal-hint { /* Was 14px; lifted 1px. */ font-size: 15px; font-we
     background: #fff;
     color: #000;
   }
+  /* Hide everything except the PDF card which IS the invitation card */
   #lang-toggle, #rsvp-section, #print-section, #calendar-section,
   .intro-gate, .sakura-falling, #invite-social,
-  #venue-map-embed, #pdf-card, .actions, #time, .qr-section {
+  #venue-map-embed, .actions, #time, .qr-section,
+  .wrap, .title, .blessing, .ceremony-image, .footer,
+  #invite-title, #invite-actions, #dance-med, #day-info,
+  #invite-footer, #photos {
     display: none !important;
   }
-  /* The QR codes were in the hide list above, which is how they ended up
-     absent from every printed copy even though the brief has always said
-     they should print. Reinstated here on purpose: a relative holding a
-     printed card can scan the map off someone else's phone or the fridge
-     door, and a printed invitation is exactly where that is useful.
-     Order matters - this block comes after the rule above, so it wins. */
-  #qr-section { display: block !important; }
-  .print-header { display: block; margin-bottom: 16px; }
-  .wrap, .title h1, .title p { color: #000; }
-  .blessing .blessing-text { color: #000; }
-
-  .footer .phone { color: #000; }
+  /* The PDF card is the complete invitation - show it centered on the page */
+  #pdf-card {
+    display: block !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 560px !important;
+    box-shadow: none !important;
+    border: 1px solid #e3d5b3 !important;
+    page-break-inside: avoid;
+  }
+  /* Ensure the PDF card content prints well */
+  #pdf-card * {
+    color: #000 !important;
+  }
+  #pdf-card img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  /* Ensure QR codes in the PDF card are visible */
+  #pdf-qr { display: block !important; }
+  .pdf-qr-grid { display: flex !important; justify-content: center !important; gap: 24px !important; }
+  .qr-item { page-break-inside: avoid; }
 }
 
 /* THE QR BLOCK IS NOW SHOWN ON PHONES.
@@ -2727,6 +2744,254 @@ html[lang="pa"] .rsvp-thanks a {
   .qr-note { font-size: 15px; }
   /* clamp(14px, 3.8vw, 16px) -> clamp(15px, 4.1vw, 17px). the contact numbers at the very bottom */
   .footer { font-size: clamp(15px, 4.1vw, 17px); }
+/* ============================================================
+   ADDITIONAL ANIMATIONS — Cultural & Delight Layer
+   ============================================================
+   All animations below respect the existing force-motion:off decision.
+   A manual "Reduce Motion" toggle (JS-controlled) can disable these
+   for guests who need it, without relying on prefers-reduced-motion.
+   ============================================================ */
+
+/* ---- 1. Ik Onkar Pulse Glow — Sacred Breath ----
+   Slow 4s gold pulse on the supreme symbol. Meditative, not distracting. */
+.ik-onkar {
+  animation: ik-pulse 4s ease-in-out infinite;
+}
+@keyframes ik-pulse {
+  0%, 100% {
+    text-shadow:
+      0 0 8px rgba(198, 160, 90, 0.4),
+      0 0 16px rgba(198, 160, 90, 0.2),
+      0 2px 20px rgba(140, 35, 64, 0.28);
+  }
+  50% {
+    text-shadow:
+      0 0 16px rgba(198, 160, 90, 0.7),
+      0 0 32px rgba(198, 160, 90, 0.4),
+      0 2px 20px rgba(140, 35, 64, 0.28);
+  }
+}
+
+/* ---- 2. Gate Opening — Divine Light Rays ----
+   Golden light spills when doors part. Ties to sunrays artwork. */
+.intro-gate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 243, 215, 0.18) 0%,
+    transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.intro-gate.opening::before {
+  opacity: 1;
+  animation: light-expand 1.2s ease-out forwards;
+}
+@keyframes light-expand {
+  0% { transform: scale(0.3); opacity: 0.3; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ---- 3. Name Shimmer for Punjabi Names — Equal Respect ----
+   Ensure Gurmukhi names get the same gold sweep as Latin names. */
+.name-shimmer-pa {
+  background: linear-gradient(100deg,
+    var(--royal) 0%, var(--royal) 32%,
+    #f0d48c 44%, #fff3d0 50%, #f0d48c 56%,
+    var(--royal) 68%, var(--royal) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-shine 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* ---- 4. Save-the-Date Card — Gentle Float In ----
+   The action card arrives with intention. Staggered after hero. */
+.save-date {
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+  animation: card-float-in 0.8s var(--ease) forwards;
+  animation-delay: calc(var(--i, 0) * 120ms + 300ms);
+}
+@keyframes card-float-in {
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- 5. QR Code — Subtle "Scan Me" Pulse (Hover/Focus Only) ----
+   Functional affordance for older guests. */
+.qr-wrap {
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.qr-wrap:hover,
+.qr-wrap:focus-within {
+  transform: scale(1.04);
+  box-shadow:
+    0 8px 24px rgba(109, 26, 45, 0.15),
+    0 0 0 3px rgba(198, 160, 90, 0.3);
+}
+.qr-item:focus-within .qr-label {
+  animation: label-pop 0.3s var(--ease);
+}
+@keyframes label-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ---- 6. RSVP Buttons — Pressed State + Confetti Burst ----
+   Primary CTA delight. Satisfying micro-interaction. */
+.attend-btn {
+  transition: all 0.2s var(--ease);
+}
+.attend-btn:active {
+  transform: scale(0.96);
+}
+.attend-btn.selected::after {
+  content: '\2713';
+  position: absolute;
+  right: 12px;
+  font-size: 18px;
+  color: var(--gold-line);
+  animation: check-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes check-pop {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  50% { transform: scale(1.3) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* Tiny gold particle burst on selection (JS-triggered via .bursting class) */
+.attend-btn.bursting::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background-image: radial-gradient(circle, var(--gold-line) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0;
+  pointer-events: none;
+  animation: burst-fade 0.6s ease-out forwards;
+}
+@keyframes burst-fade {
+  0% { opacity: 0.6; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+/* ---- 7. Scroll Progress — Gold Thread ----
+   Subtle wayfinding on long page. Unbroken continuity. */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--gold-line) 0%, var(--gold-line) var(--scroll, 0%),
+    transparent var(--scroll, 0%));
+  z-index: 9998;
+  pointer-events: none;
+}
+
+/* ---- 8. Language Toggle — Flag/Wave Transition ----
+   Bilingual switch feels intentional, not instant. */
+.lang-toggle {
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.lang-toggle.switching {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.lang-toggle.switched {
+  animation: lang-settle 0.4s var(--ease);
+}
+@keyframes lang-settle {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---- 9. Calendar/ICS & PDF Download — Success Ripple ----
+   Tangible feedback for takeaway actions. */
+.cal-btn:active,
+#download-pdf:active,
+#rsvp-send:active,
+#print-invite:active,
+.actions .venue:active {
+  animation: btn-ripple 0.4s ease-out;
+}
+@keyframes btn-ripple {
+  0% { box-shadow: 0 0 0 0 rgba(198, 160, 90, 0.5); }
+  100% { box-shadow: 0 0 0 16px transparent; }
+}
+
+/* ---- 10. PDF Generation — Loading Shimmer ----
+   Perceived performance while html2canvas/jsPDF work. */
+#download-pdf.loading {
+  position: relative;
+  color: transparent !important;
+}
+#download-pdf.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.4) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+  border-radius: inherit;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Reduce Motion Toggle Support ----
+   When .reduce-motion is on <html>, disable decorative motion
+   but KEEP functional transitions (buttons, reveals instant). */
+html.reduce-motion .ik-onkar,
+html.reduce-motion .intro-gate::before,
+html.reduce-motion .save-date,
+html.reduce-motion .qr-wrap,
+html.reduce-motion .attend-btn::after,
+html.reduce-motion .attend-btn::before,
+html.reduce-motion .scroll-progress,
+html.reduce-motion .lang-toggle,
+html.reduce-motion #download-pdf.loading::after {
+  animation: none !important;
+  transition: none !important;
+}
+html.reduce-motion .save-date {
+  opacity: 1;
+  transform: none;
+}
+html.reduce-motion .lang-toggle.switching,
+html.reduce-motion .lang-toggle.switched {
+  opacity: 1;
+  transform: none;
+}
+html.reduce-motion .qr-wrap:hover,
+html.reduce-motion .qr-wrap:focus-within {
+  transform: none;
+  box-shadow: none;
+}
+html.reduce-motion .attend-btn:active {
+  transform: none;
+}
+html.reduce-motion .cal-btn:active,
+html.reduce-motion #download-pdf:active,
+html.reduce-motion #rsvp-send:active,
+html.reduce-motion #print-invite:active,
+html.reduce-motion .actions .venue:active {
+  animation: none;
+}
+
+/* High Contrast: ensure animations don't break forced colors */
+@media (forced-colors: active) {
+  .ik-onkar { animation: none; }
+  .scroll-progress { display: none; }
+  .attend-btn.bursting::before { display: none; }
+}
 
 ﻿/* ==============================================================
    INVITE MOTION â€” floating flowers + guest controls
@@ -3332,6 +3597,9 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
       </script>
     </head>
     <body class="soft-gradient">
+
+      <!-- Scroll progress — gold thread wayfinding -->
+      <div class="scroll-progress" aria-hidden="true"></div>
 
       <!-- Intro gate: simple first-visit language pick -->
       <div class="intro-gate" id="intro-gate">

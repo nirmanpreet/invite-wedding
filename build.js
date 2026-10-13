@@ -269,6 +269,9 @@ ${qrLib}
     </head>
     <body class="soft-gradient">
 
+      <!-- Scroll progress — gold thread wayfinding -->
+      <div class="scroll-progress" aria-hidden="true"></div>
+
       <!-- Intro gate: simple first-visit language pick -->
       <div class="intro-gate" id="intro-gate">
         <div class="card">
