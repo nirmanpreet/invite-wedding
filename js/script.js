@@ -17,58 +17,7 @@
      static: no doors, no shimmer, no glow, no burst. The owner saw a dead
      page and reported it as "no animation". */
   var REDUCED = false;
-/* Manual Reduce Motion Toggle â€” guest-controlled, session-persisted.
-   This respects accessibility WITHOUT killing motion for everyone.
-   Toggles .reduce-motion on <html> which CSS uses to disable decorative
-   animations while keeping functional transitions instant. */
-var reduceMotionToggle = null;
-function initReduceMotionToggle() {
-  var btn = document.createElement('button');
-  btn.type = 'button';
-  btn.id = 'reduce-motion-btn';
-  btn.className = 'im-btn';
-  btn.setAttribute('aria-pressed', 'false');
-  btn.innerHTML =
-    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-    '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
-    '<path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
-    '<path d="M12 12l-4 4M12 12l4-4M12 12l-4-4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>' +
-    '</svg>';
-  btn.title = 'Reduce motion';
-  var labelEn = 'Reduce motion';
-  var labelPa = 'à¨¹à¨²à¨šà¨² à¨˜à¨Ÿà¨¾à¨“';
-  btn.setAttribute('aria-label', isPa() ? labelPa : labelEn);
-  btn.addEventListener('click', function () {
-    var html = document.documentElement;
-    var isReduced = html.classList.toggle('reduce-motion');
-    btn.setAttribute('aria-pressed', isReduced ? 'true' : 'false');
-    btn.setAttribute('aria-label', isPa() ? (isReduced ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : labelPa) : (isReduced ? 'Increase motion' : labelEn));
-    try { sessionStorage.setItem('wedding-reduce-motion', isReduced ? '1' : '0'); } catch (e) {}
-    /* Also tell invite-motion.js to slow/thin the shower */
-    window.dispatchEvent(new CustomEvent('wedding-reduce-motion', { detail: { reduced: isReduced } }));
-  });
-  document.body.appendChild(btn);
-  /* Restore preference */
-  try {
-    if (sessionStorage.getItem('wedding-reduce-motion') === '1') {
-      document.documentElement.classList.add('reduce-motion');
-      btn.setAttribute('aria-pressed', 'true');
-      btn.setAttribute('aria-label', isPa() ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : 'Increase motion');
-    }
-  } catch (e) {}
-  /* Update label on language change */
-  window.addEventListener('wedding-langchange', function () {
-    var isReduced = document.documentElement.classList.contains('reduce-motion');
-    btn.setAttribute('aria-label', isPa()
-      ? (isReduced ? 'à¨¹à¨²à¨šà¨² à¨µà¨§à¨¾à¨“' : labelPa)
-      : (isReduced ? 'Increase motion' : labelEn));
-  });
-  /* Position it above the other controls */
-  btn.style.cssText = 'position:fixed;right:calc(10px+env(safe-area-inset-right,0px));bottom:calc(120px+env(safe-area-inset-bottom,0px));z-index:5;';
-  reduceMotionToggle = btn;
-}
-
-  var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? window.__WEDDING_CONFIG__ : {};
+var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? window.__WEDDING_CONFIG__ : {};
   var couple = config.couple || {};
   var p1 = couple.partner1 || 'Nirman';
   var p2 = couple.partner2 || 'Simran';
@@ -268,7 +217,7 @@ function initReduceMotionToggle() {
       blessingText = esc(blessingText);
       blessingText = blessingText.replace(/\u0001/g, '<br>');
       blessingEl.innerHTML =
-        '<span class="ik" aria-hidden="true">à©´</span>' +
+        '<span class="ik ik-onkar" aria-hidden="true">à©´</span>' +
         '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
@@ -1457,7 +1406,7 @@ function initReduceMotionToggle() {
     updatePdfLang();
     renderLangToggle();
     initAnimations();
-    initReduceMotionToggle();
+    
     initScrollProgress();
     /* Tell the motion layer what language we ended up in. invite-motion.js
        paints its two buttons at parse time, which is BEFORE this point, and
@@ -1595,5 +1544,8 @@ function initReduceMotionToggle() {
     boot();
   }
 })();
+
+
+
 
 
