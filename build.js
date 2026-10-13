@@ -281,7 +281,7 @@ ${qrLib}
             ਸਤਿਗੁਰ ਦਾਤੇ ਕਾਜ ਰਚਾਇਆ, ਆਪਣੀ ਮੇਹਰ ਕਰਾਈ\u00a0।<br>
             ਦਾਸਾਂ ਕਾਰਜ ਆਪ ਸਵਾਰੇ, ਇਹ ਉਸ ਦੀ ਵਡਿਆਈ\u00a0॥
           </div>
-          <div class="gate-names"><span class="gate-name">${esc(p1)}</span><span class="amp">${esc(connector)}</span><span class="gate-name">${esc(p2)}</span></div>
+          <div class="gate-names"><span class="gate-name name-shimmer">${esc(p1)}</span><span class="amp">${esc(connector)}</span><span class="gate-name name-shimmer">${esc(p2)}</span></div>
           <div class="sub" id="intro-sub">${esc(extraEn.introSub || 'Wedding Invite')}</div>
           <div class="lang-pick" id="intro-lang-pick">
             <!-- No .active on either button: highlighting one language by

@@ -309,6 +309,7 @@ button, input {
 .intro-gate .card::after { bottom: 14px; }
 
 .intro-gate .ik {
+  position: relative;
   font-family: var(--font-gurmukhi);
   /* Was 46px; lifted 4px for presence. */
   font-size: 50px;

@@ -203,7 +203,7 @@ var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? wind
         '<h2 class="title-sub">' + esc(t('inviteTitle') || 'Wedding Reception') + '</h2>' +
         '<p>' + datePart + timePart + '</p>';
     }
-    // Blessing at the top of the page: à©´ + Satgur Prasad + Lakh khushiaan pathshahiaan
+    // Blessing at the top of the page: ੴ + Satgur Prasad + Lakh khushiaan pathshahiaan
     var blessingEl = document.getElementById('invite-blessing');
     if (blessingEl) {
       var blessingText = t('footerNote');
@@ -217,7 +217,7 @@ var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? wind
       blessingText = esc(blessingText);
       blessingText = blessingText.replace(/\u0001/g, '<br>');
       blessingEl.innerHTML =
-        '<span class="ik ik-onkar" aria-hidden="true">à©´</span>' +
+        '<span class="ik ik-onkar" aria-hidden="true">ੴ</span>' +
         '<div class="blessing-text">' + blessingText + '</div>';
     }
     // Footer at the bottom: contact only
@@ -1544,6 +1544,7 @@ var config = (typeof window !== 'undefined' && window.__WEDDING_CONFIG__) ? wind
     boot();
   }
 })();
+
 
 
 
